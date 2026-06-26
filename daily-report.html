@@ -2453,14 +2453,14 @@
       <div id="hm-grid"><div class="empty-state">로딩 중...</div></div>
     </div>
     <div class="heatmap-legend">
-      <span style="font-weight:600;color:#555">업무 밀도:</span>
-      <div class="heatmap-legend-cell hm-0"></div><span>없음</span>
-      <div class="heatmap-legend-cell hm-1"></div><span>1-3건</span>
-      <div class="heatmap-legend-cell hm-2"></div><span>4-6건</span>
-      <div class="heatmap-legend-cell hm-3"></div><span>7-10건</span>
-      <div class="heatmap-legend-cell hm-4"></div><span>11-15건</span>
-      <div class="heatmap-legend-cell hm-5"></div><span>16건+</span>
-      <span style="margin-left:12px;color:#bbb">※ 주요완료·진행사항·주요회의 합산</span>
+      <span style="font-weight:600;color:#555">작성 섹션 수:</span>
+      <div class="heatmap-legend-cell hm-0"></div><span>미제출</span>
+      <div class="heatmap-legend-cell hm-1"></div><span>1개</span>
+      <div class="heatmap-legend-cell hm-2"></div><span>2개</span>
+      <div class="heatmap-legend-cell hm-3"></div><span>3개</span>
+      <div class="heatmap-legend-cell hm-4"></div><span>4개</span>
+      <div class="heatmap-legend-cell hm-5"></div><span>5개 전체</span>
+      <span style="margin-left:12px;color:#bbb">※ 완료·회의·진행·이슈·익일계획 중 내용 있는 섹션 개수</span>
     </div>
   </div>
 
@@ -5750,21 +5750,20 @@
       const mem = MEMBERS.find(m => (r['이름'] || '').startsWith(m.name));
       if (!mem) return;
       const d = r['날짜'];
-      density[mem.name][d] = (density[mem.name][d] || 0)
-        + parseItems(r['주요완료']).length
-        + parseItems(r['진행사항']).length
-        + parseItems(r['주요회의']).length;
+      const fields = ['주요완료', '주요회의', '진행사항', '이슈리스크', '익일계획'];
+      const filled = fields.filter(f => parseItems(r[f]).length > 0).length;
+      density[mem.name][d] = (density[mem.name][d] || 0) + filled;
     });
 
     function hmClass(cnt, isWknd, isFuture) {
-      if (isWknd)  return 'hm-weekend';
+      if (isWknd)   return 'hm-weekend';
       if (isFuture) return 'hm-future';
       if (cnt === 0) return 'hm-0';
-      if (cnt <= 3)  return 'hm-1';
-      if (cnt <= 6)  return 'hm-2';
-      if (cnt <= 10) return 'hm-3';
-      if (cnt <= 15) return 'hm-4';
-      return 'hm-5';
+      if (cnt === 1) return 'hm-1';
+      if (cnt === 2) return 'hm-2';
+      if (cnt === 3) return 'hm-3';
+      if (cnt === 4) return 'hm-4';
+      return 'hm-5'; // 5개 전체
     }
 
     // 날짜 배열
