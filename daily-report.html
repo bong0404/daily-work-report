@@ -3697,10 +3697,18 @@
   }
 
   function sidebarTab(tabId, subBtn) {
-    // 사이드바 서브아이템 활성화
     document.querySelectorAll('.nav-sub-item').forEach(b => b.classList.remove('active'));
     subBtn.classList.add('active');
-    // 기존 switchTab 위임
+    // 부모 섹션 nav-item 활성화 + 상단 제목 업데이트
+    const parentSub = subBtn.closest('.nav-sub');
+    if (parentSub) {
+      const sectionId = parentSub.id.replace('nav-sub-', '');
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      const parentNavItem = document.getElementById('nav-' + sectionId);
+      if (parentNavItem) parentNavItem.classList.add('active');
+      const titleEl = document.getElementById('topbar-title');
+      if (titleEl) titleEl.textContent = _SECTION_TITLES[sectionId] || '';
+    }
     switchTab(tabId, null);
   }
 
