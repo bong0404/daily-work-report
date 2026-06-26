@@ -227,7 +227,7 @@ function TimelinePlanTab() {
                           : isSub ? '#d97706' : isSat ? '#3182ce' : undefined;
                         const bg        = isToday ? '#e0e7ff' : day.isOther ? '#f8f8fb' : isSub ? '#fffbeb' : undefined;
                         return (
-                          <th key={day.key} style={{ background: bg, color, width: (isSat || isSun) ? 90 : undefined }}>
+                          <th key={day.key} style={{ background: bg, color, width: (isSat || isSun) ? 120 : undefined }}>
                             {day.label}<br/>
                             <span style={{ fontWeight: 400, fontSize: '0.65rem' }}>{day.dow}</span>
                             {isHoliday && <><br/><span style={{ fontSize: '0.58rem', color: isSub ? '#d97706' : '#e53e3e', fontWeight: 600, whiteSpace: 'nowrap' }}>{isSub ? '🔶 ' : '🔴 '}{holiday!.name}</span></>}
@@ -250,7 +250,7 @@ function TimelinePlanTab() {
                           {chunk.map(day => {
                             const tasks = data.grid[cat][day.key] || [];
                             return (
-                              <td key={day.key} className="wpt-day-cell" style={{ width: (day.date.getDay() === 0 || day.date.getDay() === 6) ? 90 : undefined }}>
+                              <td key={day.key} className="wpt-day-cell" style={{ width: (day.date.getDay() === 0 || day.date.getDay() === 6) ? 120 : undefined }}>
                                 {tasks.map((task, ti) => (
                                   <TaskEl
                                     key={ti}
