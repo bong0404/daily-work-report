@@ -2467,6 +2467,56 @@
 
     .lounge-block-title { font-size:0.82rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
 
+    /* 사다리타기 */
+    .ladder-chip-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:16px; }
+    @media (max-width:640px) { .ladder-chip-grid { grid-template-columns:repeat(3,1fr); } }
+    .ladder-chip {
+      display:flex; align-items:center; gap:7px; padding:8px 10px;
+      border:1.5px solid #e2e8f0; border-radius:10px; cursor:pointer;
+      font-size:0.8rem; font-weight:600; color:#64748b; background:#fff;
+      transition:all 0.15s; user-select:none;
+    }
+    .ladder-chip:hover { border-color:#93c5fd; }
+    .ladder-chip.on { border-color:#2563eb; background:#eff6ff; color:#2563eb; }
+    .ladder-special-input {
+      width:100%; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px;
+      font-size:0.88rem; color:#334155; outline:none; font-family:inherit; box-sizing:border-box;
+    }
+    .ladder-special-input:focus { border-color:#2563eb; }
+    .ladder-gen-btn {
+      width:100%; background:linear-gradient(135deg,#1e40af,#3b82f6);
+      color:#fff; border:none; border-radius:12px; padding:14px;
+      font-size:1rem; font-weight:700; cursor:pointer; transition:opacity 0.15s;
+    }
+    .ladder-gen-btn:hover { opacity:0.88; }
+    .ladder-hint { font-size:0.75rem; color:#94a3b8; text-align:center; margin-bottom:10px; }
+    .ladder-svg-wrap { overflow-x:auto; border-radius:14px; box-shadow:0 2px 12px rgba(15,23,42,0.08); }
+    .ladder-controls { display:flex; gap:10px; margin-top:14px; }
+    .ladder-reveal-btn {
+      flex:1; background:#0f172a; color:#fff; border:none;
+      border-radius:10px; padding:12px; font-size:0.88rem; font-weight:700; cursor:pointer;
+      transition:opacity 0.15s;
+    }
+    .ladder-reveal-btn:hover { opacity:0.82; }
+    .ladder-reset-btn {
+      background:#f1f5f9; color:#475569; border:none; border-radius:10px;
+      padding:12px 20px; font-size:0.85rem; font-weight:600; cursor:pointer;
+    }
+    .ladder-reset-btn:hover { background:#e2e8f0; }
+    .ladder-result-board { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .ladder-result-item {
+      background:#fff; border-radius:10px; padding:9px 14px;
+      box-shadow:0 1px 4px rgba(15,23,42,0.08);
+      font-size:0.83rem; display:flex; align-items:center; gap:7px;
+    }
+    .ladder-result-item.winner {
+      background:linear-gradient(135deg,#fef3c7,#fde68a);
+      box-shadow:0 2px 10px rgba(217,119,6,0.2); font-weight:700;
+    }
+    .ladder-name-g { cursor:pointer; }
+    .ladder-name-g:hover .lnbg  { fill:#eff6ff; }
+    .ladder-name-g:hover .lntxt { fill:#2563eb; }
+
     @media print {
       header, .section-switcher, .tab-bar, #toast, .export-controls,
       .btn-export-action, button { display:none !important; }
@@ -2957,6 +3007,32 @@
           <button class="lounge-msg-btn" onclick="postLoungeMsg()">전송 💌</button>
         </div>
         <div id="lounge-msg-list"></div>
+      </div>
+
+      <!-- 🎲 사다리타기 -->
+      <div>
+        <div class="lounge-block-title">🎲 사다리타기</div>
+
+        <!-- 설정 화면 -->
+        <div id="ladder-setup" style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(15,23,42,0.07)">
+          <div style="font-size:0.78rem;font-weight:700;color:#64748b;margin-bottom:8px">👥 참가자</div>
+          <div class="ladder-chip-grid" id="ladder-chip-grid"></div>
+          <div style="font-size:0.78rem;font-weight:700;color:#64748b;margin-bottom:8px">🎁 당첨 결과 설정</div>
+          <input id="ladder-special-input" class="ladder-special-input" type="text" value="☕ 커피 쏘기" placeholder="☕ 커피 쏘기">
+          <div style="font-size:0.72rem;color:#94a3b8;margin:6px 0 16px">나머지는 자동으로 😊 통과 처리돼요</div>
+          <button class="ladder-gen-btn" onclick="generateLadder()">🎲 사다리 생성!</button>
+        </div>
+
+        <!-- 게임 화면 -->
+        <div id="ladder-game" style="display:none">
+          <div class="ladder-hint" style="margin-top:14px">이름을 클릭하면 해당 경로가 공개돼요 👆</div>
+          <div class="ladder-svg-wrap" id="ladder-svg-wrap"></div>
+          <div class="ladder-controls">
+            <button class="ladder-reveal-btn" onclick="revealAllLadder()">🎊 모두 공개!</button>
+            <button class="ladder-reset-btn" onclick="resetLadder()">↩ 다시 생성</button>
+          </div>
+          <div class="ladder-result-board" id="ladder-result-board"></div>
+        </div>
       </div>
 
     </div>
@@ -3628,6 +3704,7 @@
     await _renderLoungeEnergy();
     await _renderLoungeMVP();
     _renderLoungeMessages();
+    initLadder();
   }
 
   async function _renderLoungeEnergy() {
@@ -3751,6 +3828,162 @@
         🙌 ${m.likes.length ? `<strong>${m.likes.length}</strong>` : '응원하기'}
       </button>
     </div>`).join('');
+  }
+
+  // ── 사다리타기 ───────────────────────────────────────
+  let _ladderSel    = [];
+  let _ladderBrgs   = [];
+  let _ladderPaths  = [];
+  let _ladderResMap = {};
+  let _ladderRevd   = new Set();
+
+  const _LC = { ROWS:10, SX:80, SY:36, PX:52, PTOP:56, PBOT:52 };
+  const _LCOLORS = ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899'];
+  const _lcx = c => _LC.PX + c * _LC.SX;
+  const _lry = r => _LC.PTOP + r * _LC.SY;
+
+  function initLadder() {
+    _ladderSel = MEMBERS.map(m => m.name);
+    const grid = document.getElementById('ladder-chip-grid');
+    if (!grid) return;
+    grid.innerHTML = MEMBERS.map(m => `
+      <div class="ladder-chip on" onclick="toggleLadderChip('${m.name}',this)">
+        <span class="avatar" style="width:22px;height:22px;font-size:0.62rem;background:${avatarColor(m.name)}">${m.name[0]}</span>
+        ${m.name}
+      </div>`).join('');
+  }
+
+  function toggleLadderChip(name, el) {
+    const i = _ladderSel.indexOf(name);
+    if (i === -1) { _ladderSel.push(name); el.classList.add('on'); }
+    else { _ladderSel.splice(i, 1); el.classList.remove('on'); }
+  }
+
+  function generateLadder() {
+    const n = _ladderSel.length;
+    if (n < 2) { showToast('최소 2명을 선택해주세요'); return; }
+
+    const special = (document.getElementById('ladder-special-input').value.trim()) || '☕ 커피 쏘기';
+
+    // 무작위 가로 막대 생성 (같은 행에 인접 막대 없도록)
+    _ladderBrgs = [];
+    for (let r = 0; r < _LC.ROWS; r++) {
+      let c = 0;
+      while (c < n - 1) {
+        if (Math.random() < 0.42) { _ladderBrgs.push({ row:r, col:c }); c += 2; }
+        else c++;
+      }
+    }
+
+    // 각 참가자 경로 계산
+    _ladderPaths = [];
+    for (let i = 0; i < n; i++) {
+      let pos = i;
+      const pts = [{ x:_lcx(pos), y:_lry(0) }];
+      for (let r = 0; r < _LC.ROWS; r++) {
+        const y   = _lry(r);
+        const goR = _ladderBrgs.some(b => b.row===r && b.col===pos);
+        const goL = !goR && pos>0 && _ladderBrgs.some(b => b.row===r && b.col===pos-1);
+        if (goR) { pts.push({x:_lcx(pos),y}); pos++; pts.push({x:_lcx(pos),y}); }
+        else if (goL) { pts.push({x:_lcx(pos),y}); pos--; pts.push({x:_lcx(pos),y}); }
+        pts.push({ x:_lcx(pos), y:_lry(r+1) });
+      }
+      const len = pts.reduce((s,p,j)=>j===0?0:s+Math.abs(p.x-pts[j-1].x)+Math.abs(p.y-pts[j-1].y), 0);
+      _ladderPaths.push({ startCol:i, endCol:pos, points:pts, len });
+    }
+
+    // 결과 배정 (특별 결과 1개 + 나머지 통과, 무작위 배치)
+    const pool = [special, ...Array(n-1).fill('😊 통과')].sort(() => Math.random()-0.5);
+    _ladderResMap = Object.fromEntries(pool.map((v,c) => [c, v]));
+    _ladderRevd   = new Set();
+
+    document.getElementById('ladder-setup').style.display = 'none';
+    document.getElementById('ladder-game').style.display  = '';
+    document.getElementById('ladder-result-board').innerHTML = '';
+    _drawLadderSVG(n, special);
+  }
+
+  function _drawLadderSVG(n, special) {
+    const W = _LC.PX * 2 + (n-1) * _LC.SX;
+    const H = _LC.PTOP + _LC.ROWS * _LC.SY + _LC.PBOT;
+    let s = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" style="font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;display:block">`;
+    s += `<rect width="${W}" height="${H}" fill="#fff" rx="14"/>`;
+
+    // 세로선
+    for (let c=0; c<n; c++) s += `<line x1="${_lcx(c)}" y1="${_lry(0)}" x2="${_lcx(c)}" y2="${_lry(_LC.ROWS)}" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`;
+
+    // 가로 막대
+    _ladderBrgs.forEach(b => s += `<line x1="${_lcx(b.col)}" y1="${_lry(b.row)}" x2="${_lcx(b.col+1)}" y2="${_lry(b.row)}" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>`);
+
+    // 경로선 (숨김 상태, 공개 시 애니메이션)
+    _ladderPaths.forEach((pd, i) => {
+      const d = 'M '+pd.points.map(p=>`${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L ');
+      s += `<path id="lpath-${i}" d="${d}" fill="none" stroke="${_LCOLORS[i%_LCOLORS.length]}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${pd.len}" stroke-dashoffset="${pd.len}" style="transition:stroke-dashoffset 0.75s ease"/>`;
+    });
+
+    // 상단 이름 (클릭 가능)
+    _ladderSel.forEach((name, i) => {
+      const x = _lcx(i);
+      s += `<g class="ladder-name-g" onclick="traceLadderPath(${i})">
+        <rect class="lnbg" x="${x-26}" y="7" width="52" height="24" rx="8" fill="transparent" style="transition:fill 0.15s"/>
+        <text class="lntxt" x="${x}" y="23" text-anchor="middle" font-size="12" font-weight="700" fill="#334155" style="transition:fill 0.15s">${name}</text>
+        <polygon points="${x},${_lry(0)-5} ${x-5},${_lry(0)-13} ${x+5},${_lry(0)-13}" fill="#cbd5e1"/>
+      </g>`;
+    });
+
+    // 하단 결과 (공개 전 숨김)
+    for (let c=0; c<n; c++) {
+      const x   = _lcx(c);
+      const res  = _ladderResMap[c];
+      const isW  = res !== '😊 통과';
+      const bgC  = isW ? '#fef3c7' : '#f8fafc';
+      const txtC = isW ? '#b45309' : '#64748b';
+      const bdrC = isW ? '#fcd34d' : '#e2e8f0';
+      s += `<g id="lres-${c}" opacity="0" style="transition:opacity 0.45s ease">
+        <rect x="${x-28}" y="${_lry(_LC.ROWS)+6}" width="56" height="38" rx="9" fill="${bgC}" stroke="${bdrC}" stroke-width="1.5"/>
+        <text x="${x}" y="${_lry(_LC.ROWS)+22}" text-anchor="middle" font-size="13">${isW?'🎉':'😊'}</text>
+        <text x="${x}" y="${_lry(_LC.ROWS)+36}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${txtC}">${isW?'당첨!':'통과'}</text>
+      </g>`;
+    }
+    s += '</svg>';
+    document.getElementById('ladder-svg-wrap').innerHTML = s;
+  }
+
+  function traceLadderPath(idx) {
+    if (_ladderRevd.has(idx)) return;
+    _ladderRevd.add(idx);
+    const pEl = document.getElementById(`lpath-${idx}`);
+    if (pEl) pEl.style.strokeDashoffset = '0';
+    setTimeout(() => {
+      const endCol = _ladderPaths[idx].endCol;
+      const rEl = document.getElementById(`lres-${endCol}`);
+      if (rEl) rEl.setAttribute('opacity','1');
+      _updateLadderBoard();
+      const result = _ladderResMap[endCol];
+      if (result !== '😊 통과') showToast(`🎉 ${_ladderSel[idx]}님 "${result}" 당첨!`);
+    }, 820);
+  }
+
+  function revealAllLadder() {
+    _ladderSel.forEach((_, i) => setTimeout(() => traceLadderPath(i), i * 180));
+  }
+
+  function _updateLadderBoard() {
+    const el = document.getElementById('ladder-result-board');
+    if (!el) return;
+    el.innerHTML = _ladderSel
+      .map((name, i) => ({ name, i, result: _ladderResMap[(_ladderPaths[i]||{}).endCol] }))
+      .filter(x => _ladderRevd.has(x.i))
+      .map(x => `<div class="ladder-result-item ${x.result!=='😊 통과'?'winner':''}">
+        <span class="avatar" style="width:22px;height:22px;font-size:0.62rem;background:${avatarColor(x.name)}">${x.name[0]}</span>
+        <strong>${x.name}</strong><span style="color:#94a3b8">→</span><span>${x.result}</span>
+      </div>`).join('');
+  }
+
+  function resetLadder() {
+    _ladderRevd = new Set();
+    document.getElementById('ladder-game').style.display  = 'none';
+    document.getElementById('ladder-setup').style.display = '';
   }
 
   // ── 계획 vs 실적 대조 ────────────────────────────────
