@@ -227,14 +227,13 @@ function TimelinePlanTab() {
                           : isSub ? '#d97706' : isSat ? '#3182ce' : undefined;
                         const bg        = isToday ? '#e0e7ff' : day.isOther ? '#f8f8fb' : isSub ? '#fffbeb' : undefined;
                         return (
-                          <th key={day.key} style={{ background: bg, color, width: (isSat || isSun) ? 60 : undefined }}>
+                          <th key={day.key} style={{ background: bg, color, width: (isSat || isSun) ? 90 : undefined }}>
                             {day.label}<br/>
                             <span style={{ fontWeight: 400, fontSize: '0.65rem' }}>{day.dow}</span>
                             {isHoliday && <><br/><span style={{ fontSize: '0.58rem', color: isSub ? '#d97706' : '#e53e3e', fontWeight: 600, whiteSpace: 'nowrap' }}>{isSub ? '🔶 ' : '🔴 '}{holiday!.name}</span></>}
                           </th>
                         );
                       })}
-                      <th className="wpt-th-memo">MEMO</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -251,7 +250,7 @@ function TimelinePlanTab() {
                           {chunk.map(day => {
                             const tasks = data.grid[cat][day.key] || [];
                             return (
-                              <td key={day.key} className="wpt-day-cell" style={{ width: (day.date.getDay() === 0 || day.date.getDay() === 6) ? 60 : undefined }}>
+                              <td key={day.key} className="wpt-day-cell" style={{ width: (day.date.getDay() === 0 || day.date.getDay() === 6) ? 90 : undefined }}>
                                 {tasks.map((task, ti) => (
                                   <TaskEl
                                     key={ti}
@@ -264,20 +263,6 @@ function TimelinePlanTab() {
                               </td>
                             );
                           })}
-                          <td className="wpt-day-cell">
-                            <textarea
-                              className="wpt-memo-ta"
-                              style={{ minHeight: 60 }}
-                              placeholder="메모"
-                              defaultValue={data.memo[cat] || ''}
-                              onBlur={e => {
-                                const newData = { ...data };
-                                if (!newData.memo) newData.memo = {};
-                                newData.memo[cat] = e.target.value;
-                                save(newData);
-                              }}
-                            />
-                          </td>
                         </tr>
                       );
                     })}
