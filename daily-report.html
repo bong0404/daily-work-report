@@ -2633,13 +2633,32 @@
   <div class="tomorrow-check-modal" id="tomorrow-check-modal">
     <div class="tcm-box">
       <div class="tcm-header">
-        <div class="tcm-title">📋 어제의 익일 계획 확인</div>
+        <div class="tcm-title">📋 어제 미완료 업무 확인</div>
         <div class="tcm-subtitle" id="tcm-subtitle"></div>
       </div>
-      <div class="tcm-list" id="tcm-list"></div>
+
+      <!-- 익일 계획 섹션 -->
+      <div id="tcm-plan-section">
+        <div style="font-size:0.72rem;font-weight:700;color:#6c63ff;margin-bottom:6px;display:flex;align-items:center;gap:6px">
+          <span style="background:#f0eeff;padding:2px 7px;border-radius:4px">📋 익일 계획</span>
+        </div>
+        <div class="tcm-list" id="tcm-list"></div>
+      </div>
+
+      <!-- 진행사항 섹션 -->
+      <div id="tcm-progress-section" style="display:none">
+        <div style="font-size:0.72rem;font-weight:700;color:#f97316;margin:14px 0 6px;display:flex;align-items:center;gap:6px">
+          <span style="background:#fff7ed;padding:2px 7px;border-radius:4px">⚙️ 진행 중이었던 업무</span>
+        </div>
+        <div class="tcm-list" id="tcm-progress-list"></div>
+      </div>
+
+      <div style="font-size:0.71rem;color:#bbb;margin-top:12px;padding-top:10px;border-top:1px solid #f0f0f8">
+        ✓ 체크 → 주요완료 &nbsp;|&nbsp; 미체크 → 진행사항으로 자동 이동
+      </div>
       <div class="tcm-actions">
         <button class="tcm-btn-skip" onclick="closeTomorrowCheck()">건너뛰기</button>
-        <button class="tcm-btn-apply" onclick="applyTomorrowCheck()">완료 항목 주요완료에 추가</button>
+        <button class="tcm-btn-apply" onclick="applyTomorrowCheck()">적용하기</button>
       </div>
     </div>
   </div>
@@ -4096,38 +4115,53 @@
 
     const name = nameRaw.split('|')[0];
 
-    // 보고 날짜 기준 전날(평일 기준: 월요일이면 금요일)
+    // 전날(평일 기준: 월요일이면 금요일)
     const d = new Date(dateVal);
     d.setDate(d.getDate() - 1);
-    if (d.getDay() === 0) d.setDate(d.getDate() - 1); // 일요일이면 금요일
-    if (d.getDay() === 6) d.setDate(d.getDate() - 1); // 토요일이면 금요일
+    if (d.getDay() === 0) d.setDate(d.getDate() - 1);
+    if (d.getDay() === 6) d.setDate(d.getDate() - 1);
     const prevDate = d.toISOString().slice(0, 10);
 
     const rows = await fetchSheet();
     const prev = rows.find(r => r['날짜'] === prevDate && (r['이름'] || '').startsWith(name));
     if (!prev) return;
 
-    const items = parseItems(prev['익일계획']);
-    if (!items.length) return;
+    const planItems     = parseItems(prev['익일계획']);
+    const progressItems = parseItems(prev['진행사항']);
+    if (!planItems.length && !progressItems.length) return;
 
-    // 팝업 구성
     const [, m, day] = prevDate.split('-');
     document.getElementById('tcm-subtitle').textContent =
-      `${parseInt(m)}월 ${parseInt(day)}일 보고서의 익일 계획입니다. 완료된 항목을 체크하세요.`;
+      `${parseInt(m)}월 ${parseInt(day)}일 보고서 기반`;
 
-    document.getElementById('tcm-list').innerHTML = items.map((item, i) => `
-      <div class="tcm-item" id="tcm-item-${i}" onclick="toggleTcmItem(${i})">
-        <input type="checkbox" id="tcm-cb-${i}" onclick="event.stopPropagation(); toggleTcmItem(${i})">
-        <label for="tcm-cb-${i}">${item}</label>
-      </div>
-    `).join('');
+    // 익일 계획 섹션
+    document.getElementById('tcm-list').innerHTML = planItems.length
+      ? planItems.map((item, i) => `
+          <div class="tcm-item" id="tcm-t-${i}" onclick="toggleTcmItem('t',${i})">
+            <input type="checkbox" id="tcm-cb-t-${i}" onclick="event.stopPropagation();toggleTcmItem('t',${i})">
+            <label for="tcm-cb-t-${i}">${item}</label>
+          </div>`).join('')
+      : '<div style="font-size:0.8rem;color:#ccc;padding:4px 0">없음</div>';
+
+    // 진행사항 섹션
+    const progSection = document.getElementById('tcm-progress-section');
+    if (progressItems.length) {
+      document.getElementById('tcm-progress-list').innerHTML = progressItems.map((item, i) => `
+        <div class="tcm-item" id="tcm-p-${i}" onclick="toggleTcmItem('p',${i})">
+          <input type="checkbox" id="tcm-cb-p-${i}" onclick="event.stopPropagation();toggleTcmItem('p',${i})">
+          <label for="tcm-cb-p-${i}">${item}</label>
+        </div>`).join('');
+      progSection.style.display = '';
+    } else {
+      progSection.style.display = 'none';
+    }
 
     document.getElementById('tomorrow-check-modal').classList.add('open');
   }
 
-  function toggleTcmItem(i) {
-    const item = document.getElementById('tcm-item-' + i);
-    const cb   = document.getElementById('tcm-cb-' + i);
+  function toggleTcmItem(prefix, i) {
+    const item = document.getElementById(`tcm-${prefix}-${i}`);
+    const cb   = document.getElementById(`tcm-cb-${prefix}-${i}`);
     cb.checked = !cb.checked;
     item.classList.toggle('checked', cb.checked);
   }
@@ -4137,12 +4171,25 @@
   }
 
   function applyTomorrowCheck() {
-    const checked = [...document.querySelectorAll('#tcm-list .tcm-item.checked label')]
-      .map(l => l.textContent.trim());
-    checked.forEach(text => addItem('done', text));
+    const getTexts = (listId) => {
+      const all      = [...document.querySelectorAll(`#${listId} .tcm-item`)];
+      const checked  = all.filter(el =>  el.classList.contains('checked')).map(el => el.querySelector('label').textContent.trim());
+      const unchecked = all.filter(el => !el.classList.contains('checked')).map(el => el.querySelector('label').textContent.trim());
+      return { checked, unchecked };
+    };
+
+    const plan     = getTexts('tcm-list');
+    const progress = getTexts('tcm-progress-list');
+
+    const doneList     = [...plan.checked,   ...progress.checked];
+    const progressList = [...plan.unchecked, ...progress.unchecked];
+
+    doneList.forEach(text => addItem('done', text));
+    progressList.forEach(text => addItem('progress', text));
+
     closeTomorrowCheck();
-    if (checked.length) {
-      showToast(`${checked.length}개 항목이 주요완료에 추가되었습니다`);
+    if (doneList.length || progressList.length) {
+      showToast(`완료 ${doneList.length}건 → 주요완료 | 미완료 ${progressList.length}건 → 진행사항`);
     }
   }
 
