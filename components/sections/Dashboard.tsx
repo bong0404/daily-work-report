@@ -67,6 +67,131 @@ function hasNextWeekPlan(memberName: string): boolean {
   return false;
 }
 
+// ── 업무계획 지표 계산 ───────────────────────────────────
+interface PlanMetrics {
+  total: number; done: number; onTime: number; late: number;
+  doing: number; overdue: number; starTotal: number; starDone: number;
+}
+
+function getMemberPlanMetrics(memberName: string, mkey: string): PlanMetrics {
+  const empty = { total: 0, done: 0, onTime: 0, late: 0, doing: 0, overdue: 0, starTotal: 0, starDone: 0 };
+  const raw = lsGet(`mplan_${memberName}_${mkey}`);
+  if (!raw) return empty;
+  try {
+    const data: MonthPlanData = JSON.parse(raw);
+    const days = getMonthDays(mkey);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const dayByKey: Record<string, Date> = {};
+    days.forEach(d => { dayByKey[d.key] = d.date; });
+
+    let total = 0, done = 0, onTime = 0, late = 0, doing = 0, overdue = 0, starTotal = 0, starDone = 0;
+    (data.categories || []).forEach(cat => {
+      const catGrid = (data.grid || {})[cat] || {};
+      Object.entries(catGrid).forEach(([key, tasks]) => {
+        const plannedDate = dayByKey[key] ?? null;
+        const isPast = plannedDate && plannedDate < today;
+        (tasks || []).forEach(t => {
+          if (!t.text || !t.text.trim()) return;
+          total++;
+          const status = t.status || (t.done ? 'done' : 'todo');
+          if (status === 'done') {
+            done++;
+            if (t.completedAt && plannedDate) {
+              new Date(t.completedAt) <= plannedDate ? onTime++ : late++;
+            } else { onTime++; }
+          } else if (status === 'doing') {
+            doing++;
+            if (isPast) overdue++;
+          } else if (isPast) { overdue++; }
+          if (t.starred) { starTotal++; if (status === 'done') starDone++; }
+        });
+      });
+    });
+    return { total, done, onTime, late, doing, overdue, starTotal, starDone };
+  } catch { return empty; }
+}
+
+// ── 업무지표 모달 ────────────────────────────────────────
+function MetricsModal({ name, dept, onClose }: { name: string; dept: string; onClose: () => void }) {
+  const today = new Date();
+  const months: string[] = [];
+  let mx: PlanMetrics = { total: 0, done: 0, onTime: 0, late: 0, doing: 0, overdue: 0, starTotal: 0, starDone: 0 };
+  for (let mo = 0; mo < 2; mo++) {
+    const d = new Date(today.getFullYear(), today.getMonth() - mo, 1);
+    const mkey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    months.push(`${d.getFullYear()}년 ${d.getMonth() + 1}월`);
+    const m = getMemberPlanMetrics(name, mkey);
+    (Object.keys(mx) as (keyof PlanMetrics)[]).forEach(k => { mx[k] += m[k]; });
+  }
+  const periodLabel = `${months[1]} ~ ${months[0]} 업무계획 기준`;
+  const barCls = (pct: number) => pct >= 80 ? '' : pct >= 50 ? 'mid' : 'low';
+  const doneRate   = mx.total     > 0 ? Math.round(mx.done    / mx.total     * 100) : null;
+  const onTimeRate = mx.done      > 0 ? Math.round(mx.onTime  / mx.done      * 100) : null;
+  const starRate   = mx.starTotal > 0 ? Math.round(mx.starDone / mx.starTotal * 100) : null;
+
+  return (
+    <div className="tomorrow-check-modal open" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="tcm-box" style={{ maxWidth: 380 }}>
+        <div className="wdb-header">
+          <div className="wdb-title">{name} · 업무 지표</div>
+          <button className="wdb-close" onClick={onClose}>✕</button>
+        </div>
+        <div id="metrics-modal-body">
+          {mx.total === 0 ? (
+            <div style={{ color: '#bbb', fontSize: '0.85rem', padding: '20px 0', textAlign: 'center' }}>업무계획 데이터가 없습니다</div>
+          ) : (
+            <>
+              <div style={{ fontSize: '0.72rem', color: '#aaa', marginBottom: 18 }}>{periodLabel}</div>
+              <div className="metric-row">
+                <div className="metric-label-row">
+                  <span className="metric-label">📋 완료율</span>
+                  <span className="metric-pct" style={{ color: '#6366f1' }}>{doneRate}%</span>
+                </div>
+                <div className="metric-bar-bg">
+                  <div className={`metric-bar-fill progress-bar ${doneRate !== null ? barCls(doneRate) : ''}`} style={{ width: `${doneRate ?? 0}%` }} />
+                </div>
+                <div className="metric-sub">전체 {mx.total}건 중 {mx.done}건 완료</div>
+              </div>
+              <div className="metric-row" style={{ marginTop: 14 }}>
+                <div className="metric-label-row">
+                  <span className="metric-label">⏱ 기한내 완료율</span>
+                  <span className="metric-pct" style={{ color: '#10b981' }}>{onTimeRate !== null ? `${onTimeRate}%` : '-'}</span>
+                </div>
+                <div className="metric-bar-bg">
+                  <div className={`metric-bar-fill deadline-bar ${onTimeRate !== null ? barCls(onTimeRate) : ''}`} style={{ width: `${onTimeRate ?? 0}%` }} />
+                </div>
+                <div className="metric-sub">기한내 {mx.onTime}건 · 지연완료 {mx.late}건</div>
+              </div>
+              {starRate !== null && (
+                <div className="metric-row" style={{ marginTop: 14 }}>
+                  <div className="metric-label-row">
+                    <span className="metric-label">★ 중요업무</span>
+                    <span className="metric-pct" style={{ color: '#f59e0b' }}>{starRate}%</span>
+                  </div>
+                  <div className="metric-bar-bg">
+                    <div className="metric-bar-fill" style={{ width: `${starRate}%`, height: '100%', borderRadius: 99, background: '#f59e0b', transition: 'width 0.6s ease' }} />
+                  </div>
+                  <div className="metric-sub">{mx.starTotal}건 중 {mx.starDone}건 완료</div>
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 16 }}>
+                <div style={{ flex: 1, minWidth: 80, background: '#eef2ff', borderRadius: 10, padding: '10px 12px' }}>
+                  <div style={{ fontSize: '0.68rem', color: '#888', marginBottom: 4 }}>진행중</div>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#4f46e5' }}>{mx.doing}</div>
+                </div>
+                <div style={{ flex: 1, minWidth: 80, background: mx.overdue > 0 ? '#fee2e2' : '#f0fdf4', borderRadius: 10, padding: '10px 12px' }}>
+                  <div style={{ fontSize: '0.68rem', color: '#888', marginBottom: 4 }}>미완료 기한초과</div>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 700, color: mx.overdue > 0 ? '#dc2626' : '#16a34a' }}>{mx.overdue}</div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── 대시보드 결과 표시 ───────────────────────────────────
 interface DashResult {
   dateLabel: string;
@@ -75,13 +200,22 @@ interface DashResult {
 }
 
 function DashboardResult({ result }: { result: DashResult | null }) {
+  const [metricsTarget, setMetricsTarget] = useState<{ name: string; dept: string } | null>(null);
+
   if (!result) return <div className="empty-state">날짜를 선택하고 조회하세요</div>;
 
   const submitted = MEMBERS.filter(m => result.submittedNames.some(n => n.startsWith(m.name)));
   const missing   = MEMBERS.filter(m => !result.submittedNames.some(n => n.startsWith(m.name)));
+  const mkey = result.dateLabel ? (() => {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  })() : '';
 
   return (
     <>
+      {metricsTarget && (
+        <MetricsModal name={metricsTarget.name} dept={metricsTarget.dept} onClose={() => setMetricsTarget(null)} />
+      )}
       <div className="dash-section-title" style={{ marginBottom: 8 }}>
         📋 데일리보고 작성 현황 ({result.dateLabel})
       </div>
@@ -93,8 +227,13 @@ function DashboardResult({ result }: { result: DashResult | null }) {
       <div className="submit-status-grid">
         {MEMBERS.map(m => {
           const done = result.submittedNames.some(n => n.startsWith(m.name));
+          const mx = getMemberPlanMetrics(m.name, mkey);
+          const pct = mx.total > 0 ? Math.round(mx.done / mx.total * 100) : null;
+          const barCls = pct === null ? '' : pct >= 80 ? '' : pct >= 50 ? 'mid' : 'low';
+          const starPct = mx.starTotal > 0 ? Math.round(mx.starDone / mx.starTotal * 100) : null;
           return (
-            <div key={m.name} className={`member-status-card ${done ? 'submitted' : 'missing'}`}>
+            <div key={m.name} className={`member-status-card ${done ? 'submitted' : 'missing'}`}
+              style={{ cursor: 'pointer' }} onClick={() => setMetricsTarget({ name: m.name, dept: m.dept })}>
               <div className="member-status-top">
                 <div className={`status-dot ${done ? 'submitted' : 'missing'}`} />
                 <div className="member-status-info">
@@ -103,6 +242,33 @@ function DashboardResult({ result }: { result: DashResult | null }) {
                 </div>
                 <div className={`status-badge ${done ? 'submitted' : 'missing'}`}>{done ? '제출' : '미제출'}</div>
               </div>
+              {mx.total > 0 && (
+                <div className="plan-metrics">
+                  <div className="plan-metric-row">
+                    <span className="plan-metric-label">완료율</span>
+                    <div className="plan-metric-bar-bg">
+                      <div className={`plan-metric-bar-fill ${barCls}`} style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="plan-metric-pct">{pct}%</span>
+                  </div>
+                  {starPct !== null && (
+                    <div className="plan-metric-row">
+                      <span className="plan-metric-label">★완료율</span>
+                      <div className="plan-metric-bar-bg">
+                        <div className={`plan-metric-bar-fill ${starPct >= 80 ? '' : starPct >= 50 ? 'mid' : 'low'}`} style={{ width: `${starPct}%` }} />
+                      </div>
+                      <span className="plan-metric-pct">{starPct}%</span>
+                    </div>
+                  )}
+                  <div className="plan-metric-chips">
+                    {mx.onTime  > 0 && <span className="plan-chip ontime">기한내 {mx.onTime}</span>}
+                    {mx.late    > 0 && <span className="plan-chip late">지연완료 {mx.late}</span>}
+                    {mx.doing   > 0 && <span className="plan-chip doing">진행중 {mx.doing}</span>}
+                    {mx.overdue > 0 && <span className="plan-chip overdue">미완료초과 {mx.overdue}</span>}
+                    <span style={{ fontSize: '0.62rem', color: '#aaa' }}>전체 {mx.total}건</span>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
