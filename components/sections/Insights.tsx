@@ -95,12 +95,15 @@ function HeatmapTab() {
           : <div dangerouslySetInnerHTML={{ __html: html }} />
         }
       </div>
-      <div className="hm-legend">
-        <span>활동 없음</span>
-        {['hm-0','hm-1','hm-2','hm-3','hm-4','hm-5'].map(cls => (
-          <span key={cls} className={`hm-legend-box ${cls}`} />
+      <div className="heatmap-legend">
+        <span style={{ fontWeight: 600, color: '#555' }}>작성 섹션 수:</span>
+        {(['hm-0','hm-1','hm-2','hm-3','hm-4','hm-5'] as const).map((cls, i) => (
+          <span key={cls} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span className={`heatmap-legend-cell ${cls}`} />
+            <span>{['미제출','1개','2개','3개','4개','5개 전체'][i]}</span>
+          </span>
         ))}
-        <span>활발</span>
+        <span style={{ marginLeft: 12, color: '#bbb' }}>※ 완료·회의·진행·이슈·익일계획 중 내용 있는 섹션 개수</span>
       </div>
     </>
   );
