@@ -65,6 +65,25 @@ function TaskEl({ task, onChange, onDelete }: TaskElProps) {
   );
 }
 
+// ── 셀 하단 인라인 입력 ───────────────────────────────────
+function DraftTaskInput({ onAdd }: { onAdd: (text: string) => void }) {
+  const [val, setVal] = useState('');
+  function commit() {
+    if (val.trim()) { onAdd(val.trim()); setVal(''); }
+  }
+  return (
+    <input
+      type="text"
+      value={val}
+      onChange={e => setVal(e.target.value)}
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); commit(); } }}
+      onBlur={commit}
+      placeholder="+ 입력 후 Enter"
+      style={{ width: '100%', fontSize: '0.73rem', border: 'none', borderBottom: '1px dashed #d0d4e8', background: 'transparent', outline: 'none', padding: '3px 4px', color: '#9da3b8', marginTop: 3, boxSizing: 'border-box' }}
+    />
+  );
+}
+
 // ── 타임라인 작성 탭 ─────────────────────────────────────
 function TimelinePlanTab() {
   const [person]             = useState(lsGet('my_name') || '');
@@ -118,11 +137,11 @@ function TimelinePlanTab() {
     save(newData);
   }
 
-  function addTask(cat: string, dayKey: string) {
+  function addTask(cat: string, dayKey: string, text = '') {
     const newData = JSON.parse(JSON.stringify(data)) as MonthPlanData;
     if (!newData.grid[cat]) newData.grid[cat] = {};
     if (!newData.grid[cat][dayKey]) newData.grid[cat][dayKey] = [];
-    newData.grid[cat][dayKey].push({ text: '', status: 'todo', done: false });
+    newData.grid[cat][dayKey].push({ text, status: 'todo', done: false });
     save(newData);
   }
 
@@ -259,7 +278,7 @@ function TimelinePlanTab() {
                                     onDelete={() => deleteTask(cat, day.key, ti)}
                                   />
                                 ))}
-                                <button className="wpt-add-task" onClick={() => addTask(cat, day.key)}>+ 추가</button>
+                                <DraftTaskInput onAdd={text => addTask(cat, day.key, text)} />
                               </td>
                             );
                           })}
