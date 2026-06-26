@@ -6,6 +6,8 @@
   <title>일일 업무보고 - 라로지앵팀</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -2549,9 +2551,12 @@
       border-bottom: 1px solid rgba(255,255,255,0.07);
       flex-shrink: 0;
     }
-    .sidebar-logo { font-size:0.82rem; font-weight:700; color:#f1f5f9; letter-spacing:-0.02em; line-height:1.5; }
-    .sidebar-logo span { color:#818cf8; }
-    .sidebar-logo-sub { font-size:0.68rem; color:rgba(255,255,255,0.3); margin-top:2px; }
+    .sidebar-logo { display:flex; flex-direction:column; gap:2px; }
+    .sidebar-logo .brand-mark { font-size:0.58rem; letter-spacing:0.2em; color:rgba(255,255,255,0.25); text-transform:uppercase; }
+    .sidebar-logo .brand-name { font-family:'Cormorant Garamond', Georgia, serif; font-size:1.2rem; font-weight:300; color:#f1f5f9; letter-spacing:0.1em; line-height:1.1; }
+    .sidebar-logo .brand-name em { font-style:italic; }
+    .sidebar-logo .brand-sub { font-size:0.6rem; font-weight:600; letter-spacing:0.25em; color:rgba(255,255,255,0.32); text-transform:uppercase; margin-top:2px; }
+    .sidebar-logo-sub { font-size:0.65rem; color:rgba(255,255,255,0.22); margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06); }
 
     .sidebar-nav { flex:1; padding:10px 8px; overflow-y:auto; scrollbar-width:none; }
     .sidebar-nav::-webkit-scrollbar { display:none; }
@@ -2641,7 +2646,12 @@
 <div class="app-layout">
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div class="sidebar-logo">경영지원본부 <span>·</span> 데일리보고</div>
+    <div class="sidebar-logo">
+      <span class="brand-mark">✦ La Rosée</span>
+      <span class="brand-name">LA ROS<em>É</em>E</span>
+      <span class="brand-sub">Korea</span>
+      <span class="sidebar-logo-sub">경영지원본부 · 데일리보고</span>
+    </div>
   </div>
   <nav class="sidebar-nav">
     <button class="nav-item active" id="nav-dashboard" onclick="sidebarNav('dashboard',this)">
