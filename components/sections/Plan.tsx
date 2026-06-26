@@ -85,11 +85,12 @@ function DraftTaskInput({ onAdd }: { onAdd: (text: string) => void }) {
 
 // ── 타임라인 작성 탭 ─────────────────────────────────────
 function TimelinePlanTab() {
-  const [person]             = useState(lsGet('my_name') || '');
+  const [person, setPerson]  = useState('');
   const [mkey, setMkey]      = useState(currentMkey());
-  const [data, setData]      = useState<MonthPlanData>(() => loadMpData(currentMkey(), lsGet('my_name') || ''));
+  const [data, setData]      = useState<MonthPlanData>(() => loadMpData(currentMkey(), ''));
   const [keyWork, setKeyWork] = useState('');
   const [issue, setIssue]    = useState('');
+  useEffect(() => { setPerson(lsGet('my_name') || ''); }, []);
 
   const reload = useCallback((m: string, p: string) => {
     const d = loadMpData(m, p);

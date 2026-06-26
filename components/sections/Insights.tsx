@@ -254,7 +254,8 @@ interface Feedback { id: number; author: string; target: string; text: string; t
 
 function FeedbackTab() {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [author, setAuthor]       = useState(lsGet('my_name') || '');
+  const [author, setAuthor]       = useState('');
+  useEffect(() => { setAuthor(lsGet('my_name') || ''); }, []);
   const [target, setTarget]       = useState('');
   const [text, setText]           = useState('');
   const [anon, setAnon]           = useState(true);

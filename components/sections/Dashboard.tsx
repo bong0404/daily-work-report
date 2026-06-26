@@ -457,7 +457,8 @@ function NoticeBoard() {
   const [commentInputs, setCommentInputs] = useState<Record<number, { author: string; text: string }>>({});
   const bodyRef = useRef<HTMLDivElement>(null);
 
-  const myName = lsGet('my_name') || '';
+  const [myName, setMyName] = useState('');
+  useEffect(() => { setMyName(lsGet('my_name') || ''); }, []);
 
   const reload = useCallback(() => {
     const list = getNotices();

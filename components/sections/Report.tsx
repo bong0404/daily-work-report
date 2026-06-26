@@ -396,7 +396,8 @@ function ByPersonTab() {
 function MySummaryTab() {
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(true);
-  const myName = lsGet('my_name') || '';
+  const [myName, setMyName] = useState('');
+  useEffect(() => { setMyName(lsGet('my_name') || ''); }, []);
 
   useEffect(() => {
     if (!myName) {
@@ -404,6 +405,7 @@ function MySummaryTab() {
       setLoading(false);
       return;
     }
+    setLoading(true);
     (async () => {
       const rows = await fetchReports();
       const mine = rows.filter(r => r['이름'] === myName);
