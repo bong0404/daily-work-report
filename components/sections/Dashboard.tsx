@@ -127,52 +127,41 @@ function DashboardResult({ result }: { result: DashResult | null }) {
   );
 }
 
+// 차주 계획에는 김청진(이사) 포함
+const PLAN_MEMBERS = [{ name: '김청진', dept: '이사' }, ...MEMBERS];
+
 // ── 차주 업무계획 현황 ────────────────────────────────────
 function NextWeekPlanStatus() {
-  const { nextMon, nextSun } = getNextWeekRange();
-  const fmt = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
-  const weekLabel = `${fmt(nextMon)} ~ ${fmt(nextSun)}`;
-
-  const planDone    = MEMBERS.filter(m => hasNextWeekPlan(m.name));
-  const planMissing = MEMBERS.filter(m => !hasNextWeekPlan(m.name));
-  const pct = MEMBERS.length === 0 ? 0 : Math.round((planDone.length / MEMBERS.length) * 100);
+  const planDone    = PLAN_MEMBERS.filter(m => hasNextWeekPlan(m.name));
+  const planMissing = PLAN_MEMBERS.filter(m => !hasNextWeekPlan(m.name));
+  const pct     = Math.round(planDone.length / PLAN_MEMBERS.length * 100);
+  const barCls  = pct >= 80 ? '' : pct >= 50 ? 'mid' : 'low';
 
   return (
-    <div style={{ marginTop: 32 }}>
-      <div className="dash-section-title" style={{ marginBottom: 8 }}>
-        📅 차주 업무계획 현황 ({weekLabel})
+    <div style={{ background: '#fff', border: '1px solid #f1f5f9', boxShadow: '0 1px 3px rgba(15,23,42,0.05)', borderRadius: 12, padding: '16px 20px', marginBottom: 24, marginTop: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <span className="dash-section-title" style={{ marginBottom: 0, paddingLeft: 0, border: 'none' }}>차주 업무계획 현황</span>
+        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#4f46e5' }}>{planDone.length} / {PLAN_MEMBERS.length}명 작성</span>
       </div>
-      <div className="dashboard-grid">
-        <div className="dash-card"><div className="label">전체 팀원</div><div className="value purple">{MEMBERS.length}명</div></div>
-        <div className="dash-card"><div className="label">계획 등록</div><div className="value green">{planDone.length}명</div></div>
-        <div className="dash-card"><div className="label">미등록</div><div className="value red">{planMissing.length}명</div></div>
+      <div className="metric-bar-bg" style={{ marginBottom: 12 }}>
+        <div className={`metric-bar-fill progress-bar ${barCls}`} style={{ width: `${pct}%` }} />
       </div>
-      <div style={{ margin: '10px 0 6px', display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#64748b' }}>
-        <span>등록 완료율</span><span>{pct}%</span>
-      </div>
-      <div style={{ height: 8, background: '#e8eaf0', borderRadius: 4, overflow: 'hidden', marginBottom: 14 }}>
-        <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg, #4f46e5, #818cf8)', borderRadius: 4, transition: 'width 0.4s' }} />
-      </div>
-      <div className="submit-status-grid">
-        {MEMBERS.map(m => {
-          const done = hasNextWeekPlan(m.name);
-          return (
-            <div key={m.name} className={`member-status-card ${done ? 'submitted' : 'missing'}`}>
-              <div className="member-status-top">
-                <div className={`status-dot ${done ? 'submitted' : 'missing'}`} />
-                <div className="member-status-info">
-                  <div className="member-status-name">{m.name}</div>
-                  <div className="member-status-dept">{m.dept}</div>
-                </div>
-                <div className={`status-badge ${done ? 'submitted' : 'missing'}`}>{done ? '등록' : '미등록'}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {planMissing.length > 0 && (
-        <div style={{ marginTop: 10, padding: '8px 12px', background: '#fff8e7', border: '1px solid #fde68a', borderRadius: 8, fontSize: '0.82rem', color: '#92400e' }}>
-          ⚠️ 미등록: {planMissing.map(m => m.name).join(', ')}
+      {planMissing.length > 0 ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.75rem', color: '#aaa', flexShrink: 0 }}>미작성</span>
+          {planMissing.map(m => (
+            <span key={m.name} style={{ fontSize: '0.78rem', fontWeight: 600, color: '#ef4444', background: '#fee2e2', padding: '2px 9px', borderRadius: 20 }}>{m.name}</span>
+          ))}
+        </div>
+      ) : (
+        <div style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: 600 }}>✅ 전원 작성 완료</div>
+      )}
+      {planDone.length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+          <span style={{ fontSize: '0.75rem', color: '#aaa', flexShrink: 0 }}>완료</span>
+          {planDone.map(m => (
+            <span key={m.name} style={{ fontSize: '0.78rem', fontWeight: 600, color: '#16a34a', background: '#dcfce7', padding: '2px 9px', borderRadius: 20 }}>{m.name}</span>
+          ))}
         </div>
       )}
     </div>
