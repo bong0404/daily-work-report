@@ -172,6 +172,13 @@ function TimelinePlanTab() {
 
   return (
     <>
+      <div className="wpt-top">
+        <div className="wpt-nav">
+          <button className="wpt-nav-btn" onClick={() => changeMonth(-1)}>← 이전 달</button>
+          <div className="wpt-week-label">{mkeyLabel(mkey)}</div>
+          <button className="wpt-nav-btn" onClick={() => changeMonth(1)}>다음 달 →</button>
+        </div>
+      </div>
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, marginBottom: 8 }}>
         <div className="wpt-month-memo" style={{ flex: 1, marginBottom: 0 }}>
           <div className="wpt-memo-col">
@@ -192,13 +199,10 @@ function TimelinePlanTab() {
               <option value="김청진">김청진 (이사)</option>
             </select>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button className="wpt-nav-btn" onClick={() => changeMonth(-1)}>← 이전 달</button>
-            <div className="wpt-week-label">{mkeyLabel(mkey)}</div>
-            <button className="wpt-nav-btn" onClick={() => changeMonth(1)}>다음 달 →</button>
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
+            <button className="wpt-cat-add-btn" onClick={() => alert('템플릿을 불러옵니다')}>📋 템플릿</button>
             <button className="wpt-cat-add-btn" onClick={addCategory}>+ 카테고리 추가</button>
+            <button className="wp-submit-btn" onClick={saveMemos}>저장</button>
           </div>
         </div>
       </div>
