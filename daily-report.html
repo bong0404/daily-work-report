@@ -3217,12 +3217,12 @@
         <div class="lounge-block-title">💌 팀원에게 한마디</div>
         <div class="lounge-msg-form">
           <select id="lounge-from" class="lounge-msg-sel">
-            <option value="">내 이름</option>
+            <option value="">팀원 선택</option>
             <option>박희진</option><option>설한영</option><option>정연환</option>
             <option>박수정</option><option>박경현</option><option>유준우</option><option>유하연</option>
           </select>
           <input id="lounge-msg-input" class="lounge-msg-input" type="text"
-            placeholder="응원 메시지를 남겨보세요 ✨"
+            placeholder="응원 메시지를 남겨보세요 ✨ (익명)"
             onkeydown="if(event.key==='Enter') postLoungeMsg()">
           <button class="lounge-msg-btn" onclick="postLoungeMsg()">전송 💌</button>
         </div>
@@ -4053,7 +4053,7 @@
   function postLoungeMsg() {
     const from = document.getElementById('lounge-from').value;
     const msg  = document.getElementById('lounge-msg-input').value.trim();
-    if (!from) { showToast('이름을 선택해주세요'); return; }
+    if (!from) { showToast('받는 팀원을 선택해주세요'); return; }
     if (!msg)  { showToast('메시지를 입력해주세요'); return; }
     const msgs = _getMsgs();
     const ts   = new Date().toLocaleString('ko-KR', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
@@ -4085,7 +4085,7 @@
     }
     el.innerHTML = msgs.map(m => `
     <div class="lounge-msg-card" style="display:flex;align-items:center;gap:16px;">
-      <span class="lounge-msg-from" style="flex-shrink:0;">✍️ ${m.from}<span style="font-size:0.72rem;font-weight:400;color:#94a3b8;margin-left:4px;">님이 보냄</span></span>
+      <span class="lounge-msg-from" style="flex-shrink:0;">📨 <span style="font-size:0.72rem;font-weight:400;color:#94a3b8;margin-right:2px;">익명 →</span> ${m.from}님에게</span>
       <span class="lounge-msg-body" style="flex:1;margin-bottom:0;">${m.msg}</span>
       <button class="lounge-like-btn ${m.likes.includes(myName)?'liked':''}" onclick="likeMsg(${m.id})" style="flex-shrink:0;">
         🙌 ${m.likes.length ? `<strong>${m.likes.length}</strong>` : '응원하기'}
