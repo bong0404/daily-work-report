@@ -458,7 +458,7 @@ function NoticeBoard() {
           <div className="emoji-wrap" style={{ position: 'relative' }}>
             <button type="button" className="toolbar-btn" onClick={() => setShowEmoji(v => !v)} title="이모지">😊</button>
             {showEmoji && (
-              <div className="emoji-panel" style={{ position: 'absolute', top: '110%', left: 0, zIndex: 100, background: '#fff', border: '1px solid #e8eaf0', borderRadius: 8, padding: 8, display: 'flex', flexWrap: 'wrap', gap: 2, width: 220, boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
+              <div style={{ position: 'absolute', top: '110%', left: 0, zIndex: 200, background: '#fff', border: '1px solid #e8eaf0', borderRadius: 8, padding: 8, display: 'flex', flexWrap: 'wrap', gap: 2, width: 220, boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
                 {NOTICE_EMOJIS.map(e => (
                   <button key={e} type="button" onMouseDown={ev => { ev.preventDefault(); insertEmoji(e); }}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', padding: '2px 4px', borderRadius: 4 }}
