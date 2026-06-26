@@ -2476,7 +2476,8 @@
     /* 사다리타기 */
     .ladder-chip-grid { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; }
     .ladder-chip {
-      display:flex; align-items:center; gap:6px; padding:5px 8px;
+      display:flex; align-items:center; justify-content:center;
+      width:100%; padding:5px 8px; box-sizing:border-box;
       border:1.5px solid #e2e8f0; border-radius:7px; cursor:pointer;
       font-size:0.75rem; font-weight:600; color:#64748b; background:#fff;
       transition:all 0.15s; user-select:none;
@@ -3236,7 +3237,7 @@
         <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(15,23,42,0.07);display:flex;gap:24px;align-items:flex-start;">
 
           <!-- 왼쪽: 당첨 결과 설정 + 참가자 (항상 표시) -->
-          <div id="ladder-setup" style="flex:0 0 140px;">
+          <div id="ladder-setup" style="flex:0 0 140px;overflow:hidden;">
             <div style="font-size:0.75rem;font-weight:700;color:#64748b;margin-bottom:6px">🎁 당첨 결과 설정</div>
             <input id="ladder-special-input" class="ladder-special-input" type="text" value="☕ 커피 쏘기" placeholder="☕ 커피 쏘기" style="margin-bottom:3px;font-size:0.8rem;padding:7px 10px;">
             <div style="font-size:0.68rem;color:#94a3b8;margin-bottom:12px">나머지는 😊 통과 처리돼요</div>
@@ -3247,7 +3248,7 @@
           <!-- 오른쪽: 생성 버튼 또는 사다리 -->
           <div style="flex:1;min-width:0;">
             <!-- 생성 전 버튼 -->
-            <div id="ladder-gen-area" style="display:flex;align-items:center;justify-content:center;height:100%;min-height:80px;">
+            <div id="ladder-gen-area" style="display:flex;align-items:center;justify-content:center;min-height:200px;">
               <button class="ladder-gen-btn" onclick="generateLadder()">🎲 사다리 생성!</button>
             </div>
             <!-- 생성 후 사다리 -->
