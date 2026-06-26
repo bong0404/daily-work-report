@@ -2139,11 +2139,11 @@
     .heatmap-table td:hover { opacity:0.75; }
     .hm-name { text-align:left !important; padding:0 10px !important; font-weight:700 !important; color:#1a1a2e; font-size:0.78rem; white-space:nowrap; min-width:72px; }
     .hm-0    { background:#f3f4f6; color:#d1d5db; }
-    .hm-1    { background:#dcfce7; color:#15803d; }
-    .hm-2    { background:#86efac; color:#166534; }
-    .hm-3    { background:#22c55e; color:#fff; }
-    .hm-4    { background:#15803d; color:#fff; }
-    .hm-5    { background:#14532d; color:#fff; }
+    .hm-1    { background:#fce7f3; color:#be185d; }
+    .hm-2    { background:#f9a8d4; color:#9d174d; }
+    .hm-3    { background:#f164c0; color:#fff; }
+    .hm-4    { background:#d946a8; color:#fff; }
+    .hm-5    { background:#a21878; color:#fff; }
     .hm-weekend { background:#fafafa !important; color:#e5e7eb !important; }
     .hm-future  { background:#fafafa; color:#e5e7eb; }
     .heatmap-legend { display:flex; align-items:center; gap:8px; margin-top:14px; font-size:0.75rem; color:#666; flex-wrap:wrap; }
