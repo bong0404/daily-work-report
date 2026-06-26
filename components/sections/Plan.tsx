@@ -67,7 +67,7 @@ function TaskEl({ task, onChange, onDelete }: TaskElProps) {
 
 // ── 타임라인 작성 탭 ─────────────────────────────────────
 function TimelinePlanTab() {
-  const [person, setPerson]  = useState(lsGet('my_name') || '');
+  const [person]             = useState(lsGet('my_name') || '');
   const [mkey, setMkey]      = useState(currentMkey());
   const [data, setData]      = useState<MonthPlanData>(() => loadMpData(currentMkey(), lsGet('my_name') || ''));
   const [keyWork, setKeyWork] = useState('');
@@ -89,11 +89,6 @@ function TimelinePlanTab() {
         .select('data').eq('year_month', m).eq('name', p).maybeSingle();
       if (row) { lsSet(`mplan_${p}_${m}`, JSON.stringify(row.data)); reload(m, p); }
     } catch (e: unknown) { console.warn('동기화 실패:', (e as Error).message); }
-  }
-
-  function onPersonChange(p: string) {
-    setPerson(p);
-    if (p) { syncFromSupabase(mkey, p); }
   }
 
   function changeMonth(dir: number) {
@@ -193,11 +188,10 @@ function TimelinePlanTab() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0, alignItems: 'flex-end' }}>
           <div className="wpt-person-bar" style={{ margin: 0 }}>
             <label className="wpt-person-label">작성자</label>
-            <select value={person} onChange={e => onPersonChange(e.target.value)}>
-              <option value="">이름을 선택하세요</option>
-              {MEMBERS.map(mb => <option key={mb.name} value={mb.name}>{mb.name} ({mb.dept})</option>)}
-              <option value="김청진">김청진 (이사)</option>
-            </select>
+            {person
+              ? <span style={{ padding: '6px 12px', background: '#eef2ff', borderRadius: 8, fontWeight: 600, color: '#4338ca', fontSize: '0.9rem' }}>{person}</span>
+              : <span style={{ padding: '6px 12px', background: '#fee2e2', borderRadius: 8, color: '#b91c1c', fontSize: '0.85rem' }}>설정 필요 (설정 탭에서 이름 입력)</span>
+            }
           </div>
           <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
             <button className="wpt-cat-add-btn" onClick={() => alert('템플릿을 불러옵니다')}>📋 템플릿</button>
