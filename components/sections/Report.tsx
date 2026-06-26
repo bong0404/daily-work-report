@@ -178,11 +178,12 @@ function ByDateTab() {
   const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
   const [selected, setSelected] = useState<string | null>(null);
   const [allDates, setAllDates] = useState<Set<string>>(new Set());
-  const [rangeFrom, setRangeFrom] = useState('');
-  const [rangeTo, setRangeTo]     = useState('');
+  const [rangeFrom, setRangeFrom]     = useState('');
+  const [rangeTo, setRangeTo]         = useState('');
+  const [rangePerson, setRangePerson] = useState('');
   const [dateResult, setDateResult]   = useState('');
   const [rangeResult, setRangeResult] = useState('');
-  const [loading, setLoading]   = useState(false);
+  const [loading, setLoading]         = useState(false);
   const dateResultRef = useRef<HTMLDivElement>(null);
   const rangeResultRef = useRef<HTMLDivElement>(null);
 
@@ -225,7 +226,7 @@ function ByDateTab() {
     setDateResult('');
     setLoading(true);
     const rows = await fetchReports();
-    const filtered = rows.filter(r => r['날짜'] >= rangeFrom && r['날짜'] <= rangeTo);
+    const filtered = rows.filter(r => r['날짜'] >= rangeFrom && r['날짜'] <= rangeTo && (!rangePerson || r['이름'] === rangePerson));
     if (!filtered.length) {
       setRangeResult(`<div class="empty-state">해당 기간 보고가 없습니다</div>`);
     } else {
@@ -310,6 +311,10 @@ function ByDateTab() {
             <input type="date" value={rangeFrom} onChange={e => setRangeFrom(e.target.value)} className="range-date-input" />
             <span style={{ color: '#aaa', fontSize: '0.85rem' }}>~</span>
             <input type="date" value={rangeTo} onChange={e => setRangeTo(e.target.value)} className="range-date-input" />
+            <select value={rangePerson} onChange={e => setRangePerson(e.target.value)} className="range-person-select">
+              <option value="">전체 인원</option>
+              {MEMBERS.map(m => <option key={m.name} value={m.name}>{m.name}</option>)}
+            </select>
             <button className="btn-load" onClick={searchRange} disabled={loading}>조회</button>
           </div>
         </div>
