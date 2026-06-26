@@ -2113,6 +2113,102 @@
       flex-shrink: 0;
     }
     .btn-comment-submit:hover { background: #574fd6; }
+
+    /* ── 관리자 뷰 ── */
+    .section-btn.admin-btn.active { color: #f97316; border-bottom-color: #f97316; }
+
+    /* 히트맵 */
+    .heatmap-controls { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+    .heatmap-nav-btn { background:#fff; border:1px solid #e0e0ed; border-radius:8px; padding:7px 14px; font-size:0.82rem; cursor:pointer; color:#555; transition:background 0.15s; }
+    .heatmap-nav-btn:hover { background:#f0f0f8; }
+    .heatmap-month-label { font-size:0.95rem; font-weight:700; color:#1a1a2e; min-width:100px; text-align:center; }
+    .heatmap-wrap { overflow-x:auto; background:#fff; border-radius:12px; border:1px solid #e8eaf0; padding:16px; }
+    .heatmap-table { border-collapse:collapse; font-size:0.72rem; }
+    .heatmap-table th { padding:5px 4px; text-align:center; font-weight:700; color:#888; background:#f8f8ff; white-space:nowrap; }
+    .heatmap-table td { width:32px; height:32px; text-align:center; vertical-align:middle; border:1px solid #f0f0f8; border-radius:3px; font-size:0.68rem; font-weight:700; transition:opacity 0.15s; cursor:default; }
+    .heatmap-table td:hover { opacity:0.75; }
+    .hm-name { text-align:left !important; padding:0 10px !important; font-weight:700 !important; color:#1a1a2e; font-size:0.78rem; white-space:nowrap; min-width:72px; }
+    .hm-0    { background:#f3f4f6; color:#d1d5db; }
+    .hm-1    { background:#dcfce7; color:#15803d; }
+    .hm-2    { background:#86efac; color:#166534; }
+    .hm-3    { background:#22c55e; color:#fff; }
+    .hm-4    { background:#15803d; color:#fff; }
+    .hm-5    { background:#14532d; color:#fff; }
+    .hm-weekend { background:#fafafa !important; color:#e5e7eb !important; }
+    .hm-future  { background:#fafafa; color:#e5e7eb; }
+    .heatmap-legend { display:flex; align-items:center; gap:8px; margin-top:14px; font-size:0.75rem; color:#666; flex-wrap:wrap; }
+    .heatmap-legend-cell { width:18px; height:18px; border-radius:3px; border:1px solid rgba(0,0,0,0.06); }
+
+    /* 완료율 추이 */
+    .trend-card { background:#fff; border-radius:12px; border:1px solid #e8eaf0; padding:20px; }
+    .trend-legend { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+    .trend-legend-item { display:flex; align-items:center; gap:6px; font-size:0.78rem; cursor:pointer; padding:4px 10px; border-radius:20px; border:1px solid #e8eaf0; transition:background 0.15s; user-select:none; }
+    .trend-legend-item:hover { background:#f5f5f5; }
+    .trend-legend-item.tl-hidden { opacity:0.3; text-decoration:line-through; }
+    .trend-legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .trend-svg-wrap { overflow-x:auto; }
+    .trend-empty { text-align:center; padding:40px 0; color:#bbb; font-size:0.88rem; }
+
+    /* 리포트 내보내기 */
+    .export-controls { background:#fff; border-radius:12px; border:1px solid #e8eaf0; padding:20px; margin-bottom:16px; }
+    .export-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+    .export-row:last-child { margin-bottom:0; }
+    .export-row label { font-size:0.82rem; font-weight:600; color:#555; white-space:nowrap; }
+    .export-row select, .export-row input[type=date] { padding:7px 10px; border:1px solid #e0e0ed; border-radius:8px; font-size:0.85rem; color:#333; background:#fafafa; outline:none; }
+    .btn-export-action { padding:9px 18px; border:none; border-radius:8px; font-size:0.85rem; font-weight:600; cursor:pointer; transition:background 0.15s; }
+    .btn-export-action.primary { background:#6c63ff; color:#fff; }
+    .btn-export-action.primary:hover { background:#574fd6; }
+    .btn-export-action.secondary { background:#fff; color:#555; border:1px solid #e0e0ed; }
+    .btn-export-action.secondary:hover { background:#f5f5f5; }
+    .export-preview { background:#fff; border-radius:12px; border:1px solid #e8eaf0; padding:28px; }
+    .export-preview-header { text-align:center; margin-bottom:24px; border-bottom:2px solid #1a1a2e; padding-bottom:16px; }
+    .export-preview-title { font-size:1.2rem; font-weight:700; color:#1a1a2e; margin-bottom:4px; }
+    .export-preview-period { font-size:0.82rem; color:#666; }
+    .export-member-block { margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid #f0f0f6; }
+    .export-member-block:last-child { border-bottom:none; padding-bottom:0; }
+    .export-member-name { font-size:0.95rem; font-weight:700; color:#1a1a2e; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+    .export-date-label { font-size:0.78rem; font-weight:700; color:#9999bb; margin:8px 0 4px; }
+    .export-section-title { font-size:0.75rem; font-weight:700; color:#6c63ff; margin:6px 0 3px; }
+    .export-item { font-size:0.85rem; color:#444; padding-left:14px; position:relative; line-height:1.7; }
+    .export-item::before { content:'–'; position:absolute; left:0; color:#bbb; }
+
+    /* 피드백 */
+    .feedback-controls { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .feedback-date-input { padding:8px 12px; border:1px solid #e0e0ed; border-radius:8px; font-size:0.88rem; outline:none; background:#fff; }
+    .feedback-date-input:focus { border-color:#6c63ff; }
+    .btn-feedback-load { padding:8px 18px; background:#6c63ff; color:#fff; border:none; border-radius:8px; font-size:0.88rem; font-weight:600; cursor:pointer; transition:background 0.15s; }
+    .btn-feedback-load:hover { background:#574fd6; }
+    .feedback-report-card { background:#fff; border-radius:14px; border:1px solid #e8eaf0; padding:20px; margin-bottom:16px; }
+    .feedback-section { margin-bottom:8px; }
+    .feedback-section-title { font-size:0.75rem; font-weight:700; color:#6c63ff; margin-bottom:4px; display:flex; align-items:center; gap:5px; }
+    .feedback-section-title::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:#6c63ff; }
+    .feedback-items { list-style:none; }
+    .feedback-items li { font-size:0.85rem; color:#444; padding-left:12px; position:relative; line-height:1.7; }
+    .feedback-items li::before { content:'–'; position:absolute; left:0; color:#bbb; }
+    .feedback-comment-area { margin-top:14px; border-top:2px solid #f0eeff; padding-top:12px; }
+    .feedback-comment-title { font-size:0.78rem; font-weight:700; color:#7b68ee; margin-bottom:10px; }
+    .feedback-comment-item { display:flex; gap:8px; padding:8px 0; border-bottom:1px solid #f5f5fb; align-items:flex-start; }
+    .feedback-comment-item:last-child { border-bottom:none; }
+    .feedback-comment-body { flex:1; min-width:0; }
+    .feedback-comment-author { font-size:0.75rem; font-weight:700; color:#1a1a2e; }
+    .feedback-comment-text { font-size:0.82rem; color:#444; line-height:1.5; margin-top:2px; }
+    .feedback-comment-time { font-size:0.68rem; color:#bbb; margin-top:2px; }
+    .feedback-comment-del { background:none; border:none; color:#ddd; font-size:0.75rem; cursor:pointer; flex-shrink:0; padding:2px; }
+    .feedback-comment-del:hover { color:#ef4444; }
+    .feedback-comment-form { display:flex; gap:8px; align-items:center; background:#f8f8ff; border-radius:8px; padding:8px 10px; margin-top:8px; flex-wrap:wrap; }
+    .feedback-author-select { padding:5px 8px; border:1px solid #e0e0ed; border-radius:6px; font-size:0.78rem; color:#333; background:#fff; flex-shrink:0; outline:none; }
+    .feedback-text-input { flex:1; border:1px solid #e0e0ed; border-radius:6px; padding:6px 10px; font-size:0.82rem; font-family:inherit; color:#333; outline:none; min-width:140px; }
+    .feedback-text-input:focus { border-color:#6c63ff; }
+    .feedback-submit-btn { background:#6c63ff; color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:0.78rem; font-weight:600; cursor:pointer; flex-shrink:0; }
+    .feedback-submit-btn:hover { background:#574fd6; }
+
+    @media print {
+      header, .section-switcher, .tab-bar, #toast, .export-controls,
+      .btn-export-action, button { display:none !important; }
+      body { background:#fff; }
+      main { max-width:100% !important; margin:0; padding:0; }
+      .export-preview { border:none; padding:0; box-shadow:none; }
+    }
   </style>
 </head>
 <body>
@@ -2165,6 +2261,9 @@
     <button class="section-btn plan-btn" id="section-btn-plan" onclick="switchSection('plan',this)">
       <span class="s-icon">📅</span> 업무계획
     </button>
+    <button class="section-btn admin-btn" id="section-btn-admin" onclick="switchSection('admin',this)">
+      <span class="s-icon">👔</span> 관리자
+    </button>
   </div>
 
   <!-- 업무보고 서브탭 -->
@@ -2183,6 +2282,14 @@
     <button class="tab-btn active" onclick="switchTab('weekly-plan',this)">📅 월 계획</button>
     <button class="tab-btn" onclick="switchTab('person-plan',this)">🔍 인물별 조회</button>
     <button class="tab-btn" onclick="switchTab('team-overview',this)">👥 팀원 현황</button>
+  </div>
+
+  <!-- 관리자 서브탭 -->
+  <div class="tab-bar" id="tab-bar-admin" style="display:none">
+    <button class="tab-btn active" onclick="switchTab('heatmap',this)">🔥 업무 히트맵</button>
+    <button class="tab-btn" onclick="switchTab('trend',this)">📈 완료율 추이</button>
+    <button class="tab-btn" onclick="switchTab('export',this)">📤 리포트 내보내기</button>
+    <button class="tab-btn" onclick="switchTab('feedback',this)">💬 피드백</button>
   </div>
 
   <!-- ── 현황판 탭 ── -->
@@ -2333,6 +2440,86 @@
       <button class="wpt-nav-btn" onclick="changeTeamMonth(1)">다음 달 →</button>
     </div>
     <div class="wpt-team-grid" id="team-overview-grid"></div>
+  </div>
+
+  <!-- ── 관리자: 업무 히트맵 탭 ── -->
+  <div class="tab-panel" id="tab-heatmap">
+    <div class="heatmap-controls">
+      <button class="heatmap-nav-btn" onclick="changeHmMonth(-1)">← 이전 달</button>
+      <div class="heatmap-month-label" id="hm-month-label">—</div>
+      <button class="heatmap-nav-btn" onclick="changeHmMonth(1)">다음 달 →</button>
+    </div>
+    <div class="heatmap-wrap">
+      <div id="hm-grid"><div class="empty-state">로딩 중...</div></div>
+    </div>
+    <div class="heatmap-legend">
+      <span style="font-weight:600;color:#555">업무 밀도:</span>
+      <div class="heatmap-legend-cell hm-0"></div><span>없음</span>
+      <div class="heatmap-legend-cell hm-1"></div><span>1-3건</span>
+      <div class="heatmap-legend-cell hm-2"></div><span>4-6건</span>
+      <div class="heatmap-legend-cell hm-3"></div><span>7-10건</span>
+      <div class="heatmap-legend-cell hm-4"></div><span>11-15건</span>
+      <div class="heatmap-legend-cell hm-5"></div><span>16건+</span>
+      <span style="margin-left:12px;color:#bbb">※ 주요완료·진행사항·주요회의 합산</span>
+    </div>
+  </div>
+
+  <!-- ── 관리자: 완료율 추이 탭 ── -->
+  <div class="tab-panel" id="tab-trend">
+    <div class="trend-card">
+      <div style="font-size:0.85rem;font-weight:700;color:#555;margin-bottom:12px">멤버별 월간 완료율 추이 <span style="font-size:0.75rem;font-weight:400;color:#bbb">(주요완료 / 주요완료+진행사항)</span></div>
+      <div id="trend-legend" class="trend-legend"></div>
+      <div class="trend-svg-wrap">
+        <div id="trend-chart-area"><div class="empty-state">로딩 중...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 관리자: 리포트 내보내기 탭 ── -->
+  <div class="tab-panel" id="tab-export">
+    <div class="export-controls">
+      <div class="export-row">
+        <label>기간</label>
+        <input type="date" id="exp-from">
+        <span style="color:#aaa">~</span>
+        <input type="date" id="exp-to">
+        <label>팀원</label>
+        <select id="exp-person">
+          <option value="">전체</option>
+          <option value="박희진">박희진</option>
+          <option value="설한영">설한영</option>
+          <option value="정연환">정연환</option>
+          <option value="박수정">박수정</option>
+          <option value="박경현">박경현</option>
+          <option value="유준우">유준우</option>
+          <option value="유하연">유하연</option>
+        </select>
+      </div>
+      <div class="export-row">
+        <button class="btn-export-action primary" onclick="renderExportPreview()">조회</button>
+        <button class="btn-export-action primary" onclick="exportPrint()">🖨 인쇄 / PDF</button>
+        <button class="btn-export-action secondary" onclick="exportCopyText()">📋 텍스트 복사</button>
+      </div>
+    </div>
+    <div class="export-preview" id="export-preview-wrap">
+      <div class="export-preview-header">
+        <div class="export-preview-title" id="exp-report-title">팀 업무보고서</div>
+        <div class="export-preview-period" id="exp-report-period">기간을 선택하고 조회하세요</div>
+      </div>
+      <div id="export-preview-body"></div>
+    </div>
+  </div>
+
+  <!-- ── 관리자: 피드백 탭 ── -->
+  <div class="tab-panel" id="tab-feedback">
+    <div class="feedback-controls">
+      <label style="font-size:0.85rem;font-weight:600;color:#555">날짜 선택</label>
+      <input type="date" id="fb-date" class="feedback-date-input">
+      <button class="btn-feedback-load" onclick="loadFeedback()">조회</button>
+    </div>
+    <div id="feedback-result">
+      <div class="empty-state">날짜를 선택하고 조회하세요</div>
+    </div>
   </div>
 
   <!-- ── 인물별 조회 탭 ── -->
@@ -2725,9 +2912,11 @@
     const isDashboard = section === 'dashboard';
     const isReport    = section === 'report';
     const isPlan      = section === 'plan';
+    const isAdmin     = section === 'admin';
 
     document.getElementById('tab-bar-report').style.display = isReport ? '' : 'none';
     document.getElementById('tab-bar-plan').style.display   = isPlan   ? '' : 'none';
+    document.getElementById('tab-bar-admin').style.display  = isAdmin  ? '' : 'none';
     document.querySelector('main').classList.toggle('plan-wide', isPlan);
 
     if (isDashboard) {
@@ -2742,9 +2931,12 @@
     } else if (isReport) {
       const active = document.querySelector('#tab-bar-report .tab-btn.active');
       (active || document.querySelector('#tab-bar-report .tab-btn')).click();
-    } else {
+    } else if (isPlan) {
       const active = document.querySelector('#tab-bar-plan .tab-btn.active');
       (active || document.querySelector('#tab-bar-plan .tab-btn')).click();
+    } else if (isAdmin) {
+      const active = document.querySelector('#tab-bar-admin .tab-btn.active');
+      (active || document.querySelector('#tab-bar-admin .tab-btn')).click();
     }
   }
 
@@ -2760,6 +2952,10 @@
     if (id === 'weekly') loadWeekly();
     if (id === 'team-overview') { _teamMonth = _wpMonth; renderTeamOverview(); }
     if (id === 'person-plan') { _ppMonth = _wpMonth; document.getElementById('pp-month-label').textContent = mkeyLabel(_ppMonth); renderPersonPlan(); }
+    if (id === 'heatmap')   { initHeatmap(); }
+    if (id === 'trend')     { renderTrendChart(); }
+    if (id === 'export')    { initExportDates(); }
+    if (id === 'feedback')  { /* 날짜 선택 후 조회 */ }
   }
 
   // ── 토스트 ────────────────────────────────────────────
@@ -5505,6 +5701,421 @@
     input.focus();
     input.setSelectionRange(newPos, newPos);
     document.getElementById(`nc-mention-${id}`).classList.remove('open');
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── 관리자: 1. 팀 업무 부하 히트맵 ──────────────────
+  // ══════════════════════════════════════════════════════
+  let _hmYear = 0, _hmMonth = 0;
+
+  function initHeatmap() {
+    if (!_hmYear) {
+      // 데이터가 있는 가장 최근 달로 초기화
+      const dates = LOCAL_DATA.map(r => r['날짜']).filter(Boolean).sort();
+      if (dates.length) {
+        const last = dates[dates.length - 1];
+        _hmYear  = parseInt(last.slice(0, 4));
+        _hmMonth = parseInt(last.slice(5, 7));
+      } else {
+        const now = new Date();
+        _hmYear = now.getFullYear(); _hmMonth = now.getMonth() + 1;
+      }
+    }
+    renderHeatmap();
+  }
+
+  function changeHmMonth(delta) {
+    _hmMonth += delta;
+    if (_hmMonth > 12) { _hmMonth = 1; _hmYear++; }
+    if (_hmMonth < 1)  { _hmMonth = 12; _hmYear--; }
+    renderHeatmap();
+  }
+
+  async function renderHeatmap() {
+    const mkey  = `${_hmYear}-${String(_hmMonth).padStart(2, '0')}`;
+    const label = `${_hmYear}년 ${_hmMonth}월`;
+    document.getElementById('hm-month-label').textContent = label;
+
+    const allRows   = await fetchSheet();
+    const monthRows = allRows.filter(r => r['날짜'] && r['날짜'].startsWith(mkey));
+
+    const today      = new Date().toISOString().slice(0, 10);
+    const daysInMo   = new Date(_hmYear, _hmMonth, 0).getDate();
+    const DOW_KO     = ['일', '월', '화', '수', '목', '금', '토'];
+
+    // 멤버별·날짜별 업무 밀도 집계
+    const density = {};
+    MEMBERS.forEach(m => { density[m.name] = {}; });
+    monthRows.forEach(r => {
+      const mem = MEMBERS.find(m => (r['이름'] || '').startsWith(m.name));
+      if (!mem) return;
+      const d = r['날짜'];
+      density[mem.name][d] = (density[mem.name][d] || 0)
+        + parseItems(r['주요완료']).length
+        + parseItems(r['진행사항']).length
+        + parseItems(r['주요회의']).length;
+    });
+
+    function hmClass(cnt, isWknd, isFuture) {
+      if (isWknd)  return 'hm-weekend';
+      if (isFuture) return 'hm-future';
+      if (cnt === 0) return 'hm-0';
+      if (cnt <= 3)  return 'hm-1';
+      if (cnt <= 6)  return 'hm-2';
+      if (cnt <= 10) return 'hm-3';
+      if (cnt <= 15) return 'hm-4';
+      return 'hm-5';
+    }
+
+    // 날짜 배열
+    const days = [];
+    for (let d = 1; d <= daysInMo; d++) {
+      const ds  = `${mkey}-${String(d).padStart(2, '0')}`;
+      const dow = new Date(ds + 'T00:00:00').getDay();
+      days.push({ d, ds, dow });
+    }
+
+    // 헤더 행
+    let html = '<table class="heatmap-table"><thead><tr>';
+    html += '<th class="hm-name">팀원</th>';
+    days.forEach(({ d, dow }) => {
+      const isWknd = dow === 0 || dow === 6;
+      html += `<th style="${isWknd ? 'color:#d1d5db' : ''}">${d}<br><span style="font-size:0.6rem">${DOW_KO[dow]}</span></th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    // 데이터 행
+    MEMBERS.forEach(m => {
+      html += `<tr><td class="hm-name">${m.name}</td>`;
+      days.forEach(({ ds, dow }) => {
+        const isWknd  = dow === 0 || dow === 6;
+        const isFuture = ds > today;
+        const cnt      = density[m.name][ds] || 0;
+        const cls      = hmClass(cnt, isWknd, isFuture);
+        const tip      = isWknd ? '주말' : isFuture ? '미래' : `${cnt}건`;
+        html += `<td class="${cls}" title="${m.name} ${ds}: ${tip}">${!isWknd && !isFuture && cnt > 0 ? cnt : ''}</td>`;
+      });
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    document.getElementById('hm-grid').innerHTML = html;
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── 관리자: 2. 완료율 추이 차트 ──────────────────────
+  // ══════════════════════════════════════════════════════
+  const _trendHidden = new Set();
+  const TREND_COLORS = ['#6c63ff','#22c55e','#f97316','#3b82f6','#ec4899','#14b8a6','#a855f7'];
+
+  async function renderTrendChart() {
+    const allRows = await fetchSheet();
+
+    // 존재하는 월 수집
+    const monthSet = new Set();
+    allRows.forEach(r => { if (r['날짜']) monthSet.add(r['날짜'].slice(0, 7)); });
+    const months = [...monthSet].sort();
+
+    const legendEl = document.getElementById('trend-legend');
+    const chartEl  = document.getElementById('trend-chart-area');
+
+    if (!months.length) {
+      legendEl.innerHTML = '';
+      chartEl.innerHTML  = '<div class="trend-empty">데이터가 없습니다</div>';
+      return;
+    }
+
+    // 멤버별 월별 완료율 계산
+    const memberRates = {};
+    MEMBERS.forEach(m => {
+      memberRates[m.name] = months.map(mo => {
+        const mrows = allRows.filter(r =>
+          r['날짜']?.startsWith(mo) && (r['이름'] || '').startsWith(m.name)
+        );
+        let done = 0, progress = 0;
+        mrows.forEach(r => {
+          done     += parseItems(r['주요완료']).length;
+          progress += parseItems(r['진행사항']).length;
+        });
+        const total = done + progress;
+        return total > 0 ? Math.round((done / total) * 100) : null;
+      });
+    });
+
+    // 범례
+    legendEl.innerHTML = MEMBERS.map((m, i) =>
+      `<div class="trend-legend-item${_trendHidden.has(m.name) ? ' tl-hidden' : ''}"
+            onclick="toggleTrendMember('${m.name}')">
+        <div class="trend-legend-dot" style="background:${TREND_COLORS[i % TREND_COLORS.length]}"></div>
+        ${m.name}
+      </div>`
+    ).join('');
+
+    // SVG 그리기
+    const W = 680, H = 300;
+    const PAD = { top: 24, right: 24, bottom: 44, left: 52 };
+    const CW  = W - PAD.left - PAD.right;
+    const CH  = H - PAD.top  - PAD.bottom;
+    const xOf = (i) => PAD.left + (months.length > 1 ? (i / (months.length - 1)) * CW : CW / 2);
+    const yOf = (v) => PAD.top + CH - (v / 100) * CH;
+
+    let svg = `<svg width="100%" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="max-width:${W}px;display:block">`;
+
+    // 배경 그리드
+    [0, 25, 50, 75, 100].forEach(v => {
+      const y = yOf(v);
+      svg += `<line x1="${PAD.left}" y1="${y}" x2="${W - PAD.right}" y2="${y}" stroke="#f0f0f8" stroke-width="1.5"/>`;
+      svg += `<text x="${PAD.left - 6}" y="${y + 4}" text-anchor="end" font-size="11" fill="#bbb">${v}%</text>`;
+    });
+
+    // X축 레이블
+    months.forEach((mo, i) => {
+      const [yr, mn] = mo.split('-');
+      const x = xOf(i);
+      svg += `<text x="${x}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#888">${yr.slice(2)}.${parseInt(mn)}월</text>`;
+      svg += `<line x1="${x}" y1="${PAD.top}" x2="${x}" y2="${PAD.top + CH}" stroke="#f0f0f8" stroke-width="1" stroke-dasharray="4,3"/>`;
+    });
+
+    // 각 멤버 라인
+    MEMBERS.forEach((mem, mi) => {
+      if (_trendHidden.has(mem.name)) return;
+      const color  = TREND_COLORS[mi % TREND_COLORS.length];
+      const points = memberRates[mem.name];
+      const valid  = points.map((v, i) => v !== null ? [xOf(i), yOf(v), v] : null).filter(Boolean);
+
+      if (valid.length > 1) {
+        const d = valid.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0]},${p[1]}`).join(' ');
+        svg += `<path d="${d}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.9"/>`;
+      }
+      valid.forEach(([x, y, v]) => {
+        svg += `<circle cx="${x}" cy="${y}" r="5" fill="${color}" stroke="#fff" stroke-width="2"><title>${mem.name}: ${v}%</title></circle>`;
+        svg += `<text x="${x}" y="${y - 9}" text-anchor="middle" font-size="10" fill="${color}" font-weight="700">${v}%</text>`;
+      });
+    });
+
+    svg += '</svg>';
+    chartEl.innerHTML = svg;
+  }
+
+  function toggleTrendMember(name) {
+    if (_trendHidden.has(name)) _trendHidden.delete(name);
+    else _trendHidden.add(name);
+    renderTrendChart();
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── 관리자: 3. 리포트 내보내기 ───────────────────────
+  // ══════════════════════════════════════════════════════
+  function initExportDates() {
+    const fromEl = document.getElementById('exp-from');
+    const toEl   = document.getElementById('exp-to');
+    if (fromEl && !fromEl.value) {
+      // 이번 주 월~오늘 기본값
+      const now  = new Date();
+      const day  = now.getDay();
+      const mon  = new Date(now); mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+      fromEl.value = mon.toISOString().slice(0, 10);
+      toEl.value   = now.toISOString().slice(0, 10);
+    }
+  }
+
+  async function renderExportPreview() {
+    const from   = document.getElementById('exp-from').value;
+    const to     = document.getElementById('exp-to').value;
+    const person = document.getElementById('exp-person').value;
+
+    if (!from || !to) { showToast('기간을 입력해주세요', 'error'); return; }
+
+    const allRows = await fetchSheet();
+    let rows = allRows.filter(r => r['날짜'] && r['날짜'] >= from && r['날짜'] <= to);
+    if (person) rows = rows.filter(r => (r['이름'] || '').startsWith(person));
+
+    const bodyEl  = document.getElementById('export-preview-body');
+    const titleEl = document.getElementById('exp-report-title');
+    const periodEl = document.getElementById('exp-report-period');
+
+    titleEl.textContent  = person ? `${person} 업무보고서` : '팀 업무보고서';
+    periodEl.textContent = `${from.replace(/-/g, '.')} ~ ${to.replace(/-/g, '.')}`;
+
+    if (!rows.length) {
+      bodyEl.innerHTML = '<div class="empty-state" style="padding:40px 0">해당 기간에 데이터가 없습니다</div>';
+      return;
+    }
+
+    const memberOrder = person ? [person] : MEMBERS.map(m => m.name);
+    const REPORT_SECTIONS = [
+      ['주요완료',   '주요 완료'],
+      ['주요회의',   '주요 회의 / 의사결정'],
+      ['진행사항',   '진행사항'],
+      ['이슈리스크', '이슈 / 리스크'],
+    ];
+
+    let html = '';
+    memberOrder.forEach(name => {
+      const mrows = rows.filter(r => (r['이름'] || '').startsWith(name));
+      if (!mrows.length) return;
+      const dept = mrows[0]['부서'] || '';
+      html += `<div class="export-member-block">`;
+      html += `<div class="export-member-name">
+        <div style="width:26px;height:26px;border-radius:50%;background:${avatarColor(name)};color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0">${name[0]}</div>
+        ${name}<span style="font-size:0.78rem;font-weight:400;color:#999;margin-left:4px">${dept}</span>
+      </div>`;
+
+      mrows.slice().sort((a, b) => a['날짜'] > b['날짜'] ? 1 : -1).forEach(r => {
+        const dl = r['날짜'].replace(/-/g, '.').slice(2);
+        html += `<div class="export-date-label">▸ ${dl}</div>`;
+        REPORT_SECTIONS.forEach(([key, label]) => {
+          const items = parseItems(r[key]);
+          if (!items.length) return;
+          html += `<div class="export-section-title">${label}</div>`;
+          html += items.map(it => `<div class="export-item">${it}</div>`).join('');
+        });
+      });
+      html += '</div>';
+    });
+
+    bodyEl.innerHTML = html;
+  }
+
+  function exportPrint() {
+    const body = document.getElementById('export-preview-body');
+    if (!body || !body.textContent.trim()) { showToast('먼저 조회하세요', 'error'); return; }
+    window.print();
+  }
+
+  function exportCopyText() {
+    const body = document.getElementById('export-preview-body');
+    if (!body || !body.textContent.trim()) { showToast('먼저 조회하세요', 'error'); return; }
+    const text = body.innerText;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => showToast('클립보드에 복사됐습니다', 'success'));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      showToast('클립보드에 복사됐습니다', 'success');
+    }
+  }
+
+  // ══════════════════════════════════════════════════════
+  // ── 관리자: 4. 업무 댓글 / 피드백 ───────────────────
+  // ══════════════════════════════════════════════════════
+  const _fbKeyMap = {};   // idx → localStorage key
+  let   _fbDate   = '';
+
+  async function loadFeedback() {
+    const dateEl = document.getElementById('fb-date');
+    if (dateEl.value) _fbDate = dateEl.value;
+    if (!_fbDate) { showToast('날짜를 선택해주세요', 'error'); return; }
+
+    const allRows = await fetchSheet();
+    const dayRows = allRows.filter(r => r['날짜'] === _fbDate);
+    const el      = document.getElementById('feedback-result');
+
+    if (!dayRows.length) {
+      el.innerHTML = '<div class="empty-state">해당 날짜에 보고서가 없습니다</div>';
+      return;
+    }
+
+    const MEMBER_OPTIONS = `
+      <option value="">작성자 선택</option>
+      <optgroup label="임원"><option>이지선</option><option>조맹섭</option><option>김청진</option></optgroup>
+      <optgroup label="경영지원본부"><option>박희진</option><option>설한영</option><option>정연환</option><option>박수정</option><option>박경현</option><option>유준우</option><option>유하연</option></optgroup>`;
+
+    const REPORT_SECS = [
+      ['주요완료','주요 완료'],['주요회의','주요 회의'],
+      ['진행사항','진행사항'],['이슈리스크','이슈/리스크'],
+    ];
+
+    el.innerHTML = dayRows.map((r, idx) => {
+      const name  = r['이름'] || '';
+      const dept  = r['부서'] || '';
+      const fkey  = `mgr_fb_${_fbDate}_${name}`;
+      _fbKeyMap[idx] = fkey;
+
+      const comments = JSON.parse(_lsGet(fkey) || '[]');
+
+      const sectionsHtml = REPORT_SECS.map(([key, label]) => {
+        const items = parseItems(r[key]);
+        if (!items.length) return '';
+        return `<div class="feedback-section">
+          <div class="feedback-section-title">${label}</div>
+          <ul class="feedback-items">${items.map(it => `<li>${it}</li>`).join('')}</ul>
+        </div>`;
+      }).join('');
+
+      const commentsHtml = comments.length
+        ? comments.map((c, ci) => `
+          <div class="feedback-comment-item">
+            <div class="report-avatar" style="background:${avatarColor(c.author)};width:26px;height:26px;font-size:0.7rem;flex-shrink:0">${c.author[0]}</div>
+            <div class="feedback-comment-body">
+              <div class="feedback-comment-author">${c.author}</div>
+              <div class="feedback-comment-text">${c.text}</div>
+              <div class="feedback-comment-time">${c.time}</div>
+            </div>
+            <button class="feedback-comment-del" onclick="deleteFeedback(${idx},${ci})" title="삭제">✕</button>
+          </div>`).join('')
+        : '<div style="font-size:0.78rem;color:#bbb;padding:4px 0">아직 피드백이 없습니다</div>';
+
+      return `
+        <div class="feedback-report-card">
+          <div class="report-card-header" style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f0f0f6">
+            <div class="report-avatar" style="background:${avatarColor(name)}">${name[0]}</div>
+            <div>
+              <div class="report-name">${name}</div>
+              <div class="report-dept">${dept}</div>
+            </div>
+            <div class="report-date-badge">${_fbDate}</div>
+          </div>
+          ${sectionsHtml}
+          <div class="feedback-comment-area">
+            <div class="feedback-comment-title">
+              💬 관리자 피드백
+              <span style="font-size:0.72rem;font-weight:400;color:#bbb;margin-left:4px">${comments.length}건</span>
+            </div>
+            <div class="feedback-comment-list">${commentsHtml}</div>
+            <div class="feedback-comment-form">
+              <select class="feedback-author-select" id="fb-author-${idx}">${MEMBER_OPTIONS}</select>
+              <input class="feedback-text-input" id="fb-text-${idx}" type="text"
+                placeholder="피드백 또는 코멘트를 입력하세요"
+                onkeydown="if(event.key==='Enter')submitFeedback(${idx})">
+              <button class="feedback-submit-btn" onclick="submitFeedback(${idx})">등록</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function submitFeedback(idx) {
+    const authorEl = document.getElementById(`fb-author-${idx}`);
+    const textEl   = document.getElementById(`fb-text-${idx}`);
+    const author   = authorEl?.value;
+    const text     = textEl?.value?.trim();
+    const fkey     = _fbKeyMap[idx];
+    if (!fkey)   return;
+    if (!author) { showToast('작성자를 선택해주세요', 'error'); return; }
+    if (!text)   { showToast('내용을 입력해주세요', 'error'); return; }
+
+    const comments = JSON.parse(_lsGet(fkey) || '[]');
+    const now      = new Date();
+    const timeStr  = `${now.getFullYear()}.${now.getMonth()+1}.${String(now.getDate()).padStart(2,'0')} `
+                   + `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    comments.push({ author, text, time: timeStr });
+    _lsSet(fkey, JSON.stringify(comments));
+    textEl.value = '';
+    loadFeedback();
+    showToast('피드백이 등록됐습니다', 'success');
+  }
+
+  function deleteFeedback(idx, commentIdx) {
+    const fkey = _fbKeyMap[idx];
+    if (!fkey) return;
+    if (!confirm('피드백을 삭제할까요?')) return;
+    const comments = JSON.parse(_lsGet(fkey) || '[]');
+    comments.splice(commentIdx, 1);
+    _lsSet(fkey, JSON.stringify(comments));
+    loadFeedback();
+    showToast('삭제됐습니다');
   }
 
   loadWeekly();
