@@ -62,67 +62,68 @@
       display: flex;
       gap: 0;
       margin-bottom: 0;
-      background: #1e293b;
-      border-bottom: none;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
     }
     .section-btn {
       display: flex;
       align-items: center;
       gap: 7px;
-      padding: 11px 28px;
+      padding: 13px 26px;
       border: none;
       background: none;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 600;
-      color: rgba(255,255,255,0.45);
+      color: #94a3b8;
       cursor: pointer;
-      border-bottom: 3px solid transparent;
-      margin-bottom: 0;
-      transition: color 0.15s, background 0.15s, border-color 0.15s;
+      border-bottom: 2.5px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
       white-space: nowrap;
     }
-    .section-btn:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.06); }
-    .section-btn.active { color: #93c5fd; border-bottom-color: #3b82f6; background: rgba(59,130,246,0.12); }
-    .section-btn.plan-btn.active { color: #6ee7b7; border-bottom-color: #10b981; background: rgba(16,185,129,0.1); }
-    .section-btn.admin-btn.active { color: #fcd34d; border-bottom-color: #f59e0b; background: rgba(245,158,11,0.1); }
-    .section-btn .s-icon { font-size: 1rem; }
+    .section-btn:hover { color: #475569; }
+    .section-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+    .section-btn.plan-btn.active { color: #059669; border-bottom-color: #059669; }
+    .section-btn.admin-btn.active { color: #d97706; border-bottom-color: #d97706; }
+    .section-btn .s-icon { font-size: 0.95rem; }
 
     /* ── 탭 ── */
     .tab-bar {
       display: flex;
       flex-wrap: nowrap;
-      gap: 2px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 0 0 10px 10px;
-      border-top: none;
-      padding: 6px 6px 6px;
-      margin-bottom: 28px;
+      gap: 4px;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      border-radius: 0;
+      padding: 8px 12px 0;
+      margin-bottom: 24px;
       overflow-x: auto;
       scrollbar-width: none;
     }
     .tab-bar::-webkit-scrollbar { display: none; }
 
     .tab-btn {
-      padding: 8px 14px;
+      padding: 7px 14px 9px;
       border: none;
       background: none;
-      border-radius: 7px;
-      font-size: 0.82rem;
+      border-radius: 0;
+      font-size: 0.81rem;
       font-weight: 500;
-      color: #64748b;
+      color: #94a3b8;
       cursor: pointer;
       white-space: nowrap;
       flex-shrink: 0;
-      transition: background 0.15s, color 0.15s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
     }
 
-    .tab-btn:hover { background: #e2e8f0; color: #1e293b; }
+    .tab-btn:hover { color: #334155; }
 
     .tab-btn.active {
-      background: #2563eb;
-      color: #fff;
-      font-weight: 600;
+      color: #2563eb;
+      font-weight: 700;
+      border-bottom-color: #2563eb;
     }
 
     .tab-panel { display: none; }
@@ -131,8 +132,9 @@
     /* ── 작성 폼 ── */
     .form-card {
       background: #fff;
-      border-radius: 14px;
-      border: 1px solid #e8eaf0;
+      border-radius: 12px;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 1px 4px rgba(15,23,42,0.06), 0 4px 16px rgba(15,23,42,0.04);
       padding: 32px;
     }
 
@@ -397,7 +399,7 @@
     .report-card {
       background: #fff;
       border-radius: 14px;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       padding: 24px;
     }
 
@@ -515,7 +517,7 @@
     .timeline-item {
       background: #fff;
       border-radius: 12px;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       overflow: hidden;
     }
 
@@ -565,28 +567,33 @@
 
     .dash-card {
       background: #fff;
-      border-radius: 10px;
-      border: 1px solid #e8eaf0;
-      padding: 10px 16px;
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.07), 0 4px 12px rgba(15,23,42,0.04);
+      padding: 18px 20px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
     }
 
     .dash-card .label {
-      font-size: 0.72rem;
-      color: #999;
-      letter-spacing: 0.02em;
+      font-size: 0.7rem;
+      color: #94a3b8;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
     }
 
     .dash-card .value {
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #0f172a;
     }
 
     .dash-card .value.purple { color: #2563eb; }
-    .dash-card .value.green  { color: #22c55e; }
+    .dash-card .value.green  { color: #059669; }
     .dash-card .value.red    { color: #ef4444; }
 
     .submit-status-grid {
@@ -598,16 +605,17 @@
 
     .member-status-card {
       background: #fff;
-      border-radius: 10px;
-      border: 1.5px solid #e8eaf0;
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.07), 0 2px 8px rgba(15,23,42,0.04);
       padding: 14px 16px;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .member-status-card.submitted { border-color: #bbf7d0; background: #f0fdf4; }
-    .member-status-card.missing   { border-color: #fecaca; background: #fef2f2; }
+    .member-status-card.submitted { box-shadow: 0 0 0 1.5px #bbf7d0, 0 2px 8px rgba(5,150,105,0.07); background: #f0fdf4; }
+    .member-status-card.missing   { box-shadow: 0 0 0 1.5px #fecaca, 0 2px 8px rgba(239,68,68,0.07); background: #fef2f2; }
 
     .member-status-top { display: flex; align-items: center; gap: 12px; }
 
@@ -640,7 +648,7 @@
       gap: 8px; margin-bottom: 24px;
     }
     .next-plan-card {
-      background: #fff; border: 1.5px solid #e8eaf0; border-radius: 10px;
+      background: #fff; border: none; box-shadow: 0 1px 3px rgba(15,23,42,0.07); border-radius: 10px;
       padding: 12px 14px; display: flex; align-items: center; gap: 10px;
     }
     .next-plan-card.ok      { border-color: #bbf7d0; background: #f0fdf4; }
@@ -751,7 +759,7 @@
     .search-result-card {
       background: #fff;
       border-radius: 12px;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       padding: 16px 20px;
       margin-bottom: 10px;
     }
@@ -827,7 +835,7 @@
       padding: 10px 10px;
       background: #fff;
       border-radius: 8px;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
     }
     .weekly-name-cell .wn-name { font-size: 0.88rem; font-weight: 700; color: #1a1a2e; }
     .weekly-name-cell .wn-dept { font-size: 0.7rem; color: #999; margin-top: 2px; }
@@ -835,7 +843,7 @@
     .weekly-day-cell {
       background: #fff;
       border-radius: 8px;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       padding: 8px 10px;
       min-height: 70px;
       font-size: 0.78rem;
@@ -925,7 +933,7 @@
       gap: 10px;
       padding: 10px 12px;
       border-radius: 8px;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       background: #f8f9ff;
       cursor: pointer;
       transition: background 0.12s;
@@ -1041,7 +1049,7 @@
     .metric-card {
       background: #fff;
       border-radius: 12px;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       padding: 16px 18px;
     }
     .metric-card-header {
@@ -1115,7 +1123,7 @@
     /* ── 공지 게시판 ── */
     .notice-compose {
       background: #fff;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       border-radius: 14px;
       padding: 20px;
       margin-bottom: 24px;
@@ -1241,7 +1249,7 @@
 
     .notice-card {
       background: #fff;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       border-radius: 12px;
       padding: 18px 20px;
       margin-bottom: 12px;
@@ -1490,7 +1498,7 @@
     }
     .wpt-memo-col {
       background: #fff;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       border-radius: 10px;
       padding: 10px 12px;
     }
@@ -1546,7 +1554,7 @@
       background: #fff;
       border-radius: 12px;
       overflow: hidden;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
     }
     .wpt-table thead th {
       background: #f8f8ff;
@@ -1715,7 +1723,7 @@
     .wpt-team-month-label { font-size:1rem; font-weight:700; color:#1a1a2e; }
     .wpt-team-grid { display: flex; flex-direction: column; gap: 18px; }
     .wpt-team-person-block {
-      background: #fff; border: 1px solid #e8eaf0; border-radius: 12px; overflow: hidden;
+      background: #fff; border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05); border-radius: 12px; overflow: hidden;
     }
     .wpt-team-person-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -1789,7 +1797,7 @@
     .range-search-wrap {
       background: #fff;
       border-radius: 12px;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       padding: 18px 20px;
       margin-top: 8px;
     }
@@ -1851,7 +1859,7 @@
     .cal-wrap {
       background: #fff;
       border-radius: 12px;
-      border: 1px solid #e8eaf0;
+      border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
       padding: 14px;
       margin-bottom: 24px;
       max-width: 240px;
@@ -2125,7 +2133,7 @@
     .heatmap-nav-btn { background:#fff; border:1px solid #e0e0ed; border-radius:8px; padding:7px 14px; font-size:0.82rem; cursor:pointer; color:#555; transition:background 0.15s; }
     .heatmap-nav-btn:hover { background:#f0f0f8; }
     .heatmap-month-label { font-size:0.95rem; font-weight:700; color:#1a1a2e; min-width:100px; text-align:center; }
-    .heatmap-wrap { overflow-x:auto; background:#fff; border-radius:12px; border:1px solid #e8eaf0; padding:16px; }
+    .heatmap-wrap { overflow-x:auto; background:#fff; border-radius:12px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05); padding:16px; }
     .heatmap-table { border-collapse:collapse; font-size:0.72rem; }
     .heatmap-table th { padding:5px 4px; text-align:center; font-weight:700; color:#888; background:#f8f8ff; white-space:nowrap; }
     .heatmap-table td { width:32px; height:32px; text-align:center; vertical-align:middle; border:1px solid #f0f0f8; border-radius:3px; font-size:0.68rem; font-weight:700; transition:opacity 0.15s; cursor:default; }
@@ -2143,9 +2151,9 @@
     .heatmap-legend-cell { width:18px; height:18px; border-radius:3px; border:1px solid rgba(0,0,0,0.06); }
 
     /* 완료율 추이 */
-    .trend-card { background:#fff; border-radius:12px; border:1px solid #e8eaf0; padding:20px; }
+    .trend-card { background:#fff; border-radius:12px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05); padding:20px; }
     .trend-legend { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-    .trend-legend-item { display:flex; align-items:center; gap:6px; font-size:0.78rem; cursor:pointer; padding:4px 10px; border-radius:20px; border:1px solid #e8eaf0; transition:background 0.15s; user-select:none; }
+    .trend-legend-item { display:flex; align-items:center; gap:6px; font-size:0.78rem; cursor:pointer; padding:4px 10px; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05); transition:background 0.15s; user-select:none; }
     .trend-legend-item:hover { background:#f5f5f5; }
     .trend-legend-item.tl-hidden { opacity:0.3; text-decoration:line-through; }
     .trend-legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
@@ -2153,7 +2161,7 @@
     .trend-empty { text-align:center; padding:40px 0; color:#bbb; font-size:0.88rem; }
 
     /* 리포트 내보내기 */
-    .export-controls { background:#fff; border-radius:12px; border:1px solid #e8eaf0; padding:20px; margin-bottom:16px; }
+    .export-controls { background:#fff; border-radius:12px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05); padding:20px; margin-bottom:16px; }
     .export-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
     .export-row:last-child { margin-bottom:0; }
     .export-row label { font-size:0.82rem; font-weight:600; color:#555; white-space:nowrap; }
@@ -2163,7 +2171,7 @@
     .btn-export-action.primary:hover { background:#1d4ed8; }
     .btn-export-action.secondary { background:#fff; color:#555; border:1px solid #e0e0ed; }
     .btn-export-action.secondary:hover { background:#f5f5f5; }
-    .export-preview { background:#fff; border-radius:12px; border:1px solid #e8eaf0; padding:28px; }
+    .export-preview { background:#fff; border-radius:12px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05); padding:28px; }
     .export-preview-header { text-align:center; margin-bottom:24px; border-bottom:2px solid #1a1a2e; padding-bottom:16px; }
     .export-preview-title { font-size:1.2rem; font-weight:700; color:#1a1a2e; margin-bottom:4px; }
     .export-preview-period { font-size:0.82rem; color:#666; }
@@ -2181,7 +2189,7 @@
     .feedback-date-input:focus { border-color:#2563eb; }
     .btn-feedback-load { padding:8px 18px; background:#2563eb; color:#fff; border:none; border-radius:8px; font-size:0.88rem; font-weight:600; cursor:pointer; transition:background 0.15s; }
     .btn-feedback-load:hover { background:#1d4ed8; }
-    .feedback-report-card { background:#fff; border-radius:14px; border:1px solid #e8eaf0; padding:20px; margin-bottom:16px; }
+    .feedback-report-card { background:#fff; border-radius:14px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05); padding:20px; margin-bottom:16px; }
     .feedback-section { margin-bottom:8px; }
     .feedback-section-title { font-size:0.75rem; font-weight:700; color:#2563eb; margin-bottom:4px; display:flex; align-items:center; gap:5px; }
     .feedback-section-title::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:#2563eb; }
@@ -2207,19 +2215,19 @@
 
     /* ── 이슈 트래킹 ── */
     .itrack-summary { display:flex; gap:10px; margin-bottom:18px; }
-    .itrack-sum-card { background:#fff; border-radius:10px; border:1px solid #e8eaf0; padding:10px 16px; flex:1; text-align:center; }
+    .itrack-sum-card { background:#fff; border-radius:10px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05); padding:10px 16px; flex:1; text-align:center; }
     .itrack-sum-num   { font-size:1.35rem; font-weight:700; letter-spacing:-0.02em; }
     .itrack-sum-label { font-size:0.72rem; color:#999; margin-top:2px; }
 
     .itrack-controls { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
     .itrack-filter-btn {
-      padding:5px 14px; border:1.5px solid #e0e0ed; border-radius:20px;
+      padding:5px 14px; border:1px solid #e2e8f0; border-radius:20px;
       background:#fff; font-size:0.8rem; cursor:pointer; color:#666;
       transition:background 0.15s, color 0.15s, border-color 0.15s;
     }
     .itrack-filter-btn:hover { background:#f5f5f5; }
 
-    .itrack-card { background:#fff; border-radius:12px; border:1.5px solid #e8eaf0; padding:16px 18px; margin-bottom:10px; border-left:4px solid #e8eaf0; }
+    .itrack-card { background:#fff; border-radius:12px; border:none; box-shadow:0 1px 3px rgba(15,23,42,0.07); padding:16px 18px; margin-bottom:10px; border-left:4px solid #e8eaf0; }
     .itrack-card.s-open     { border-left-color:#ef4444; }
     .itrack-card.s-progress { border-left-color:#f59e0b; }
     .itrack-card.s-resolved { border-left-color:#22c55e; opacity:0.7; }
@@ -2252,17 +2260,17 @@
     /* ── 계획 vs 실적 ── */
     .cmp-controls { display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
     .cmp-nav { display:flex; align-items:center; gap:10px; }
-    .cmp-nav-btn { background:#fff; border:1.5px solid #e0e0ed; border-radius:20px; padding:5px 14px; font-size:0.82rem; cursor:pointer; color:#555; font-weight:600; transition:background 0.15s; }
+    .cmp-nav-btn { background:#fff; border:1px solid #e2e8f0; border-radius:20px; padding:5px 14px; font-size:0.82rem; cursor:pointer; color:#555; font-weight:600; transition:background 0.15s; }
     .cmp-nav-btn:hover { background:#f5f5f5; }
     .cmp-month-lbl { font-size:1rem; font-weight:700; color:#1a1a2e; min-width:80px; text-align:center; }
 
     .cmp-summary { display:flex; gap:10px; margin-bottom:18px; }
-    .cmp-sum-item { background:#fff; border:1.5px solid #e8eaf0; border-radius:10px; flex:1; padding:10px 12px; text-align:center; }
+    .cmp-sum-item { background:#fff; border:none; box-shadow:0 1px 3px rgba(15,23,42,0.07); border-radius:10px; flex:1; padding:10px 12px; text-align:center; }
     .cmp-sum-num  { display:block; font-size:1.4rem; font-weight:800; letter-spacing:-0.02em; }
     .cmp-sum-num.good { color:#22c55e; } .cmp-sum-num.mid { color:#f59e0b; } .cmp-sum-num.low { color:#ef4444; }
     .cmp-sum-lbl  { display:block; font-size:0.7rem; color:#aaa; margin-top:2px; }
 
-    .cmp-card { background:#fff; border:1.5px solid #e8eaf0; border-radius:12px; padding:16px 18px; margin-bottom:12px; }
+    .cmp-card { background:#fff; border:none; box-shadow:0 1px 3px rgba(15,23,42,0.07); border-radius:12px; padding:16px 18px; margin-bottom:12px; }
     .cmp-card-date { font-size:0.85rem; font-weight:700; color:#1a1a2e; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
     .cmp-rate { font-size:0.78rem; font-weight:700; padding:2px 10px; border-radius:12px; }
     .cmp-rate.good { background:#dcfce7; color:#16a34a; }
@@ -2280,12 +2288,12 @@
 
     /* ── 키워드 빈도 분석 ── */
     .kfreq-nav { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-    .kfreq-nav-btn { background:#fff; border:1.5px solid #e0e0ed; border-radius:20px; padding:5px 14px; font-size:0.82rem; cursor:pointer; color:#555; font-weight:600; transition:background 0.15s; }
+    .kfreq-nav-btn { background:#fff; border:1px solid #e2e8f0; border-radius:20px; padding:5px 14px; font-size:0.82rem; cursor:pointer; color:#555; font-weight:600; transition:background 0.15s; }
     .kfreq-nav-btn:hover { background:#f5f5f5; }
     .kfreq-month-lbl { font-size:1rem; font-weight:700; color:#1a1a2e; min-width:80px; text-align:center; }
 
     .kfreq-field-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
-    .kfreq-field-btn { padding:5px 16px; border:1.5px solid #e0e0ed; border-radius:20px; background:#fff; font-size:0.8rem; cursor:pointer; color:#666; transition:all 0.15s; }
+    .kfreq-field-btn { padding:5px 16px; border:1px solid #e2e8f0; border-radius:20px; background:#fff; font-size:0.8rem; cursor:pointer; color:#666; transition:all 0.15s; }
     .kfreq-field-btn:hover { background:#f5f5f5; }
     .kfreq-field-btn.is-active { background:#2563eb; color:#fff; border-color:#2563eb; }
 
@@ -2293,7 +2301,7 @@
     @media (max-width:700px) { .kfreq-two-col { grid-template-columns:1fr; } }
 
     .kfreq-chart-card, .kfreq-cloud-card {
-      background:#fff; border-radius:14px; border:1.5px solid #e8eaf0; padding:20px 20px 16px;
+      background:#fff; border-radius:14px; border:none; box-shadow:0 1px 3px rgba(15,23,42,0.07); padding:20px 20px 16px;
     }
     .kfreq-card-title { font-size:0.85rem; font-weight:700; color:#555; margin-bottom:14px; }
 
@@ -2445,7 +2453,7 @@
 <!-- 금요일 차주 계획 알림 배너 -->
 <div id="friday-banner" style="
   display:none; position:fixed; bottom:32px; right:32px; z-index:900;
-  background:#fff; border-radius:16px; border:1px solid #e8eaf0;
+  background:#fff; border-radius:16px; border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05);
   box-shadow:0 8px 32px rgba(37,99,235,0.18); padding:20px 22px;
   max-width:320px; width:calc(100vw - 64px);
   transform:translateY(20px); opacity:0;
@@ -2599,7 +2607,7 @@
       <button class="itrack-filter-btn" onclick="setItrackFilter('open',this)">🔴 미해결</button>
       <button class="itrack-filter-btn" onclick="setItrackFilter('progress',this)">🟡 해결 중</button>
       <button class="itrack-filter-btn" onclick="setItrackFilter('resolved',this)">🟢 완료</button>
-      <select id="itrack-person-sel" onchange="setItrackPerson(this.value)" style="margin-left:auto;border:1.5px solid #e0e0ed;border-radius:20px;padding:5px 14px;font-size:0.8rem;color:#666;background:#fff;cursor:pointer;outline:none;">
+      <select id="itrack-person-sel" onchange="setItrackPerson(this.value)" style="margin-left:auto;border:1px solid #e2e8f0;border-radius:20px;padding:5px 14px;font-size:0.8rem;color:#666;background:#fff;cursor:pointer;outline:none;">
         <option value="">전체 팀원</option>
         <option>박희진</option><option>설한영</option><option>정연환</option>
         <option>박수정</option><option>박경현</option><option>유준우</option><option>유하연</option>
@@ -2816,7 +2824,7 @@
         <button class="cmp-nav-btn" onclick="changeCmpMonth(1)">다음 달 →</button>
       </div>
       <select id="cmp-person-sel" onchange="setCmpPerson(this.value)"
-        style="border:1.5px solid #e0e0ed;border-radius:20px;padding:5px 14px;font-size:0.8rem;color:#555;background:#fff;cursor:pointer;outline:none;">
+        style="border:1px solid #e2e8f0;border-radius:20px;padding:5px 14px;font-size:0.8rem;color:#555;background:#fff;cursor:pointer;outline:none;">
         <option value="">팀원을 선택하세요</option>
         <option>박희진</option><option>설한영</option><option>정연환</option>
         <option>박수정</option><option>박경현</option><option>유준우</option><option>유하연</option>
@@ -4266,7 +4274,7 @@
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
         <!-- 이달 진행률 -->
-        <div style="background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 20px">
+        <div style="background:#fff;border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05);border-radius:12px;padding:16px 20px">
           <div style="font-size:0.8rem;font-weight:700;color:#2563eb;margin-bottom:12px">📅 ${today.getMonth()+1}월 업무 진행률</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
             <span style="font-size:0.78rem;color:#666">전체 완료율</span>
@@ -4295,7 +4303,7 @@
         </div>
 
         <!-- 오늘 할 일 -->
-        <div style="background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 20px">
+        <div style="background:#fff;border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05);border-radius:12px;padding:16px 20px">
           <div style="font-size:0.8rem;font-weight:700;color:#2563eb;margin-bottom:10px">📌 오늘 할 일 (${today.getMonth()+1}월 ${today.getDate()}일)</div>
           ${todayTasks.length
             ? todayTasks.map(taskRow).join('')
@@ -4311,7 +4319,7 @@
 
       <!-- 이번 주 나머지 일정 -->
       ${weekTasks.length ? `
-      <div style="background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 20px;margin-bottom:16px">
+      <div style="background:#fff;border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05);border-radius:12px;padding:16px 20px;margin-bottom:16px">
         <div style="font-size:0.8rem;font-weight:700;color:#2563eb;margin-bottom:10px">📆 이번 주 남은 일정 (${weekTasks.length}건)</div>
         ${weekTasks.map(taskRow).join('')}
       </div>` : ''}
@@ -5338,7 +5346,7 @@
           const pct     = Math.round(done.length / PLAN_MEMBERS.length * 100);
           const barCls  = pct >= 80 ? '' : pct >= 50 ? 'mid' : 'low';
           return `
-          <div style="background:#fff;border:1px solid #e8eaf0;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+          <div style="background:#fff;border:1px solid #f1f5f9; box-shadow:0 1px 3px rgba(15,23,42,0.05);border-radius:12px;padding:16px 20px;margin-bottom:24px">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
               <span class="dash-section-title" style="margin-bottom:0;padding-left:0;border:none">차주 업무계획 현황</span>
               <span style="font-size:0.82rem;font-weight:700;color:#2563eb">${done.length} / ${PLAN_MEMBERS.length}명 작성</span>
