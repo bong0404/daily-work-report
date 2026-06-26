@@ -230,6 +230,7 @@ function LadderGame() {
   const [svgHtml, setSvgHtml]     = useState('');
   const [resultItems, setResultItems] = useState<{name:string;i:number;result:string}[]>([]);
   const revealedRef               = useRef<Set<number>>(new Set());
+  const revealAllActiveRef        = useRef(false);
   const svgRef                    = useRef<HTMLDivElement>(null);
 
   function toggleChip(name: string) {
@@ -333,21 +334,31 @@ function LadderGame() {
       const endCol = paths[idx]?.endCol;
       const rEl = document.getElementById(`lres-${endCol}`);
       if (rEl) rEl.setAttribute('opacity', '1');
-      const result = resMap[endCol];
-      const name = sel[idx];
-      setResultItems(prev => [...prev, { name, i: idx, result }]);
-      if (result !== '😊 통과') alert(`🎉 ${name}님 "${result}" 당첨!`);
+      if (!revealAllActiveRef.current) {
+        const result = resMap[endCol];
+        const name = sel[idx];
+        setResultItems(prev => [...prev, { name, i: idx, result }]);
+        if (result !== '😊 통과') alert(`🎉 ${name}님 "${result}" 당첨!`);
+      }
     }, 820);
   }
 
   function revealAll() {
+    revealAllActiveRef.current = true;
+    const n = sel.length;
     sel.forEach((_, i) => setTimeout(() => (window as unknown as Record<string,unknown>).__traceIdx?.(i), i * 180));
+    setTimeout(() => {
+      revealAllActiveRef.current = false;
+      const allResults = paths.map((p, i) => ({ name: sel[i], i, result: resMap[p.endCol] }));
+      setResultItems(allResults);
+    }, (n - 1) * 180 + 950);
   }
 
   function reset() {
     setPhase('setup');
     setSvgHtml('');
     revealedRef.current = new Set();
+    revealAllActiveRef.current = false;
     setResultItems([]);
   }
 
