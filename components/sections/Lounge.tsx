@@ -225,11 +225,11 @@ function LadderGame() {
   const [sel, setSel]             = useState<string[]>(MEMBERS.map(m => m.name));
   const [special, setSpecial]     = useState('☕ 커피 쏘기');
   const [phase, setPhase]         = useState<'setup' | 'game'>('setup');
-  const [bridges, setBridges]     = useState<LadderBridge[]>([]);
   const [paths, setPaths]         = useState<LadderPath[]>([]);
   const [resMap, setResMap]       = useState<Record<number, string>>({});
-  const [revealed, setRevealed]   = useState<Set<number>>(new Set());
   const [svgHtml, setSvgHtml]     = useState('');
+  const [resultItems, setResultItems] = useState<{name:string;i:number;result:string}[]>([]);
+  const revealedRef               = useRef<Set<number>>(new Set());
   const svgRef                    = useRef<HTMLDivElement>(null);
 
   function toggleChip(name: string) {
@@ -270,18 +270,18 @@ function LadderGame() {
     const pool = [sp, ...Array(n - 1).fill('😊 통과')].sort(() => Math.random() - 0.5);
     const rm: Record<number, string> = Object.fromEntries(pool.map((v, c) => [c, v]));
 
-    setBridges(brgs);
+    revealedRef.current = new Set();
+    setResultItems([]);
     setPaths(ps);
     setResMap(rm);
-    setRevealed(new Set());
     setPhase('game');
-    drawSVG(n, sp, ps, brgs, rm, new Set());
+    drawSVG(n, sp, ps, brgs, rm);
   }
 
   function drawSVG(
     n: number, sp: string,
     ps: LadderPath[], brgs: LadderBridge[],
-    rm: Record<number, string>, revd: Set<number>
+    rm: Record<number, string>
   ) {
     const W = LC.PX * 2 + (n - 1) * LC.SX;
     const H = LC.PTOP + LC.ROWS * LC.SY + LC.PBOT;
@@ -297,8 +297,7 @@ function LadderGame() {
 
     ps.forEach((pd, i) => {
       const d = 'M ' + pd.points.map(p => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L ');
-      const offset = revd.has(i) ? '0' : String(pd.len);
-      s += `<path id="lpath-${i}" d="${d}" fill="none" stroke="${LCOLORS[i % LCOLORS.length]}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${pd.len}" stroke-dashoffset="${offset}" style="transition:stroke-dashoffset 0.75s ease"/>`;
+      s += `<path id="lpath-${i}" d="${d}" fill="none" stroke="${LCOLORS[i % LCOLORS.length]}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${pd.len}" stroke-dashoffset="${pd.len}" style="transition:stroke-dashoffset 0.75s ease"/>`;
     });
 
     sel.forEach((name, i) => {
@@ -311,17 +310,13 @@ function LadderGame() {
     });
 
     for (let c = 0; c < n; c++) {
-      const x    = lcx(c);
-      const res  = rm[c];
-      const isW  = res !== '😊 통과';
-      const bgC  = isW ? '#fef3c7' : '#f8fafc';
-      const txtC = isW ? '#b45309' : '#64748b';
-      const bdrC = isW ? '#fcd34d' : '#e2e8f0';
-      const shown = [...revd].some(idx => ps[idx]?.endCol === c);
-      s += `<g id="lres-${c}" opacity="${shown ? '1' : '0'}" style="transition:opacity 0.45s ease">
-        <rect x="${x-28}" y="${lry(LC.ROWS)+6}" width="56" height="38" rx="9" fill="${bgC}" stroke="${bdrC}" stroke-width="1.5"/>
-        <text x="${x}" y="${lry(LC.ROWS)+22}" text-anchor="middle" font-size="13">${isW ? '🎉' : '😊'}</text>
-        <text x="${x}" y="${lry(LC.ROWS)+36}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${txtC}">${isW ? '당첨!' : '통과'}</text>
+      const x   = lcx(c);
+      const res = rm[c];
+      const isW = res !== '😊 통과';
+      s += `<g id="lres-${c}" opacity="0" style="transition:opacity 0.45s ease">
+        <rect x="${x-28}" y="${lry(LC.ROWS)+6}" width="56" height="38" rx="9" fill="${isW?'#fef3c7':'#f8fafc'}" stroke="${isW?'#fcd34d':'#e2e8f0'}" stroke-width="1.5"/>
+        <text x="${x}" y="${lry(LC.ROWS)+22}" text-anchor="middle" font-size="13">${isW?'🎉':'😊'}</text>
+        <text x="${x}" y="${lry(LC.ROWS)+36}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${isW?'#b45309':'#64748b'}">${isW?'당첨!':'통과'}</text>
       </g>`;
     }
     s += '</svg>';
@@ -329,10 +324,8 @@ function LadderGame() {
   }
 
   function traceIdx(idx: number) {
-    if (revealed.has(idx)) return;
-    const newRevd = new Set(revealed);
-    newRevd.add(idx);
-    setRevealed(newRevd);
+    if (revealedRef.current.has(idx)) return;
+    revealedRef.current.add(idx);
 
     const pEl = document.getElementById(`lpath-${idx}`);
     if (pEl) pEl.style.strokeDashoffset = '0';
@@ -341,28 +334,27 @@ function LadderGame() {
       const rEl = document.getElementById(`lres-${endCol}`);
       if (rEl) rEl.setAttribute('opacity', '1');
       const result = resMap[endCol];
-      if (result !== '😊 통과') alert(`🎉 ${sel[idx]}님 "${result}" 당첨!`);
+      const name = sel[idx];
+      setResultItems(prev => [...prev, { name, i: idx, result }]);
+      if (result !== '😊 통과') alert(`🎉 ${name}님 "${result}" 당첨!`);
     }, 820);
   }
 
   function revealAll() {
-    sel.forEach((_, i) => setTimeout(() => traceIdx(i), i * 180));
+    sel.forEach((_, i) => setTimeout(() => (window as unknown as Record<string,unknown>).__traceIdx?.(i), i * 180));
   }
 
   function reset() {
     setPhase('setup');
     setSvgHtml('');
-    setRevealed(new Set());
+    revealedRef.current = new Set();
+    setResultItems([]);
   }
 
   // expose traceIdx to SVG onclick
   useEffect(() => {
     (window as unknown as Record<string, unknown>).__traceIdx = traceIdx;
   });
-
-  const resultItems = sel
-    .map((name, i) => ({ name, i, result: resMap[paths[i]?.endCol] }))
-    .filter(x => revealed.has(x.i));
 
   return (
     <div>
