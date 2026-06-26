@@ -2202,6 +2202,206 @@
     .feedback-submit-btn { background:#6c63ff; color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:0.78rem; font-weight:600; cursor:pointer; flex-shrink:0; }
     .feedback-submit-btn:hover { background:#574fd6; }
 
+    /* ── 이슈 트래킹 ── */
+    .itrack-summary { display:flex; gap:10px; margin-bottom:18px; }
+    .itrack-sum-card { background:#fff; border-radius:10px; border:1px solid #e8eaf0; padding:10px 16px; flex:1; text-align:center; }
+    .itrack-sum-num   { font-size:1.35rem; font-weight:700; letter-spacing:-0.02em; }
+    .itrack-sum-label { font-size:0.72rem; color:#999; margin-top:2px; }
+
+    .itrack-controls { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+    .itrack-filter-btn {
+      padding:5px 14px; border:1.5px solid #e0e0ed; border-radius:20px;
+      background:#fff; font-size:0.8rem; cursor:pointer; color:#666;
+      transition:background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .itrack-filter-btn:hover { background:#f5f5f5; }
+
+    .itrack-card { background:#fff; border-radius:12px; border:1.5px solid #e8eaf0; padding:16px 18px; margin-bottom:10px; border-left:4px solid #e8eaf0; }
+    .itrack-card.s-open     { border-left-color:#ef4444; }
+    .itrack-card.s-progress { border-left-color:#f59e0b; }
+    .itrack-card.s-resolved { border-left-color:#22c55e; opacity:0.7; }
+
+    .itrack-card-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .itrack-meta { font-size:0.75rem; color:#aaa; margin-top:1px; }
+    .itrack-issue-text { font-size:0.88rem; color:#1a1a2e; line-height:1.65; padding-left:16px; position:relative; margin-bottom:12px; }
+    .itrack-issue-text::before { content:'⚠'; position:absolute; left:0; font-size:0.72rem; color:#ef4444; top:2px; }
+
+    .itrack-actions { display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+    .itrack-status-btn {
+      font-size:0.75rem; font-weight:600; padding:4px 12px;
+      border-radius:20px; border:1.5px solid; cursor:pointer;
+      background:#fff; transition:all 0.15s;
+    }
+    .itrack-status-btn.sb-open     { color:#ef4444; border-color:#ef4444; }
+    .itrack-status-btn.sb-progress { color:#f59e0b; border-color:#f59e0b; }
+    .itrack-status-btn.sb-resolved { color:#22c55e; border-color:#22c55e; }
+    .itrack-status-btn.sb-open.is-active     { background:#ef4444; color:#fff; }
+    .itrack-status-btn.sb-progress.is-active { background:#f59e0b; color:#fff; }
+    .itrack-status-btn.sb-resolved.is-active { background:#22c55e; color:#fff; }
+
+    .itrack-note-wrap { display:flex; gap:6px; flex:1; min-width:200px; }
+    .itrack-note-input { flex:1; border:1px solid #e0e0ed; border-radius:7px; padding:5px 10px; font-size:0.78rem; color:#333; font-family:inherit; outline:none; }
+    .itrack-note-input:focus { border-color:#6c63ff; }
+    .itrack-note-save { background:#6c63ff; color:#fff; border:none; border-radius:7px; padding:5px 12px; font-size:0.75rem; font-weight:600; cursor:pointer; white-space:nowrap; }
+    .itrack-note-save:hover { background:#574fd6; }
+    .itrack-resolved-at { font-size:0.7rem; color:#22c55e; font-weight:600; white-space:nowrap; }
+
+    /* ── 계획 vs 실적 ── */
+    .cmp-controls { display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+    .cmp-nav { display:flex; align-items:center; gap:10px; }
+    .cmp-nav-btn { background:#fff; border:1.5px solid #e0e0ed; border-radius:20px; padding:5px 14px; font-size:0.82rem; cursor:pointer; color:#555; font-weight:600; transition:background 0.15s; }
+    .cmp-nav-btn:hover { background:#f5f5f5; }
+    .cmp-month-lbl { font-size:1rem; font-weight:700; color:#1a1a2e; min-width:80px; text-align:center; }
+
+    .cmp-summary { display:flex; gap:10px; margin-bottom:18px; }
+    .cmp-sum-item { background:#fff; border:1.5px solid #e8eaf0; border-radius:10px; flex:1; padding:10px 12px; text-align:center; }
+    .cmp-sum-num  { display:block; font-size:1.4rem; font-weight:800; letter-spacing:-0.02em; }
+    .cmp-sum-num.good { color:#22c55e; } .cmp-sum-num.mid { color:#f59e0b; } .cmp-sum-num.low { color:#ef4444; }
+    .cmp-sum-lbl  { display:block; font-size:0.7rem; color:#aaa; margin-top:2px; }
+
+    .cmp-card { background:#fff; border:1.5px solid #e8eaf0; border-radius:12px; padding:16px 18px; margin-bottom:12px; }
+    .cmp-card-date { font-size:0.85rem; font-weight:700; color:#1a1a2e; margin-bottom:12px; display:flex; align-items:center; gap:10px; }
+    .cmp-rate { font-size:0.78rem; font-weight:700; padding:2px 10px; border-radius:12px; }
+    .cmp-rate.good { background:#dcfce7; color:#16a34a; }
+    .cmp-rate.mid  { background:#fef9c3; color:#b45309; }
+    .cmp-rate.low  { background:#fee2e2; color:#dc2626; }
+
+    .cmp-two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width:680px) { .cmp-two-col { grid-template-columns:1fr; } }
+    .cmp-col-label { font-size:0.75rem; font-weight:700; color:#888; margin-bottom:7px; }
+    .cmp-item { font-size:0.82rem; line-height:1.6; padding:3px 0; color:#333; }
+    .cmp-item.is-done  { color:#16a34a; }
+    .cmp-item.is-miss  { color:#dc2626; opacity:0.8; }
+    .cmp-item.is-extra { color:#6c63ff; }
+    .cmp-item.is-none  { color:#bbb; font-size:0.75rem; font-style:italic; }
+
+    /* ── 키워드 빈도 분석 ── */
+    .kfreq-nav { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .kfreq-nav-btn { background:#fff; border:1.5px solid #e0e0ed; border-radius:20px; padding:5px 14px; font-size:0.82rem; cursor:pointer; color:#555; font-weight:600; transition:background 0.15s; }
+    .kfreq-nav-btn:hover { background:#f5f5f5; }
+    .kfreq-month-lbl { font-size:1rem; font-weight:700; color:#1a1a2e; min-width:80px; text-align:center; }
+
+    .kfreq-field-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+    .kfreq-field-btn { padding:5px 16px; border:1.5px solid #e0e0ed; border-radius:20px; background:#fff; font-size:0.8rem; cursor:pointer; color:#666; transition:all 0.15s; }
+    .kfreq-field-btn:hover { background:#f5f5f5; }
+    .kfreq-field-btn.is-active { background:#6c63ff; color:#fff; border-color:#6c63ff; }
+
+    .kfreq-two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media (max-width:700px) { .kfreq-two-col { grid-template-columns:1fr; } }
+
+    .kfreq-chart-card, .kfreq-cloud-card {
+      background:#fff; border-radius:14px; border:1.5px solid #e8eaf0; padding:20px 20px 16px;
+    }
+    .kfreq-card-title { font-size:0.85rem; font-weight:700; color:#555; margin-bottom:14px; }
+
+    .kfreq-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .kfreq-bar-label { width:70px; font-size:0.78rem; font-weight:600; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:0; }
+    .kfreq-bar-track { flex:1; height:14px; background:#f0f0f8; border-radius:7px; overflow:hidden; }
+    .kfreq-bar-fill  { height:100%; border-radius:7px; transition:width 0.5s ease; }
+    .kfreq-bar-count { width:28px; font-size:0.75rem; font-weight:700; color:#888; text-align:right; flex-shrink:0; }
+
+    .kfreq-cloud { display:flex; flex-wrap:wrap; gap:10px 14px; align-items:baseline; padding:4px 0; }
+    .kfreq-tag { color:#6c63ff; font-weight:700; cursor:default; line-height:1.5; transition:opacity 0.2s; }
+    .kfreq-tag:hover { opacity:1 !important; }
+
+    /* ═══════════════════════════════════════════════════
+       모바일 반응형  ≤ 640px
+    ═══════════════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      /* 전체 레이아웃 */
+      header { padding: 0 16px; }
+      header .logo { font-size: 0.9rem; }
+      main   { margin: 8px auto 32px; padding: 0 12px; }
+
+      /* 섹션 스위처 — 가로 스크롤 */
+      .section-switcher { overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap; }
+      .section-switcher::-webkit-scrollbar { display: none; }
+      .section-btn { padding: 10px 14px; font-size: 0.78rem; gap: 4px; }
+      .section-btn .s-icon { font-size: 0.88rem; }
+
+      /* 탭바 — 이미 overflow-x:auto, padding 축소 */
+      .tab-bar { padding: 4px; margin-bottom: 18px; }
+      .tab-btn { padding: 7px 11px; font-size: 0.76rem; }
+
+      /* 작성 폼 */
+      .form-card { padding: 18px 14px; }
+      .form-title { font-size: 1rem; margin-bottom: 18px; }
+      .form-row  { grid-template-columns: 1fr; gap: 12px; margin-bottom: 14px; }
+      .form-actions { gap: 8px; }
+      .btn-reset  { flex: 1; }
+      .btn-submit { flex: 2; }
+
+      /* 업무보고 서브 뷰 컨트롤 */
+      .view-controls { gap: 8px; }
+      .view-controls input[type="date"],
+      .view-controls select { flex: 1; min-width: 0; font-size: 0.82rem; padding: 7px 10px; }
+
+      /* 현황판 제출 현황 그리드 */
+      .submit-status-grid { grid-template-columns: 1fr 1fr; }
+
+      /* 공지사항 작성 */
+      .notice-compose-row { flex-direction: column; }
+      .notice-compose-row select { width: 100%; }
+
+      /* 히트맵 범례 */
+      .heatmap-legend { flex-wrap: wrap; gap: 6px; font-size: 0.72rem; }
+      .heatmap-controls { flex-wrap: wrap; gap: 8px; }
+
+      /* 완료율 추이 */
+      .trend-legend { gap: 6px; }
+      .trend-legend-item { font-size: 0.72rem; padding: 3px 8px; }
+
+      /* 내보내기 */
+      .export-row { flex-direction: column; align-items: stretch; gap: 8px; }
+      .export-row label { font-size: 0.8rem; }
+      .export-row input[type=date] { width: 100%; }
+      .btn-export-action { width: 100%; text-align: center; }
+
+      /* 이슈 트래킹 */
+      .itrack-summary { flex-wrap: wrap; }
+      .itrack-sum-card { min-width: calc(50% - 5px); }
+      .itrack-controls { gap: 6px; }
+      .itrack-filter-btn { font-size: 0.74rem; padding: 4px 10px; }
+      .itrack-controls select { width: 100% !important; margin-left: 0 !important; margin-top: 4px; }
+      .itrack-actions { flex-direction: column; align-items: flex-start; }
+      .itrack-note-wrap { width: 100%; }
+
+      /* 계획 vs 실적 */
+      .cmp-summary { flex-wrap: wrap; }
+      .cmp-sum-item { min-width: calc(50% - 5px); }
+      .cmp-controls { flex-direction: column; align-items: stretch; gap: 10px; }
+      .cmp-controls select { width: 100%; }
+      .cmp-card { padding: 14px 12px; }
+
+      /* 키워드 분석 */
+      .kfreq-nav { gap: 8px; margin-bottom: 12px; }
+      .kfreq-nav-btn { font-size: 0.76rem; padding: 4px 10px; }
+      .kfreq-field-tabs { gap: 5px; margin-bottom: 14px; }
+      .kfreq-field-btn { font-size: 0.72rem; padding: 4px 10px; }
+      .kfreq-bar-label { width: 55px; font-size: 0.72rem; }
+      .kfreq-bar-count { font-size: 0.7rem; }
+
+      /* 금요일 배너 */
+      #friday-banner { right: 12px !important; left: 12px !important; width: auto !important; max-width: none !important; }
+
+      /* 인사이트 월 내비게이션 공통 */
+      .heatmap-nav-btn, .kfreq-nav-btn, .cmp-nav-btn { font-size: 0.76rem; padding: 4px 10px; }
+      .heatmap-month-label, .kfreq-month-lbl, .cmp-month-lbl { font-size: 0.9rem; min-width: 70px; }
+
+      /* 모달 */
+      .tcm-box { width: calc(100vw - 32px) !important; max-width: none !important; }
+
+      /* 텍스트 에리어 */
+      textarea { font-size: 0.88rem; }
+    }
+
+    @media (max-width: 400px) {
+      .section-btn span:not(.s-icon) { display: none; }
+      .section-btn { padding: 10px 12px; }
+      .submit-status-grid { grid-template-columns: 1fr; }
+      .cmp-sum-item, .itrack-sum-card { min-width: calc(50% - 5px); }
+    }
+
     @media print {
       header, .section-switcher, .tab-bar, #toast, .export-controls,
       .btn-export-action, button { display:none !important; }
@@ -2288,6 +2488,7 @@
     <button class="tab-btn" onclick="switchTab('by-date',this)">📅 날짜별 보기</button>
     <button class="tab-btn" onclick="switchTab('by-person',this)">👤 인물별 보기</button>
     <button class="tab-btn" onclick="switchTab('issues',this)">⚠️ 이슈 모아보기</button>
+    <button class="tab-btn" onclick="switchTab('issue-track',this)">🚨 이슈 트래킹</button>
     <button class="tab-btn" onclick="switchTab('search',this)">🔍 키워드 검색</button>
     <button class="tab-btn" onclick="switchTab('weekly',this)">📋 주간 요약</button>
   </div>
@@ -2305,6 +2506,8 @@
     <button class="tab-btn" onclick="switchTab('trend',this)">📈 완료율 추이</button>
     <button class="tab-btn" onclick="switchTab('export',this)">📤 리포트 내보내기</button>
     <button class="tab-btn" onclick="switchTab('feedback',this)">💬 피드백</button>
+    <button class="tab-btn" onclick="switchTab('kfreq',this)">☁️ 키워드 분석</button>
+    <button class="tab-btn" onclick="switchTab('plan-cmp',this)">🎯 계획 vs 실적</button>
   </div>
 
   <!-- ── 현황판 탭 ── -->
@@ -2364,6 +2567,43 @@
     <div id="issue-result">
       <div class="empty-state">기간을 선택하고 조회하세요</div>
     </div>
+  </div>
+
+  <!-- ── 이슈 트래킹 탭 ── -->
+  <div class="tab-panel" id="tab-issue-track">
+    <!-- 요약 카드 -->
+    <div class="itrack-summary">
+      <div class="itrack-sum-card">
+        <div class="itrack-sum-num" id="itrack-cnt-open" style="color:#ef4444">0</div>
+        <div class="itrack-sum-label">미해결</div>
+      </div>
+      <div class="itrack-sum-card">
+        <div class="itrack-sum-num" id="itrack-cnt-progress" style="color:#f59e0b">0</div>
+        <div class="itrack-sum-label">해결 중</div>
+      </div>
+      <div class="itrack-sum-card">
+        <div class="itrack-sum-num" id="itrack-cnt-resolved" style="color:#22c55e">0</div>
+        <div class="itrack-sum-label">완료</div>
+      </div>
+      <div class="itrack-sum-card">
+        <div class="itrack-sum-num" id="itrack-cnt-total" style="color:#6c63ff">0</div>
+        <div class="itrack-sum-label">전체</div>
+      </div>
+    </div>
+    <!-- 필터 -->
+    <div class="itrack-controls">
+      <button class="itrack-filter-btn is-active" onclick="setItrackFilter('all',this)">전체</button>
+      <button class="itrack-filter-btn" onclick="setItrackFilter('open',this)">🔴 미해결</button>
+      <button class="itrack-filter-btn" onclick="setItrackFilter('progress',this)">🟡 해결 중</button>
+      <button class="itrack-filter-btn" onclick="setItrackFilter('resolved',this)">🟢 완료</button>
+      <select id="itrack-person-sel" onchange="setItrackPerson(this.value)" style="margin-left:auto;border:1.5px solid #e0e0ed;border-radius:20px;padding:5px 14px;font-size:0.8rem;color:#666;background:#fff;cursor:pointer;outline:none;">
+        <option value="">전체 팀원</option>
+        <option>박희진</option><option>설한영</option><option>정연환</option>
+        <option>박수정</option><option>박경현</option><option>유준우</option><option>유하연</option>
+      </select>
+    </div>
+    <!-- 이슈 목록 -->
+    <div id="itrack-list"><div class="empty-state">로딩 중...</div></div>
   </div>
 
   <!-- ── 키워드 검색 탭 ── -->
@@ -2535,6 +2775,51 @@
     <div id="feedback-result">
       <div class="empty-state">날짜를 선택하고 조회하세요</div>
     </div>
+  </div>
+
+  <!-- ── 키워드 빈도 분석 탭 ── -->
+  <div class="tab-panel" id="tab-kfreq">
+    <div class="kfreq-nav">
+      <button class="kfreq-nav-btn" onclick="changeKfreqMonth(-1)">← 이전 달</button>
+      <div class="kfreq-month-lbl" id="kfreq-month-label">—</div>
+      <button class="kfreq-nav-btn" onclick="changeKfreqMonth(1)">다음 달 →</button>
+    </div>
+    <div class="kfreq-field-tabs">
+      <button class="kfreq-field-btn is-active" onclick="setKfreqField('all',this)">전체 섹션</button>
+      <button class="kfreq-field-btn" onclick="setKfreqField('주요완료',this)">주요완료</button>
+      <button class="kfreq-field-btn" onclick="setKfreqField('진행사항',this)">진행사항</button>
+      <button class="kfreq-field-btn" onclick="setKfreqField('주요회의',this)">주요회의</button>
+      <button class="kfreq-field-btn" onclick="setKfreqField('이슈리스크',this)">이슈리스크</button>
+      <button class="kfreq-field-btn" onclick="setKfreqField('익일계획',this)">익일계획</button>
+    </div>
+    <div class="kfreq-two-col">
+      <div class="kfreq-chart-card">
+        <div class="kfreq-card-title">🏆 상위 키워드 Top 20</div>
+        <div id="kfreq-bars"><div class="empty-state">로딩 중...</div></div>
+      </div>
+      <div class="kfreq-cloud-card">
+        <div class="kfreq-card-title">☁️ 키워드 태그</div>
+        <div id="kfreq-cloud" class="kfreq-cloud"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 계획 vs 실적 탭 ── -->
+  <div class="tab-panel" id="tab-plan-cmp">
+    <div class="cmp-controls">
+      <div class="cmp-nav">
+        <button class="cmp-nav-btn" onclick="changeCmpMonth(-1)">← 이전 달</button>
+        <div class="cmp-month-lbl" id="cmp-month-label">—</div>
+        <button class="cmp-nav-btn" onclick="changeCmpMonth(1)">다음 달 →</button>
+      </div>
+      <select id="cmp-person-sel" onchange="setCmpPerson(this.value)"
+        style="border:1.5px solid #e0e0ed;border-radius:20px;padding:5px 14px;font-size:0.8rem;color:#555;background:#fff;cursor:pointer;outline:none;">
+        <option value="">팀원을 선택하세요</option>
+        <option>박희진</option><option>설한영</option><option>정연환</option>
+        <option>박수정</option><option>박경현</option><option>유준우</option><option>유하연</option>
+      </select>
+    </div>
+    <div id="cmp-result"><div class="empty-state">팀원을 선택하세요</div></div>
   </div>
 
   <!-- ── 인물별 조회 탭 ── -->
@@ -2986,10 +3271,339 @@
     if (id === 'weekly') loadWeekly();
     if (id === 'team-overview') { _teamMonth = _wpMonth; renderTeamOverview(); }
     if (id === 'person-plan') { _ppMonth = _wpMonth; document.getElementById('pp-month-label').textContent = mkeyLabel(_ppMonth); renderPersonPlan(); }
-    if (id === 'heatmap')   { initHeatmap(); }
-    if (id === 'trend')     { renderTrendChart(); }
-    if (id === 'export')    { initExportDates(); }
-    if (id === 'feedback')  { /* 날짜 선택 후 조회 */ }
+    if (id === 'heatmap')      { initHeatmap(); }
+    if (id === 'trend')        { renderTrendChart(); }
+    if (id === 'export')       { initExportDates(); }
+    if (id === 'feedback')     { /* 날짜 선택 후 조회 */ }
+    if (id === 'issue-track')  { loadIssueTrack(); }
+    if (id === 'kfreq')        { initKfreqTab(); }
+    if (id === 'plan-cmp')     { initCmpTab(); }
+  }
+
+  // ── 이슈 트래킹 ────────────────────────────────────────
+  let _itrackFilter = 'all';
+  let _itrackPerson = '';
+
+  function _itrackStore() {
+    try { return JSON.parse(_lsGet('issue_track') || '{}'); } catch(e) { return {}; }
+  }
+  function _itrackSave(data) { _lsSet('issue_track', JSON.stringify(data)); }
+  function _itrackKey(date, name, idx) { return `${date}__${name}__${idx}`; }
+
+  function setItrackFilter(status, btn) {
+    _itrackFilter = status;
+    document.querySelectorAll('.itrack-filter-btn').forEach(b => b.classList.remove('is-active'));
+    if (btn) btn.classList.add('is-active');
+    _renderItrackList();
+  }
+  function setItrackPerson(val) { _itrackPerson = val; _renderItrackList(); }
+
+  async function loadIssueTrack() {
+    const rows = await fetchSheet();
+    const store = _itrackStore();
+
+    // 보고서에서 이슈리스크 수집
+    const issues = []; // { key, date, name, text }
+    rows.forEach(r => {
+      const items = parseItems(r['이슈리스크'] || '');
+      items.forEach((text, i) => {
+        const key = _itrackKey(r['날짜'], r['이름'], i);
+        if (!store[key]) store[key] = { status: 'open', note: '', resolvedAt: '' };
+        issues.push({ key, date: r['날짜'], name: r['이름'], text: text.trim() });
+      });
+    });
+    _itrackSave(store);
+
+    window._itrackIssues = issues;
+    _renderItrackList();
+  }
+
+  function _renderItrackList() {
+    const issues = window._itrackIssues || [];
+    const store  = _itrackStore();
+
+    const visible = issues.filter(iss => {
+      const s = (store[iss.key] || {}).status || 'open';
+      const matchStatus = _itrackFilter === 'all' || s === _itrackFilter;
+      const matchPerson = !_itrackPerson || iss.name === _itrackPerson;
+      return matchStatus && matchPerson;
+    });
+
+    // 요약 카운트 (필터 무관, 인물 필터만 적용)
+    const filtered = issues.filter(iss => !_itrackPerson || iss.name === _itrackPerson);
+    const cnt = { open:0, progress:0, resolved:0 };
+    filtered.forEach(iss => { const s=(store[iss.key]||{}).status||'open'; cnt[s]=(cnt[s]||0)+1; });
+    document.getElementById('itrack-cnt-open').textContent     = cnt.open     || 0;
+    document.getElementById('itrack-cnt-progress').textContent = cnt.progress || 0;
+    document.getElementById('itrack-cnt-resolved').textContent = cnt.resolved || 0;
+    document.getElementById('itrack-cnt-total').textContent    = filtered.length;
+
+    const el = document.getElementById('itrack-list');
+    if (!visible.length) { el.innerHTML = '<div class="empty-state">해당하는 이슈가 없습니다</div>'; return; }
+
+    // 날짜 내림차순
+    visible.sort((a,b) => b.date.localeCompare(a.date));
+
+    el.innerHTML = visible.map((iss, fi) => {
+      const d  = store[iss.key] || { status:'open', note:'', resolvedAt:'' };
+      const sc = d.status;
+      const cardCls = sc === 'open' ? 's-open' : sc === 'progress' ? 's-progress' : 's-resolved';
+      const statusLabel = { open:'미해결', progress:'해결 중', resolved:'완료' };
+      return `
+      <div class="itrack-card ${cardCls}" id="icard-${fi}">
+        <div class="itrack-card-header">
+          <div class="avatar" style="background:${avatarColor(iss.name)}">${iss.name[0]}</div>
+          <div>
+            <div style="font-size:0.82rem;font-weight:700;color:#1a1a2e">${iss.name}</div>
+            <div class="itrack-meta">${iss.date}</div>
+          </div>
+        </div>
+        <div class="itrack-issue-text">${iss.text}</div>
+        <div class="itrack-actions">
+          <button class="itrack-status-btn sb-open${sc==='open'?' is-active':''}"
+            onclick="setIssueStatus('${iss.key}',${fi},'open')">미해결</button>
+          <button class="itrack-status-btn sb-progress${sc==='progress'?' is-active':''}"
+            onclick="setIssueStatus('${iss.key}',${fi},'progress')">해결 중</button>
+          <button class="itrack-status-btn sb-resolved${sc==='resolved'?' is-active':''}"
+            onclick="setIssueStatus('${iss.key}',${fi},'resolved')">완료</button>
+          ${d.resolvedAt ? `<span class="itrack-resolved-at">✓ ${d.resolvedAt} 완료</span>` : ''}
+          <div class="itrack-note-wrap">
+            <input class="itrack-note-input" id="inote-${fi}" type="text"
+              placeholder="메모 (담당자, 조치사항 등)" value="${(d.note||'').replace(/"/g,'&quot;')}">
+            <button class="itrack-note-save" onclick="saveIssueNote('${iss.key}',${fi})">저장</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function setIssueStatus(key, fi, status) {
+    const store = _itrackStore();
+    if (!store[key]) store[key] = { status:'open', note:'', resolvedAt:'' };
+    store[key].status = status;
+    if (status === 'resolved' && !store[key].resolvedAt) {
+      store[key].resolvedAt = new Date().toLocaleDateString('ko-KR', { month:'2-digit', day:'2-digit' }).replace('. ', '-').replace('.', '');
+    }
+    if (status !== 'resolved') store[key].resolvedAt = '';
+    _itrackSave(store);
+    _renderItrackList();
+  }
+
+  function saveIssueNote(key, fi) {
+    const store = _itrackStore();
+    if (!store[key]) store[key] = { status:'open', note:'', resolvedAt:'' };
+    const inp = document.getElementById(`inote-${fi}`);
+    if (!inp) return;
+    store[key].note = inp.value;
+    _itrackSave(store);
+    showToast('메모가 저장되었습니다');
+  }
+
+  // ── 키워드 빈도 분석 ──────────────────────────────────
+  let _kfreqMonth = '';
+  let _kfreqField = 'all';
+
+  const _KSTOP = new Set([
+    '및','등','의','을','를','이','가','은','는','에','와','과','로','으로','에서','에게',
+    '부터','까지','도','만','이나','이고','하고','또는','그리고','관련','통해','위해','위한',
+    '대한','통한','하여','하며','했으며','했음','함께','관련하여','이후','이전','기준',
+    '내용','사항','관련된','부분','경우','통하여','관련하여','위하여','대하여','예정',
+    '확인','검토','완료','진행','처리','관련','미팅','통해서','위해서','이를','이에',
+    '그에','따른','따라','함께','모두','이번','해당','각','전','후','주','월','일',
+    '오전','오후','오늘','내일','어제','이번주','다음주'
+  ]);
+
+  function _kfreqTokenize(text) {
+    return text
+      .replace(/[^가-힣a-zA-Z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .map(w => w.trim())
+      .filter(w => w.length >= 2 && !_KSTOP.has(w) && !/^\d+$/.test(w));
+  }
+
+  function changeKfreqMonth(dir) {
+    const [y, m] = _kfreqMonth.split('-').map(Number);
+    const d = new Date(y, m - 1 + dir, 1);
+    _kfreqMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    document.getElementById('kfreq-month-label').textContent = mkeyLabel(_kfreqMonth);
+    _doRenderKfreq();
+  }
+
+  function setKfreqField(field, btn) {
+    _kfreqField = field;
+    document.querySelectorAll('.kfreq-field-btn').forEach(b => b.classList.remove('is-active'));
+    if (btn) btn.classList.add('is-active');
+    _doRenderKfreq();
+  }
+
+  async function initKfreqTab() {
+    if (!_kfreqMonth) {
+      const now = new Date();
+      _kfreqMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    }
+    document.getElementById('kfreq-month-label').textContent = mkeyLabel(_kfreqMonth);
+    _doRenderKfreq();
+  }
+
+  async function _doRenderKfreq() {
+    const rows = await fetchSheet();
+    const fieldList = _kfreqField === 'all'
+      ? ['주요완료','진행사항','주요회의','이슈리스크','익일계획']
+      : [_kfreqField];
+
+    const freq = {};
+    rows
+      .filter(r => r['날짜'] && r['날짜'].startsWith(_kfreqMonth))
+      .forEach(r => {
+        fieldList.forEach(f => {
+          parseItems(r[f] || '').forEach(line => {
+            _kfreqTokenize(line).forEach(word => {
+              freq[word] = (freq[word] || 0) + 1;
+            });
+          });
+        });
+      });
+
+    const sorted = Object.entries(freq).sort((a,b) => b[1]-a[1]);
+
+    if (!sorted.length) {
+      document.getElementById('kfreq-bars').innerHTML  = '<div class="empty-state">해당 월 데이터가 없습니다</div>';
+      document.getElementById('kfreq-cloud').innerHTML = '';
+      return;
+    }
+
+    // 바 차트 (Top 20)
+    const top20  = sorted.slice(0, 20);
+    const maxCnt = top20[0][1];
+    const GRAD   = ['#6c63ff','#7b73ff','#8a84ff','#9996ff','#5b8af0','#4a79e0','#3a69d0','#2a59c0'];
+
+    document.getElementById('kfreq-bars').innerHTML = top20.map(([word, cnt], i) => {
+      const pct   = Math.round(cnt / maxCnt * 100);
+      const color = GRAD[Math.min(i, GRAD.length - 1)];
+      return `
+      <div class="kfreq-bar-row">
+        <div class="kfreq-bar-label" title="${word}">${word}</div>
+        <div class="kfreq-bar-track">
+          <div class="kfreq-bar-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <div class="kfreq-bar-count">${cnt}</div>
+      </div>`;
+    }).join('');
+
+    // 태그 클라우드 (Top 50)
+    const top50   = sorted.slice(0, 50);
+    const maxCld  = top50[0][1];
+    const minCld  = top50[top50.length-1][1];
+    const range   = maxCld === minCld ? 1 : maxCld - minCld;
+    document.getElementById('kfreq-cloud').innerHTML = top50.map(([word, cnt]) => {
+      const ratio = (cnt - minCld) / range;
+      const size  = (0.72 + ratio * 1.3).toFixed(2);
+      const alpha = (0.45 + ratio * 0.55).toFixed(2);
+      const hue   = Math.round(220 + ratio * 60);
+      return `<span class="kfreq-tag" style="font-size:${size}rem;opacity:${alpha};color:hsl(${hue},65%,52%)" title="${cnt}회">${word}<sup style="font-size:0.5em;opacity:0.65"> ${cnt}</sup></span>`;
+    }).join('');
+  }
+
+  // ── 계획 vs 실적 대조 ────────────────────────────────
+  let _cmpMonth  = '';
+  let _cmpPerson = '';
+
+  function changeCmpMonth(dir) {
+    const [y, m] = _cmpMonth.split('-').map(Number);
+    const d = new Date(y, m - 1 + dir, 1);
+    _cmpMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    document.getElementById('cmp-month-label').textContent = mkeyLabel(_cmpMonth);
+    _renderCmp();
+  }
+
+  function setCmpPerson(val) { _cmpPerson = val; _renderCmp(); }
+
+  async function initCmpTab() {
+    if (!_cmpMonth) {
+      const now = new Date();
+      _cmpMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    }
+    document.getElementById('cmp-month-label').textContent = mkeyLabel(_cmpMonth);
+    _renderCmp();
+  }
+
+  function _cmpMatch(plan, actual) {
+    const words = s => new Set(s.replace(/[^가-힣a-zA-Z]/g,' ').split(/\s+/).filter(w=>w.length>=2));
+    const pw = words(plan);
+    return [...words(actual)].some(w => pw.has(w));
+  }
+
+  async function _renderCmp() {
+    const el = document.getElementById('cmp-result');
+    if (!_cmpPerson) { el.innerHTML = '<div class="empty-state">팀원을 선택하세요</div>'; return; }
+
+    const rows = await fetchSheet();
+    const myRows = rows
+      .filter(r => r['이름'] === _cmpPerson && r['날짜'] && r['날짜'].startsWith(_cmpMonth))
+      .sort((a,b) => a['날짜'].localeCompare(b['날짜']));
+
+    if (!myRows.length) { el.innerHTML = '<div class="empty-state">해당 월 보고서가 없습니다</div>'; return; }
+
+    let tPlan=0, tDone=0, tExtra=0;
+    const DOW = ['일','월','화','수','목','금','토'];
+
+    const cards = myRows.map((row, i) => {
+      const prev = i > 0 ? myRows[i-1] : null;
+      let planItems = [];
+      if (prev) {
+        const diff = (new Date(row['날짜']) - new Date(prev['날짜'])) / 86400000;
+        if (diff <= 4) planItems = parseItems(prev['익일계획'] || '');
+      }
+      const actualItems = parseItems(row['주요완료'] || '');
+
+      const matchedPlan   = new Set();
+      const usedActual    = new Set();
+      planItems.forEach((plan, pi) => {
+        const ai = actualItems.findIndex((act, i2) => !usedActual.has(i2) && _cmpMatch(plan, act));
+        if (ai !== -1) { matchedPlan.add(pi); usedActual.add(ai); }
+      });
+
+      const extraItems = actualItems.filter((_,ai) => !usedActual.has(ai));
+      tPlan  += planItems.length;
+      tDone  += matchedPlan.size;
+      tExtra += extraItems.length;
+
+      const rate    = planItems.length ? Math.round(matchedPlan.size / planItems.length * 100) : null;
+      const rateCls = rate === null ? '' : rate >= 80 ? 'good' : rate >= 50 ? 'mid' : 'low';
+      const dow     = DOW[new Date(row['날짜']).getDay()];
+
+      const planHtml = planItems.length
+        ? planItems.map((item,pi) => `<div class="cmp-item ${matchedPlan.has(pi)?'is-done':'is-miss'}">${matchedPlan.has(pi)?'✅':'⬜'} ${item}</div>`).join('')
+        : '<div class="cmp-item is-none">— 전날 익일계획 없음</div>';
+
+      const actualHtml = actualItems.length
+        ? actualItems.map((item,ai) => `<div class="cmp-item ${usedActual.has(ai)?'is-done':'is-extra'}">${usedActual.has(ai)?'✅':'➕'} ${item}</div>`).join('')
+        : '<div class="cmp-item is-none">— 주요완료 없음</div>';
+
+      return `
+      <div class="cmp-card">
+        <div class="cmp-card-date">
+          ${row['날짜']} (${dow})
+          ${rate !== null ? `<span class="cmp-rate ${rateCls}">${rate}% 달성</span>` : ''}
+        </div>
+        <div class="cmp-two-col">
+          <div><div class="cmp-col-label">📋 계획 (전날 익일계획)</div>${planHtml}</div>
+          <div><div class="cmp-col-label">✅ 실적 (주요완료)</div>${actualHtml}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const orate    = tPlan ? Math.round(tDone / tPlan * 100) : 0;
+    const orateCls = orate >= 80 ? 'good' : orate >= 50 ? 'mid' : 'low';
+
+    el.innerHTML = `
+    <div class="cmp-summary">
+      <div class="cmp-sum-item"><span class="cmp-sum-num">${tPlan}</span><span class="cmp-sum-lbl">계획 항목</span></div>
+      <div class="cmp-sum-item"><span class="cmp-sum-num" style="color:#22c55e">${tDone}</span><span class="cmp-sum-lbl">계획 달성</span></div>
+      <div class="cmp-sum-item"><span class="cmp-sum-num" style="color:#6c63ff">${tExtra}</span><span class="cmp-sum-lbl">추가 완료</span></div>
+      <div class="cmp-sum-item"><span class="cmp-sum-num ${orateCls}">${orate}%</span><span class="cmp-sum-lbl">월 달성률</span></div>
+    </div>
+    ${cards}`;
   }
 
   // ── 토스트 ────────────────────────────────────────────
