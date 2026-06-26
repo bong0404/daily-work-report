@@ -419,7 +419,7 @@ function MySummaryTab() {
           totalIssue += parseItems(r['이슈리스크'] || '').length;
         });
         const statsHtml = `
-          <div class="dashboard-grid" style="margin-bottom:20px">
+          <div class="dashboard-grid" style="margin-bottom:20px;grid-template-columns:repeat(4,1fr)">
             <div class="dash-card"><div class="label">제출 일수</div><div class="value purple">${sorted.length}일</div></div>
             <div class="dash-card"><div class="label">완료 업무</div><div class="value green">${totalDone}건</div></div>
             <div class="dash-card"><div class="label">회의 참석</div><div class="value">${totalMeet}건</div></div>
