@@ -2594,17 +2594,14 @@
     .nav-item.active { background:#e0f2fe; color:#0284c7; font-weight:600; }
     .nav-item .nav-icon { font-size:0.85rem; opacity:0.75; flex-shrink:0; }
     .nav-item.active .nav-icon { opacity:1; }
-    .nav-item .nav-chevron { margin-left:auto; font-size:0.55rem; color:#d1d5db; transition:transform 0.2s; }
-    .nav-item.open .nav-chevron { transform:rotate(90deg); color:#9ca3af; }
-    .nav-item.active .nav-chevron { color:#7dd3fc; }
+    .nav-item .nav-chevron { display:none; }
 
     .nav-sub {
-      display:none;
-      margin:1px 0 2px 14px;
+      display:flex; flex-direction:column;
+      margin:1px 0 4px 14px;
       padding:2px 0 2px 10px;
       border-left:2px solid #f3f4f6;
     }
-    .nav-sub.open { display:block; }
 
     .nav-sub-item {
       display:flex; align-items:center; gap:6px;
@@ -2684,11 +2681,11 @@
 
     <div class="nav-group-label">업무 관리</div>
 
-    <button class="nav-item" id="nav-report" onclick="sidebarNav('report',this)">
+    <button class="nav-item open" id="nav-report" onclick="sidebarNav('report',this)">
       <span class="nav-icon">≡</span> 업무보고
       <span class="nav-chevron">▶</span>
     </button>
-    <div class="nav-sub" id="nav-sub-report">
+    <div class="nav-sub open" id="nav-sub-report">
       <button class="nav-sub-item active" data-tab="write"       onclick="sidebarTab('write',this)">데일리보고 작성</button>
       <button class="nav-sub-item"        data-tab="my-summary"  onclick="sidebarTab('my-summary',this)">내 업무 요약</button>
       <button class="nav-sub-item"        data-tab="by-date"     onclick="sidebarTab('by-date',this)">날짜별 보기</button>
@@ -2699,11 +2696,11 @@
       <button class="nav-sub-item"        data-tab="weekly"      onclick="sidebarTab('weekly',this)">주간 요약</button>
     </div>
 
-    <button class="nav-item" id="nav-plan" onclick="sidebarNav('plan',this)">
+    <button class="nav-item open" id="nav-plan" onclick="sidebarNav('plan',this)">
       <span class="nav-icon">◫</span> 업무계획
       <span class="nav-chevron">▶</span>
     </button>
-    <div class="nav-sub" id="nav-sub-plan">
+    <div class="nav-sub open" id="nav-sub-plan">
       <button class="nav-sub-item active" data-tab="weekly-plan"   onclick="sidebarTab('weekly-plan',this)">월 계획</button>
       <button class="nav-sub-item"        data-tab="person-plan"   onclick="sidebarTab('person-plan',this)">인물별 조회</button>
       <button class="nav-sub-item"        data-tab="team-overview" onclick="sidebarTab('team-overview',this)">팀원 현황</button>
@@ -2711,11 +2708,11 @@
 
     <div class="nav-group-label">분석</div>
 
-    <button class="nav-item" id="nav-admin" onclick="sidebarNav('admin',this)">
+    <button class="nav-item open" id="nav-admin" onclick="sidebarNav('admin',this)">
       <span class="nav-icon">↗</span> 인사이트
       <span class="nav-chevron">▶</span>
     </button>
-    <div class="nav-sub" id="nav-sub-admin">
+    <div class="nav-sub open" id="nav-sub-admin">
       <button class="nav-sub-item active" data-tab="heatmap"   onclick="sidebarTab('heatmap',this)">업무 히트맵</button>
       <button class="nav-sub-item"        data-tab="trend"     onclick="sidebarTab('trend',this)">완료율 추이</button>
       <button class="nav-sub-item"        data-tab="export"    onclick="sidebarTab('export',this)">리포트 내보내기</button>
@@ -3670,21 +3667,16 @@
   const _SECTION_TITLES = { dashboard:'현황판', report:'업무보고', plan:'업무계획', admin:'인사이트', lounge:'라운지' };
 
   function sidebarNav(section, navBtn) {
-    // 사이드바 nav-item 활성화
-    document.querySelectorAll('.nav-item').forEach(b => { b.classList.remove('active','open'); });
-    document.querySelectorAll('.nav-sub').forEach(s => s.classList.remove('open'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     navBtn.classList.add('active');
-    const sub = document.getElementById('nav-sub-' + section);
-    if (sub) { navBtn.classList.add('open'); sub.classList.add('open'); }
     // 첫 번째 서브아이템 활성화
+    const sub = document.getElementById('nav-sub-' + section);
     if (sub) {
       const firstSub = sub.querySelector('.nav-sub-item');
       if (firstSub) { document.querySelectorAll('.nav-sub-item').forEach(b=>b.classList.remove('active')); firstSub.classList.add('active'); }
     }
-    // topbar 제목 업데이트
     const titleEl = document.getElementById('topbar-title');
     if (titleEl) titleEl.textContent = _SECTION_TITLES[section] || '';
-    // 기존 switchSection 위임
     const fakeBtn = document.getElementById('section-btn-' + section);
     if (fakeBtn) switchSection(section, fakeBtn);
   }
