@@ -432,6 +432,268 @@ function LadderGame() {
   );
 }
 
+// ── 밸런스 게임 ─────────────────────────────────────────
+interface BalanceQuestion {
+  id: number;
+  a: string;
+  b: string;
+  category: string;
+}
+
+interface BalanceVotes {
+  [questionId: number]: { a: string[]; b: string[] };
+}
+
+const DEFAULT_QUESTIONS: BalanceQuestion[] = [
+  { id: 1,  a: '🍗 치킨',         b: '🍕 피자',         category: '점심/회식' },
+  { id: 2,  a: '🍜 면 요리',       b: '🍚 밥 요리',       category: '점심/회식' },
+  { id: 3,  a: '🍣 일식',          b: '🥩 고기',          category: '점심/회식' },
+  { id: 4,  a: '🍺 1차 회식',      b: '🏠 바로 귀가',     category: '점심/회식' },
+  { id: 5,  a: '🥂 고급 레스토랑', b: '🍻 편한 분위기 술자리', category: '점심/회식' },
+  { id: 6,  a: '☕ 커피',          b: '🧋 버블티',        category: '카페' },
+  { id: 7,  a: '🏢 사무실 점심',   b: '🚶 외식',          category: '점심/회식' },
+  { id: 8,  a: '🛵 배달',          b: '🚶 직접 픽업',     category: '점심/회식' },
+];
+
+function getVotes(): BalanceVotes {
+  try { return JSON.parse(lsGet('balance_votes') || '{}'); } catch { return {}; }
+}
+function saveVotes(v: BalanceVotes) { lsSet('balance_votes', JSON.stringify(v)); }
+
+function getCustomQuestions(): BalanceQuestion[] {
+  try { return JSON.parse(lsGet('balance_custom_q') || '[]'); } catch { return []; }
+}
+function saveCustomQuestions(q: BalanceQuestion[]) { lsSet('balance_custom_q', JSON.stringify(q)); }
+
+function BalanceGame() {
+  const [questions, setQuestions]   = useState<BalanceQuestion[]>([...DEFAULT_QUESTIONS, ...getCustomQuestions()]);
+  const [votes, setVotes]           = useState<BalanceVotes>(getVotes());
+  const [activeIdx, setActiveIdx]   = useState(0);
+  const [myName, setMyName]         = useState(lsGet('my_name') || '');
+  const [newA, setNewA]             = useState('');
+  const [newB, setNewB]             = useState('');
+  const [showAdd, setShowAdd]       = useState(false);
+  const [categories, setCategories] = useState<string[]>([...new Set(DEFAULT_QUESTIONS.map(q => q.category))]);
+  const [filterCat, setFilterCat]   = useState('전체');
+
+  const filtered = filterCat === '전체' ? questions : questions.filter(q => q.category === filterCat);
+  const q        = filtered[activeIdx] ?? filtered[0];
+
+  function refreshName() { setMyName(lsGet('my_name') || ''); }
+
+  function vote(side: 'a' | 'b') {
+    if (!myName) { alert('내 이름을 먼저 설정해주세요'); return; }
+    if (!q) return;
+    const v = getVotes();
+    if (!v[q.id]) v[q.id] = { a: [], b: [] };
+    // remove from both sides first (toggle)
+    v[q.id].a = v[q.id].a.filter(n => n !== myName);
+    v[q.id].b = v[q.id].b.filter(n => n !== myName);
+    // check if already voted same side → cancel
+    const currentVotes = getVotes()[q.id];
+    const alreadyVoted = currentVotes?.[side]?.includes(myName);
+    if (!alreadyVoted) v[q.id][side].push(myName);
+    saveVotes(v);
+    setVotes({ ...v });
+  }
+
+  function addQuestion() {
+    if (!newA.trim() || !newB.trim()) { alert('A와 B 보기를 모두 입력해주세요'); return; }
+    const custom = getCustomQuestions();
+    const newQ: BalanceQuestion = { id: Date.now(), a: newA.trim(), b: newB.trim(), category: '커스텀' };
+    custom.push(newQ);
+    saveCustomQuestions(custom);
+    const all = [...DEFAULT_QUESTIONS, ...custom];
+    setQuestions(all);
+    setNewA(''); setNewB(''); setShowAdd(false);
+    const newIdx = filtered.length; // go to new question
+    setActiveIdx(Math.max(0, all.length - 1));
+    if (!categories.includes('커스텀')) setCategories(p => [...p, '커스텀']);
+  }
+
+  function deleteQuestion(id: number) {
+    const custom = getCustomQuestions().filter(q => q.id !== id);
+    saveCustomQuestions(custom);
+    setQuestions([...DEFAULT_QUESTIONS, ...custom]);
+    setActiveIdx(0);
+  }
+
+  function resetVotes() {
+    if (!confirm('이 질문의 투표를 초기화할까요?')) return;
+    if (!q) return;
+    const v = getVotes();
+    delete v[q.id];
+    saveVotes(v);
+    setVotes({ ...v });
+  }
+
+  if (!q) return null;
+
+  const qVotes   = votes[q.id] || { a: [], b: [] };
+  const totalVotes = qVotes.a.length + qVotes.b.length;
+  const pctA     = totalVotes ? Math.round(qVotes.a.length / totalVotes * 100) : 50;
+  const pctB     = 100 - pctA;
+  const myVote   = qVotes.a.includes(myName) ? 'a' : qVotes.b.includes(myName) ? 'b' : null;
+  const winnerA  = totalVotes > 0 && pctA > pctB;
+  const winnerB  = totalVotes > 0 && pctB > pctA;
+  const isCustom = !DEFAULT_QUESTIONS.find(dq => dq.id === q.id);
+
+  const allCats  = ['전체', ...new Set(questions.map(q => q.category))];
+
+  return (
+    <div>
+      <div className="lounge-block-title">⚖️ 밸런스 게임</div>
+      <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 2px 10px rgba(15,23,42,0.07)' }}>
+
+        {/* 카테고리 필터 */}
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' as const, marginBottom: 16 }}>
+          {allCats.map(cat => (
+            <button
+              key={cat}
+              onClick={() => { setFilterCat(cat); setActiveIdx(0); }}
+              style={{
+                padding: '4px 12px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+                background: filterCat === cat ? '#4f46e5' : '#f1f5f9',
+                color: filterCat === cat ? '#fff' : '#64748b',
+                transition: 'all 0.15s',
+              }}
+            >{cat}</button>
+          ))}
+          <button
+            onClick={() => { setShowAdd(p => !p); }}
+            style={{ padding: '4px 12px', borderRadius: 20, border: '1px dashed #cbd5e1', background: '#fff', cursor: 'pointer', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600 }}
+          >+ 질문 추가</button>
+        </div>
+
+        {/* 질문 추가 폼 */}
+        {showAdd && (
+          <div style={{ background: '#f8fafc', borderRadius: 10, padding: '12px 14px', marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' as const }}>
+            <input
+              type="text" placeholder="A 보기 (예: 🍗 치킨)"
+              value={newA} onChange={e => setNewA(e.target.value)}
+              style={{ flex: 1, minWidth: 120, padding: '7px 10px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.84rem' }}
+            />
+            <span style={{ color: '#94a3b8', fontWeight: 700 }}>vs</span>
+            <input
+              type="text" placeholder="B 보기 (예: 🍕 피자)"
+              value={newB} onChange={e => setNewB(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') addQuestion(); }}
+              style={{ flex: 1, minWidth: 120, padding: '7px 10px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.84rem' }}
+            />
+            <button onClick={addQuestion} style={{ padding: '7px 16px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: '0.83rem', fontWeight: 700, cursor: 'pointer' }}>추가</button>
+          </div>
+        )}
+
+        {/* 질문 네비게이션 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+          <button
+            onClick={() => setActiveIdx(p => Math.max(0, p - 1))}
+            disabled={activeIdx === 0}
+            style={{ padding: '4px 10px', border: '1px solid #e2e8f0', borderRadius: 8, background: '#fff', cursor: 'pointer', color: '#64748b', fontSize: '0.85rem' }}
+          >‹</button>
+          <div style={{ flex: 1, textAlign: 'center', fontSize: '0.78rem', color: '#94a3b8' }}>
+            {activeIdx + 1} / {filtered.length}
+            <span style={{ marginLeft: 6, padding: '2px 8px', background: '#f1f5f9', borderRadius: 20, fontSize: '0.72rem', color: '#64748b' }}>{q.category}</span>
+          </div>
+          <button
+            onClick={() => setActiveIdx(p => Math.min(filtered.length - 1, p + 1))}
+            disabled={activeIdx === filtered.length - 1}
+            style={{ padding: '4px 10px', border: '1px solid #e2e8f0', borderRadius: 8, background: '#fff', cursor: 'pointer', color: '#64748b', fontSize: '0.85rem' }}
+          >›</button>
+          {isCustom && (
+            <button onClick={() => deleteQuestion(q.id)} style={{ padding: '4px 8px', border: 'none', background: 'none', cursor: 'pointer', color: '#fca5a5', fontSize: '0.82rem' }}>✕</button>
+          )}
+        </div>
+
+        {/* 메인 투표 카드 */}
+        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+          {/* A */}
+          <button
+            onClick={() => vote('a')}
+            style={{
+              flex: 1, padding: '22px 14px', border: `2px solid ${myVote === 'a' ? '#4f46e5' : '#e2e8f0'}`,
+              borderRadius: 14, background: myVote === 'a' ? '#eef2ff' : '#fff',
+              cursor: 'pointer', transition: 'all 0.18s', textAlign: 'center' as const,
+              boxShadow: myVote === 'a' ? '0 0 0 3px rgba(79,70,229,0.15)' : 'none',
+            }}
+          >
+            <div style={{ fontSize: '1.5rem', marginBottom: 6 }}>{q.a}</div>
+            {myVote === 'a' && <div style={{ fontSize: '0.72rem', color: '#4f46e5', fontWeight: 700 }}>✓ 내 선택</div>}
+          </button>
+
+          {/* vs */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: '#94a3b8' }}>VS</div>
+          </div>
+
+          {/* B */}
+          <button
+            onClick={() => vote('b')}
+            style={{
+              flex: 1, padding: '22px 14px', border: `2px solid ${myVote === 'b' ? '#ec4899' : '#e2e8f0'}`,
+              borderRadius: 14, background: myVote === 'b' ? '#fdf2f8' : '#fff',
+              cursor: 'pointer', transition: 'all 0.18s', textAlign: 'center' as const,
+              boxShadow: myVote === 'b' ? '0 0 0 3px rgba(236,72,153,0.15)' : 'none',
+            }}
+          >
+            <div style={{ fontSize: '1.5rem', marginBottom: 6 }}>{q.b}</div>
+            {myVote === 'b' && <div style={{ fontSize: '0.72rem', color: '#ec4899', fontWeight: 700 }}>✓ 내 선택</div>}
+          </button>
+        </div>
+
+        {/* 결과 바 */}
+        {totalVotes > 0 ? (
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', borderRadius: 12, overflow: 'hidden', height: 28, marginBottom: 8 }}>
+              <div style={{ width: `${pctA}%`, background: winnerA ? '#4f46e5' : '#a5b4fc', transition: 'width 0.5s ease', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {pctA > 15 && <span style={{ color: '#fff', fontSize: '0.78rem', fontWeight: 700 }}>{pctA}%</span>}
+              </div>
+              <div style={{ width: `${pctB}%`, background: winnerB ? '#ec4899' : '#f9a8d4', transition: 'width 0.5s ease', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {pctB > 15 && <span style={{ color: '#fff', fontSize: '0.78rem', fontWeight: 700 }}>{pctB}%</span>}
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                {qVotes.a.length > 0 && (
+                  <div style={{ fontSize: '0.73rem', color: '#6366f1' }}>
+                    {qVotes.a.map(n => (
+                      <span key={n} style={{ display: 'inline-block', background: '#eef2ff', borderRadius: 20, padding: '1px 7px', marginRight: 3, marginBottom: 2 }}>{n}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div style={{ textAlign: 'right' as const }}>
+                {qVotes.b.length > 0 && (
+                  <div style={{ fontSize: '0.73rem', color: '#ec4899' }}>
+                    {qVotes.b.map(n => (
+                      <span key={n} style={{ display: 'inline-block', background: '#fdf2f8', borderRadius: 20, padding: '1px 7px', marginLeft: 3, marginBottom: 2 }}>{n}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ textAlign: 'center' as const, marginTop: 6 }}>
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>총 {totalVotes}명 참여</span>
+              <button onClick={resetVotes} style={{ marginLeft: 10, fontSize: '0.72rem', color: '#cbd5e1', background: 'none', border: 'none', cursor: 'pointer' }}>초기화</button>
+            </div>
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center' as const, color: '#94a3b8', fontSize: '0.82rem', marginBottom: 12, padding: '8px 0' }}>
+            아직 투표가 없어요. 먼저 선택해보세요! 🗳️
+          </div>
+        )}
+
+        {/* 내 이름 안내 */}
+        {!myName && (
+          <div style={{ textAlign: 'center' as const, fontSize: '0.78rem', color: '#f97316', background: '#fff7ed', borderRadius: 8, padding: '7px 14px' }}>
+            왼쪽 하단에서 <strong>내 이름을 설정</strong>하면 투표할 수 있어요
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── 메인 Lounge 컴포넌트 ─────────────────────────────────
 export function Lounge() {
   return (
@@ -442,6 +704,7 @@ export function Lounge() {
         <MvpBadges />
       </div>
       <MessageBoard />
+      <BalanceGame />
       <LadderGame />
     </div>
   );
