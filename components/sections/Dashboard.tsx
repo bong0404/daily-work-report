@@ -379,7 +379,12 @@ const EMOJI_CATS = [
 
 // ── 내 업무 요약 ─────────────────────────────────────────
 function MyPlanSummary() {
-  const myName = lsGet('my_name') || '';
+  const [myName, setMyName] = useState('');
+
+  useEffect(() => {
+    setMyName(lsGet('my_name') || '');
+  }, []);
+
   if (!myName) return null;
 
   const mkey = currentMkey();
@@ -399,7 +404,7 @@ function MyPlanSummary() {
     });
   });
 
-  const cardStyle: React.CSSProperties = { background: '#fff', borderRadius: 12, border: '1px solid #f1f5f9', padding: '16px 20px', boxShadow: '0 1px 4px rgba(15,23,42,0.05)' };
+  const cardStyle = { background: '#fff', borderRadius: 12, border: '1px solid #f1f5f9', padding: '16px 20px', boxShadow: '0 1px 4px rgba(15,23,42,0.05)' };
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
