@@ -3234,13 +3234,19 @@
         <div class="lounge-block-title">🎲 사다리타기</div>
 
         <!-- 설정 화면 -->
-        <div id="ladder-setup" style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(15,23,42,0.07)">
-          <div style="font-size:0.78rem;font-weight:700;color:#64748b;margin-bottom:8px">👥 참가자</div>
-          <div class="ladder-chip-grid" id="ladder-chip-grid"></div>
-          <div style="font-size:0.78rem;font-weight:700;color:#64748b;margin-bottom:8px">🎁 당첨 결과 설정</div>
-          <input id="ladder-special-input" class="ladder-special-input" type="text" value="☕ 커피 쏘기" placeholder="☕ 커피 쏘기">
-          <div style="font-size:0.72rem;color:#94a3b8;margin:6px 0 16px">나머지는 자동으로 😊 통과 처리돼요</div>
-          <button class="ladder-gen-btn" onclick="generateLadder()">🎲 사다리 생성!</button>
+        <div id="ladder-setup" style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(15,23,42,0.07);display:flex;gap:24px;align-items:flex-start;">
+          <!-- 왼쪽: 당첨 결과 설정 + 참가자 -->
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:0.78rem;font-weight:700;color:#64748b;margin-bottom:8px">🎁 당첨 결과 설정</div>
+            <input id="ladder-special-input" class="ladder-special-input" type="text" value="☕ 커피 쏘기" placeholder="☕ 커피 쏘기" style="margin-bottom:4px;">
+            <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:16px">나머지는 자동으로 😊 통과 처리돼요</div>
+            <div style="font-size:0.78rem;font-weight:700;color:#64748b;margin-bottom:8px">👥 참가자</div>
+            <div class="ladder-chip-grid" id="ladder-chip-grid"></div>
+          </div>
+          <!-- 오른쪽: 생성 버튼 -->
+          <div style="flex-shrink:0;display:flex;align-items:center;padding-top:4px;">
+            <button class="ladder-gen-btn" onclick="generateLadder()" style="white-space:nowrap;">🎲 사다리 생성!</button>
+          </div>
         </div>
 
         <!-- 게임 화면 -->
