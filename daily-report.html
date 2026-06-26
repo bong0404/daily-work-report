@@ -4075,7 +4075,7 @@
     el.innerHTML = msgs.map(m => `
     <div class="lounge-msg-card">
       <div class="lounge-msg-header">
-        <span class="lounge-msg-from">${m.from}</span>
+        <span class="lounge-msg-from">✍️ ${m.from}<span style="font-size:0.72rem;font-weight:400;color:#94a3b8;margin-left:4px;">님이 보냄</span></span>
         <span class="lounge-msg-ts">${m.ts}</span>
       </div>
       <div class="lounge-msg-body">${m.msg}</div>
