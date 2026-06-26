@@ -327,20 +327,46 @@ function ByDateTab() {
 
 // ── 인물별 탭 ────────────────────────────────────────────
 function ByPersonTab() {
-  const [person, setPerson] = useState('');
-  const [result, setResult] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [person, setPerson]       = useState('');
+  const [month, setMonth]         = useState('');
+  const [monthOptions, setMonthOptions] = useState<string[]>([]);
+  const [result, setResult]       = useState('');
+  const [loading, setLoading]     = useState(false);
 
-  async function load(p: string) {
-    if (!p) { setResult(''); return; }
+  async function updateMonthOptions(p: string) {
+    if (!p) { setMonthOptions([]); setMonth(''); return; }
+    const rows = await fetchReports();
+    const months = [...new Set(
+      rows.filter(r => r['이름'] === p).map(r => r['날짜'].slice(0, 7))
+    )].sort((a, b) => b.localeCompare(a));
+    setMonthOptions(months);
+    setMonth('');
+  }
+
+  async function load() {
+    if (!person) { alert('이름을 선택해주세요'); return; }
     setLoading(true);
     const rows = await fetchReports();
-    const filtered = rows.filter(r => r['이름'] === p);
+    const filtered = rows
+      .filter(r => r['이름'] === person)
+      .filter(r => !month || r['날짜'].startsWith(month))
+      .sort((a, b) => b['날짜'].localeCompare(a['날짜']));
     if (!filtered.length) {
-      setResult(`<div class="empty-state">${p}의 보고가 없습니다</div>`);
+      setResult(`<div class="empty-state">${person}${month ? ' · ' + month : ''}의 보고가 없습니다</div>`);
     } else {
-      const sorted = [...filtered].sort((a, b) => b['날짜'].localeCompare(a['날짜']));
-      setResult(`<div class="date-report-grid">${sorted.map(r => renderReportHtml(r, getComments(`${r['날짜']}_${r['이름']}`))).join('')}</div>`);
+      const byMonth: Record<string, typeof filtered> = {};
+      filtered.forEach(r => {
+        const key = r['날짜'].slice(0, 7);
+        if (!byMonth[key]) byMonth[key] = [];
+        byMonth[key].push(r);
+      });
+      let html = '';
+      Object.keys(byMonth).sort((a, b) => b.localeCompare(a)).forEach(mk => {
+        const [y, m] = mk.split('-');
+        const label = `${y}년 ${parseInt(m)}월`;
+        html += `<div class="range-date-group"><div class="range-date-label">${label}</div><div class="date-report-grid">${byMonth[mk].map(r => renderReportHtml(r, getComments(`${r['날짜']}_${r['이름']}`))).join('')}</div></div>`;
+      });
+      setResult(html);
     }
     setLoading(false);
   }
@@ -348,12 +374,20 @@ function ByPersonTab() {
   return (
     <>
       <div className="view-controls">
-        <select value={person} onChange={e => { setPerson(e.target.value); load(e.target.value); }}>
-          <option value="">팀원을 선택하세요</option>
-          {MEMBERS.map(m => <option key={m.name}>{m.name}</option>)}
+        <select value={person} onChange={e => { setPerson(e.target.value); updateMonthOptions(e.target.value); }}>
+          <option value="">이름을 선택하세요</option>
+          {MEMBERS.map(m => <option key={m.name} value={m.name}>{m.name}</option>)}
         </select>
+        <select value={month} onChange={e => setMonth(e.target.value)}>
+          <option value="">전체 월</option>
+          {monthOptions.map(mk => {
+            const [y, m] = mk.split('-');
+            return <option key={mk} value={mk}>{y}년 {parseInt(m)}월</option>;
+          })}
+        </select>
+        <button className="btn-load" onClick={load} disabled={loading}>조회</button>
       </div>
-      <div dangerouslySetInnerHTML={{ __html: loading ? '<div class="empty-state"><div class="loading-spinner"></div>불러오는 중...</div>' : result || '<div class="empty-state">팀원을 선택하세요</div>' }} />
+      <div dangerouslySetInnerHTML={{ __html: loading ? '<div class="empty-state"><div class="loading-spinner"></div>불러오는 중...</div>' : result || '<div class="empty-state">이름을 선택하고 조회하세요</div>' }} />
     </>
   );
 }
