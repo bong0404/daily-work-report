@@ -334,11 +334,47 @@ function NextWeekPlanStatus() {
   );
 }
 
-// ── 이모지 목록 ──────────────────────────────────────────
-const NOTICE_EMOJIS = [
-  '😊','😂','🎉','👍','🙏','💪','🔥','✅','❌','⚠️',
-  '📌','📢','📊','💡','🎯','🚀','💬','❤️','👀','🤔',
-  '😅','😍','🥳','👏','✨','🎈','📝','🔔','💯','🙌',
+// ── 이모지 카테고리 ──────────────────────────────────────
+const EMOJI_CATS = [
+  { label: '😊', emojis: [
+    '😀','😄','😁','😆','😅','🤣','😂','🥹','😊','😇',
+    '🙂','😉','😍','🥰','😘','😗','😋','😛','😜','🤪',
+    '🤨','🧐','🤔','😮','😯','😲','😳','🥺','😢','😭',
+    '😤','😠','😡','🤬','😈','👿','😱','😨','😰','😥',
+    '🤗','🤭','🫡','🤫','🤥','😶','😬','🙄','😴','🥴',
+  ]},
+  { label: '👋', emojis: [
+    '👍','👎','👌','🤌','✌️','🤞','🤟','🤘','👈','👉',
+    '☝️','👆','👇','✋','🤚','🖐️','🖖','👋','🤙','💪',
+    '🦾','🙏','👏','🤲','🤝','🫶','🙌','👐','🫂','💅',
+    '🧠','👁️','👀','👄','🫦','💋','🦷','👂','🦻','👃',
+  ]},
+  { label: '❤️', emojis: [
+    '❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔',
+    '❤️‍🔥','❤️‍🩹','💕','💞','💓','💗','💖','💘','💝','💟',
+    '☮️','✝️','☯️','✨','💫','⭐','🌟','💥','🔥','🎆',
+    '🎉','🎊','🎈','🎁','🏆','🥇','🥈','🥉','🎖️','🏅',
+  ]},
+  { label: '🐶', emojis: [
+    '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
+    '🦁','🐸','🐵','🐔','🐧','🐦','🦆','🦅','🦉','🦇',
+    '🌸','🌺','🌻','🌹','🌷','🍀','🌿','🌱','🌲','🌳',
+    '🌈','⛅','🌤️','🌦️','🌧️','⛈️','🌩️','❄️','☃️','🌊',
+  ]},
+  { label: '🍕', emojis: [
+    '🍎','🍊','🍋','🍇','🍓','🫐','🍑','🍒','🥝','🍉',
+    '🍕','🍔','🌮','🌯','🍜','🍣','🍱','🍛','🍝','🥗',
+    '☕','🍵','🧋','🥤','🍺','🍻','🥂','🍷','🧃','🍾',
+    '🍰','🎂','🧁','🍩','🍪','🍫','🍬','🍭','🍮','🧇',
+  ]},
+  { label: '📌', emojis: [
+    '✅','❎','☑️','⭕','❌','❗','❓','💡','🔔','🔕',
+    '📌','📍','📎','🖇️','📋','📊','📈','📉','📅','📆',
+    '📝','✏️','🖊️','🖋️','📖','📚','📂','📁','🗂️','🗃️',
+    '💼','🖥️','💻','⌨️','🖨️','📱','☎️','📞','📟','📠',
+    '🔑','🗝️','🔒','🔓','🔧','🔨','⚙️','🛠️','💰','💳',
+    '🚀','💯','🔥','⚠️','🚨','🏁','🎯','💬','📢','📣',
+  ]},
 ];
 
 // ── 공지 게시판 ──────────────────────────────────────────
@@ -348,6 +384,7 @@ function NoticeBoard() {
   const [title, setTitle]         = useState('');
   const [pinned, setPinned]       = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
+  const [emojiCat, setEmojiCat]   = useState(0);
   const [openComments, setOpenComments] = useState<Set<number>>(new Set());
   const [commentInputs, setCommentInputs] = useState<Record<number, { author: string; text: string }>>({});
   const bodyRef = useRef<HTMLDivElement>(null);
@@ -458,14 +495,24 @@ function NoticeBoard() {
           <div className="emoji-wrap" style={{ position: 'relative' }}>
             <button type="button" className="toolbar-btn" onClick={() => setShowEmoji(v => !v)} title="이모지">😊</button>
             {showEmoji && (
-              <div style={{ position: 'absolute', top: '110%', left: 0, zIndex: 200, background: '#fff', border: '1px solid #e8eaf0', borderRadius: 8, padding: 8, display: 'flex', flexWrap: 'wrap', gap: 2, width: 220, boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
-                {NOTICE_EMOJIS.map(e => (
-                  <button key={e} type="button" onMouseDown={ev => { ev.preventDefault(); insertEmoji(e); }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', padding: '2px 4px', borderRadius: 4 }}
-                    onMouseEnter={ev => (ev.currentTarget.style.background = '#f1f5f9')}
-                    onMouseLeave={ev => (ev.currentTarget.style.background = 'none')}
-                  >{e}</button>
-                ))}
+              <div style={{ position: 'absolute', top: '110%', left: 0, zIndex: 200, background: '#fff', border: '1px solid #e8eaf0', borderRadius: 10, width: 272, boxShadow: '0 4px 20px rgba(0,0,0,0.14)' }}>
+                <div style={{ display: 'flex', gap: 2, padding: '8px 8px 0', borderBottom: '1px solid #f0f0f6' }}>
+                  {EMOJI_CATS.map((cat, i) => (
+                    <button key={i} type="button"
+                      onMouseDown={ev => { ev.preventDefault(); setEmojiCat(i); }}
+                      style={{ background: i === emojiCat ? '#eef2ff' : 'none', border: 'none', borderRadius: '6px 6px 0 0', fontSize: '1.1rem', padding: '4px 6px', cursor: 'pointer', opacity: i === emojiCat ? 1 : 0.4 }}
+                    >{cat.label}</button>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 1, padding: 8, maxHeight: 200, overflowY: 'auto' }}>
+                  {EMOJI_CATS[emojiCat].emojis.map(e => (
+                    <button key={e} type="button" onMouseDown={ev => { ev.preventDefault(); insertEmoji(e); }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', padding: '3px 4px', borderRadius: 4 }}
+                      onMouseEnter={ev => (ev.currentTarget.style.background = '#f1f5f9')}
+                      onMouseLeave={ev => (ev.currentTarget.style.background = 'none')}
+                    >{e}</button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
