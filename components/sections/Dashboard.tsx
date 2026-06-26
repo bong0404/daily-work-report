@@ -692,7 +692,8 @@ export function Dashboard() {
     }
   }
 
-  useEffect(() => { loadDashboard(); }, []); // load today on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { loadDashboard(); }, []);
 
   return (
     <>

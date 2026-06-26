@@ -8,7 +8,6 @@ import { MEMBERS, lsGet, lsSet,
 import { supabase } from '@/lib/supabase';
 import { useSectionContext } from '@/hooks/useSection';
 import { fetchReports } from '@/hooks/useReports';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 const STATUS_CYCLE: Record<string, string> = { todo: 'doing', doing: 'done', done: 'todo' };
 const STATUS_LABEL: Record<string, string> = { todo: '예정', doing: '진행', done: '완료' };
