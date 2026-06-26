@@ -1,0 +1,16 @@
+# Next.js
+.next/
+out/
+
+# Node
+node_modules/
+
+# Env
+.env.local
+.env*.local
+
+# Claude worktrees
+.claude/
+
+# Backup files
+daily-report-backup-*.html
