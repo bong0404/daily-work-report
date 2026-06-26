@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { MEMBERS, ALL_MEMBERS, lsGet, lsSet, parseItems, todayString } from '@/lib/constants';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { MEMBERS, ALL_MEMBERS, lsGet, lsSet, parseItems, todayString, getMonthDays, MonthPlanData } from '@/lib/constants';
 import { fetchReports } from '@/hooks/useReports';
 
 // ── 공지 타입 ────────────────────────────────────────────
@@ -24,6 +24,47 @@ function getNoticeComments(id: number): NoticeComment[] {
 }
 function saveNoticeComments(id: number, list: NoticeComment[]) {
   lsSet(`notice_comments_${id}`, JSON.stringify(list));
+}
+
+// ── 차주 계획 유틸 ───────────────────────────────────────
+function getNextWeekRange(): { nextMon: Date; nextSun: Date } {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const dow = today.getDay();
+  const daysToNextMon = dow === 0 ? 1 : 8 - dow;
+  const nextMon = new Date(today);
+  nextMon.setDate(today.getDate() + daysToNextMon);
+  const nextSun = new Date(nextMon);
+  nextSun.setDate(nextMon.getDate() + 6);
+  return { nextMon, nextSun };
+}
+
+function hasNextWeekPlan(memberName: string): boolean {
+  const { nextMon, nextSun } = getNextWeekRange();
+  const months = new Set<string>();
+  for (let d = new Date(nextMon); d <= nextSun; d.setDate(d.getDate() + 1)) {
+    months.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  }
+  for (const mkey of months) {
+    const raw = lsGet(`mplan_${memberName}_${mkey}`);
+    if (!raw) continue;
+    try {
+      const data: MonthPlanData = JSON.parse(raw);
+      const days = getMonthDays(mkey);
+      for (const day of days) {
+        if (day.isOther) continue;
+        if (day.date >= nextMon && day.date <= nextSun) {
+          const cats = data.categories || [];
+          for (const cat of cats) {
+            const tasks = (data.grid[cat] || {})[day.key] || [];
+            if (tasks.some(t => t.text && t.text.trim())) return true;
+          }
+        }
+      }
+    } catch {
+      continue;
+    }
+  }
+  return false;
 }
 
 // ── 대시보드 결과 표시 ───────────────────────────────────
@@ -81,19 +122,80 @@ function DashboardResult({ result }: { result: DashResult | null }) {
           ))}
         </>
       )}
+      <NextWeekPlanStatus />
     </>
   );
 }
+
+// ── 차주 업무계획 현황 ────────────────────────────────────
+function NextWeekPlanStatus() {
+  const { nextMon, nextSun } = getNextWeekRange();
+  const fmt = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
+  const weekLabel = `${fmt(nextMon)} ~ ${fmt(nextSun)}`;
+
+  const planDone    = MEMBERS.filter(m => hasNextWeekPlan(m.name));
+  const planMissing = MEMBERS.filter(m => !hasNextWeekPlan(m.name));
+  const pct = MEMBERS.length === 0 ? 0 : Math.round((planDone.length / MEMBERS.length) * 100);
+
+  return (
+    <div style={{ marginTop: 32 }}>
+      <div className="dash-section-title" style={{ marginBottom: 8 }}>
+        📅 차주 업무계획 현황 ({weekLabel})
+      </div>
+      <div className="dashboard-grid">
+        <div className="dash-card"><div className="label">전체 팀원</div><div className="value purple">{MEMBERS.length}명</div></div>
+        <div className="dash-card"><div className="label">계획 등록</div><div className="value green">{planDone.length}명</div></div>
+        <div className="dash-card"><div className="label">미등록</div><div className="value red">{planMissing.length}명</div></div>
+      </div>
+      <div style={{ margin: '10px 0 6px', display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#64748b' }}>
+        <span>등록 완료율</span><span>{pct}%</span>
+      </div>
+      <div style={{ height: 8, background: '#e8eaf0', borderRadius: 4, overflow: 'hidden', marginBottom: 14 }}>
+        <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg, #4f46e5, #818cf8)', borderRadius: 4, transition: 'width 0.4s' }} />
+      </div>
+      <div className="submit-status-grid">
+        {MEMBERS.map(m => {
+          const done = hasNextWeekPlan(m.name);
+          return (
+            <div key={m.name} className={`member-status-card ${done ? 'submitted' : 'missing'}`}>
+              <div className="member-status-top">
+                <div className={`status-dot ${done ? 'submitted' : 'missing'}`} />
+                <div className="member-status-info">
+                  <div className="member-status-name">{m.name}</div>
+                  <div className="member-status-dept">{m.dept}</div>
+                </div>
+                <div className={`status-badge ${done ? 'submitted' : 'missing'}`}>{done ? '등록' : '미등록'}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {planMissing.length > 0 && (
+        <div style={{ marginTop: 10, padding: '8px 12px', background: '#fff8e7', border: '1px solid #fde68a', borderRadius: 8, fontSize: '0.82rem', color: '#92400e' }}>
+          ⚠️ 미등록: {planMissing.map(m => m.name).join(', ')}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── 이모지 목록 ──────────────────────────────────────────
+const NOTICE_EMOJIS = [
+  '😊','😂','🎉','👍','🙏','💪','🔥','✅','❌','⚠️',
+  '📌','📢','📊','💡','🎯','🚀','💬','❤️','👀','🤔',
+  '😅','😍','🥳','👏','✨','🎈','📝','🔔','💯','🙌',
+];
 
 // ── 공지 게시판 ──────────────────────────────────────────
 function NoticeBoard() {
   const [notices, setNotices]     = useState<Notice[]>([]);
   const [author, setAuthor]       = useState('');
   const [title, setTitle]         = useState('');
-  const [body, setBody]           = useState('');
   const [pinned, setPinned]       = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
   const [openComments, setOpenComments] = useState<Set<number>>(new Set());
   const [commentInputs, setCommentInputs] = useState<Record<number, { author: string; text: string }>>({});
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   const myName = lsGet('my_name') || '';
 
@@ -105,17 +207,31 @@ function NoticeBoard() {
 
   useEffect(() => { reload(); }, [reload]);
 
+  function noticeFormat(cmd: string) {
+    document.execCommand(cmd, false);
+    bodyRef.current?.focus();
+  }
+
+  function insertEmoji(emoji: string) {
+    bodyRef.current?.focus();
+    document.execCommand('insertText', false, emoji);
+    setShowEmoji(false);
+  }
+
   function submit() {
     const a = myName || author;
-    if (!a)     { alert('작성자를 선택해주세요'); return; }
-    if (!title) { alert('제목을 입력해주세요'); return; }
-    if (!body)  { alert('내용을 입력해주세요'); return; }
+    const bodyContent = bodyRef.current?.innerHTML?.trim() || '';
+    if (!a)          { alert('작성자를 선택해주세요'); return; }
+    if (!title)      { alert('제목을 입력해주세요'); return; }
+    if (!bodyContent || bodyContent === '<br>') { alert('내용을 입력해주세요'); return; }
     const now  = new Date();
     const time = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     const list = getNotices();
-    list.unshift({ author: a, title, body, pinned, time, id: Date.now() });
+    list.unshift({ author: a, title, body: bodyContent, pinned, time, id: Date.now() });
     saveNotices(list);
-    setTitle(''); setBody(''); setPinned(false);
+    setTitle('');
+    if (bodyRef.current) bodyRef.current.innerHTML = '';
+    setPinned(false);
     reload();
   }
 
@@ -178,12 +294,36 @@ function NoticeBoard() {
           )}
           <input type="text" placeholder="제목을 입력하세요" value={title} onChange={e => setTitle(e.target.value)} />
         </div>
-        <textarea
-          style={{ width: '100%', boxSizing: 'border-box', minHeight: 80, padding: '10px 12px', border: '1px solid #e8eaf0', borderRadius: 8, fontSize: '0.85rem', resize: 'vertical', fontFamily: 'inherit' }}
-          placeholder="내용을 입력하세요"
-          value={body}
-          onChange={e => setBody(e.target.value)}
+
+        <div className="notice-editor-toolbar">
+          <button type="button" className="toolbar-btn" onMouseDown={e => { e.preventDefault(); noticeFormat('bold'); }} title="굵게"><b>B</b></button>
+          <button type="button" className="toolbar-btn" onMouseDown={e => { e.preventDefault(); noticeFormat('underline'); }} title="밑줄"><u>U</u></button>
+          <button type="button" className="toolbar-btn" onMouseDown={e => { e.preventDefault(); noticeFormat('strikeThrough'); }} title="취소선"><s>S</s></button>
+          <div className="toolbar-divider" />
+          <div className="emoji-wrap" style={{ position: 'relative' }}>
+            <button type="button" className="toolbar-btn" onClick={() => setShowEmoji(v => !v)} title="이모지">😊</button>
+            {showEmoji && (
+              <div className="emoji-panel" style={{ position: 'absolute', top: '110%', left: 0, zIndex: 100, background: '#fff', border: '1px solid #e8eaf0', borderRadius: 8, padding: 8, display: 'flex', flexWrap: 'wrap', gap: 2, width: 220, boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }}>
+                {NOTICE_EMOJIS.map(e => (
+                  <button key={e} type="button" onMouseDown={ev => { ev.preventDefault(); insertEmoji(e); }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', padding: '2px 4px', borderRadius: 4 }}
+                    onMouseEnter={ev => (ev.currentTarget.style.background = '#f1f5f9')}
+                    onMouseLeave={ev => (ev.currentTarget.style.background = 'none')}
+                  >{e}</button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div
+          ref={bodyRef}
+          className="notice-editor"
+          contentEditable
+          suppressContentEditableWarning
+          data-placeholder="내용을 입력하세요"
         />
+
         <div className="notice-compose-footer">
           <label className="notice-pin-label">
             <input type="checkbox" checked={pinned} onChange={e => setPinned(e.target.checked)} /> 상단 고정
