@@ -2537,8 +2537,9 @@
     .app-layout { display:flex; min-height:100vh; }
 
     .sidebar {
-      width: 220px; flex-shrink:0;
-      background: #0f172a;
+      width: 200px; flex-shrink:0;
+      background: #ffffff;
+      border-right: 1px solid #e5e7eb;
       display:flex; flex-direction:column;
       position: fixed; top:0; left:0; height:100vh;
       z-index: 200;
@@ -2547,75 +2548,91 @@
     .sidebar::-webkit-scrollbar { display:none; }
 
     .sidebar-header {
-      padding: 18px 16px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 16px 14px 14px;
+      border-bottom: 1px solid #f3f4f6;
       flex-shrink: 0;
     }
-    .sidebar-logo { display:flex; flex-direction:column; gap:2px; }
-    .sidebar-logo .brand-mark { font-size:0.58rem; letter-spacing:0.2em; color:rgba(255,255,255,0.25); text-transform:uppercase; }
-    .sidebar-logo .brand-name { font-family:'Cormorant Garamond', Georgia, serif; font-size:1.2rem; font-weight:300; color:#f1f5f9; letter-spacing:0.1em; line-height:1.1; }
-    .sidebar-logo .brand-name em { font-style:italic; }
-    .sidebar-logo .brand-sub { font-size:0.6rem; font-weight:600; letter-spacing:0.25em; color:rgba(255,255,255,0.32); text-transform:uppercase; margin-top:2px; }
-    .sidebar-logo-sub { font-size:0.65rem; color:rgba(255,255,255,0.22); margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06); }
 
-    .sidebar-nav { flex:1; padding:10px 8px; overflow-y:auto; scrollbar-width:none; }
+    /* 로고 */
+    .sidebar-logo { display:flex; align-items:center; gap:9px; }
+    .brand-icon {
+      width:30px; height:30px; border-radius:8px; flex-shrink:0;
+      background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .brand-icon svg { display:block; }
+    .brand-text-block { display:flex; flex-direction:column; gap:1px; }
+    .brand-name-main {
+      font-family:'Cormorant Garamond', Georgia, serif;
+      font-size:0.95rem; font-weight:700; letter-spacing:0.06em;
+      color:#111827; line-height:1.1;
+    }
+    .brand-paris {
+      font-size:0.56rem; letter-spacing:0.18em; text-transform:uppercase;
+      color:#9ca3af; font-weight:500; line-height:1;
+    }
+
+    .sidebar-nav { flex:1; padding:8px 8px; overflow-y:auto; scrollbar-width:none; }
     .sidebar-nav::-webkit-scrollbar { display:none; }
 
     .nav-group-label {
-      font-size:0.65rem; font-weight:700; letter-spacing:0.08em;
-      color:rgba(255,255,255,0.25); text-transform:uppercase;
-      padding:12px 12px 5px; margin-top:4px;
+      font-size:0.6rem; font-weight:600; letter-spacing:0.1em;
+      color:#9ca3af; text-transform:uppercase;
+      padding:14px 10px 5px; margin-top:2px;
     }
 
     .nav-item {
-      display:flex; align-items:center; gap:9px;
-      width:100%; padding:8px 12px; border-radius:8px;
-      font-size:0.82rem; font-weight:500;
-      color:rgba(255,255,255,0.5);
+      display:flex; align-items:center; gap:8px;
+      width:100%; padding:7px 10px; border-radius:7px;
+      font-size:0.8rem; font-weight:500;
+      color:#374151;
       cursor:pointer; border:none; background:none;
       text-align:left; font-family:inherit;
-      transition:all 0.15s; margin-bottom:2px;
+      transition:all 0.13s; margin-bottom:1px;
     }
-    .nav-item:hover { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.85); }
-    .nav-item.active { background:rgba(99,102,241,0.22); color:#a5b4fc; font-weight:600; }
-    .nav-item .nav-chevron { margin-left:auto; font-size:0.6rem; opacity:0.4; transition:transform 0.2s; }
-    .nav-item.open .nav-chevron { transform:rotate(90deg); opacity:0.7; }
+    .nav-item:hover { background:#f3f4f6; color:#111827; }
+    .nav-item.active { background:#e0f2fe; color:#0284c7; font-weight:600; }
+    .nav-item .nav-icon { font-size:0.85rem; opacity:0.75; flex-shrink:0; }
+    .nav-item.active .nav-icon { opacity:1; }
+    .nav-item .nav-chevron { margin-left:auto; font-size:0.55rem; color:#d1d5db; transition:transform 0.2s; }
+    .nav-item.open .nav-chevron { transform:rotate(90deg); color:#9ca3af; }
+    .nav-item.active .nav-chevron { color:#7dd3fc; }
 
     .nav-sub {
       display:none;
-      margin:0 0 2px 20px;
-      padding:2px 0 4px 12px;
-      border-left:1px solid rgba(255,255,255,0.07);
+      margin:1px 0 2px 14px;
+      padding:2px 0 2px 10px;
+      border-left:2px solid #f3f4f6;
     }
     .nav-sub.open { display:block; }
 
     .nav-sub-item {
       display:flex; align-items:center; gap:6px;
-      width:100%; padding:5px 10px; border-radius:6px;
-      font-size:0.78rem; color:rgba(255,255,255,0.38);
+      width:100%; padding:5px 8px; border-radius:6px;
+      font-size:0.76rem; color:#6b7280;
       cursor:pointer; border:none; background:none;
       text-align:left; font-family:inherit;
-      transition:all 0.15s; margin-bottom:1px;
+      transition:all 0.13s; margin-bottom:1px;
     }
-    .nav-sub-item:hover { background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.72); }
-    .nav-sub-item.active { color:#818cf8; font-weight:600; background:rgba(99,102,241,0.14); }
+    .nav-sub-item:hover { background:#f9fafb; color:#374151; }
+    .nav-sub-item.active { color:#0284c7; font-weight:600; background:#e0f2fe; }
 
     .sidebar-footer {
-      padding:12px 10px;
-      border-top:1px solid rgba(255,255,255,0.07);
+      padding:10px 8px;
+      border-top:1px solid #f3f4f6;
       flex-shrink:0;
     }
     .sidebar-name-btn {
       display:flex; align-items:center; gap:8px;
-      width:100%; padding:7px 10px; border-radius:8px;
+      width:100%; padding:7px 10px; border-radius:7px;
       cursor:pointer; border:none; background:none;
-      font-family:inherit; transition:background 0.15s;
+      font-family:inherit; transition:background 0.13s;
     }
-    .sidebar-name-btn:hover { background:rgba(255,255,255,0.07); }
-    .sidebar-name-label { font-size:0.78rem; color:rgba(255,255,255,0.5); }
+    .sidebar-name-btn:hover { background:#f3f4f6; }
+    .sidebar-name-label { font-size:0.76rem; color:#6b7280; }
 
     /* ── 앱 바디 ── */
-    .app-body { margin-left:220px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
+    .app-body { margin-left:200px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
 
     .topbar {
       background:#fff; border-bottom:1px solid #e8eaf0;
@@ -2634,8 +2651,8 @@
     main.plan-wide { max-width:none; }
 
     @media (max-width: 768px) {
-      .sidebar { width:200px; }
-      .app-body { margin-left:200px; }
+      .sidebar { width:180px; }
+      .app-body { margin-left:180px; }
       main { padding:16px; }
       .topbar { padding:0 16px; }
     }
@@ -2647,62 +2664,75 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-logo">
-      <span class="brand-mark">✦ La Rosée</span>
-      <span class="brand-name">LA ROS<em>É</em>E</span>
-      <span class="brand-sub">Korea</span>
-      <span class="sidebar-logo-sub">경영지원본부 · 데일리보고</span>
+      <div class="brand-icon">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="7.5" cy="7.5" r="6" stroke="white" stroke-width="1.4"/>
+          <path d="M5 5h3.2c.96 0 1.8.8 1.8 1.8 0 1-.84 1.7-1.8 1.7H5V5z" fill="white"/>
+          <path d="M5 8.5l2.8 3" stroke="white" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="brand-text-block">
+        <div class="brand-name-main">LA ROSÉE</div>
+        <div class="brand-paris">KOREA</div>
+      </div>
     </div>
   </div>
   <nav class="sidebar-nav">
     <button class="nav-item active" id="nav-dashboard" onclick="sidebarNav('dashboard',this)">
-      <span>📊</span> 현황판
+      <span class="nav-icon">⊞</span> 현황판
     </button>
 
+    <div class="nav-group-label">업무 관리</div>
+
     <button class="nav-item" id="nav-report" onclick="sidebarNav('report',this)">
-      <span>📋</span> 업무보고
+      <span class="nav-icon">≡</span> 업무보고
       <span class="nav-chevron">▶</span>
     </button>
     <div class="nav-sub" id="nav-sub-report">
-      <button class="nav-sub-item active" data-tab="write"       onclick="sidebarTab('write',this)">✏️ 데일리보고 작성</button>
-      <button class="nav-sub-item"        data-tab="my-summary"  onclick="sidebarTab('my-summary',this)">📊 내 업무 요약</button>
-      <button class="nav-sub-item"        data-tab="by-date"     onclick="sidebarTab('by-date',this)">📅 날짜별 보기</button>
-      <button class="nav-sub-item"        data-tab="by-person"   onclick="sidebarTab('by-person',this)">👤 인물별 보기</button>
-      <button class="nav-sub-item"        data-tab="issues"      onclick="sidebarTab('issues',this)">⚠️ 이슈 모아보기</button>
-      <button class="nav-sub-item"        data-tab="issue-track" onclick="sidebarTab('issue-track',this)">🚨 이슈 트래킹</button>
-      <button class="nav-sub-item"        data-tab="search"      onclick="sidebarTab('search',this)">🔍 키워드 검색</button>
-      <button class="nav-sub-item"        data-tab="weekly"      onclick="sidebarTab('weekly',this)">📋 주간 요약</button>
+      <button class="nav-sub-item active" data-tab="write"       onclick="sidebarTab('write',this)">데일리보고 작성</button>
+      <button class="nav-sub-item"        data-tab="my-summary"  onclick="sidebarTab('my-summary',this)">내 업무 요약</button>
+      <button class="nav-sub-item"        data-tab="by-date"     onclick="sidebarTab('by-date',this)">날짜별 보기</button>
+      <button class="nav-sub-item"        data-tab="by-person"   onclick="sidebarTab('by-person',this)">인물별 보기</button>
+      <button class="nav-sub-item"        data-tab="issues"      onclick="sidebarTab('issues',this)">이슈 모아보기</button>
+      <button class="nav-sub-item"        data-tab="issue-track" onclick="sidebarTab('issue-track',this)">이슈 트래킹</button>
+      <button class="nav-sub-item"        data-tab="search"      onclick="sidebarTab('search',this)">키워드 검색</button>
+      <button class="nav-sub-item"        data-tab="weekly"      onclick="sidebarTab('weekly',this)">주간 요약</button>
     </div>
 
     <button class="nav-item" id="nav-plan" onclick="sidebarNav('plan',this)">
-      <span>📅</span> 업무계획
+      <span class="nav-icon">◫</span> 업무계획
       <span class="nav-chevron">▶</span>
     </button>
     <div class="nav-sub" id="nav-sub-plan">
-      <button class="nav-sub-item active" data-tab="weekly-plan"   onclick="sidebarTab('weekly-plan',this)">📅 월 계획</button>
-      <button class="nav-sub-item"        data-tab="person-plan"   onclick="sidebarTab('person-plan',this)">🔍 인물별 조회</button>
-      <button class="nav-sub-item"        data-tab="team-overview" onclick="sidebarTab('team-overview',this)">👥 팀원 현황</button>
+      <button class="nav-sub-item active" data-tab="weekly-plan"   onclick="sidebarTab('weekly-plan',this)">월 계획</button>
+      <button class="nav-sub-item"        data-tab="person-plan"   onclick="sidebarTab('person-plan',this)">인물별 조회</button>
+      <button class="nav-sub-item"        data-tab="team-overview" onclick="sidebarTab('team-overview',this)">팀원 현황</button>
     </div>
 
+    <div class="nav-group-label">분석</div>
+
     <button class="nav-item" id="nav-admin" onclick="sidebarNav('admin',this)">
-      <span>📈</span> 인사이트
+      <span class="nav-icon">↗</span> 인사이트
       <span class="nav-chevron">▶</span>
     </button>
     <div class="nav-sub" id="nav-sub-admin">
-      <button class="nav-sub-item active" data-tab="heatmap"   onclick="sidebarTab('heatmap',this)">🔥 업무 히트맵</button>
-      <button class="nav-sub-item"        data-tab="trend"     onclick="sidebarTab('trend',this)">📈 완료율 추이</button>
-      <button class="nav-sub-item"        data-tab="export"    onclick="sidebarTab('export',this)">📤 리포트 내보내기</button>
-      <button class="nav-sub-item"        data-tab="feedback"  onclick="sidebarTab('feedback',this)">💬 피드백</button>
-      <button class="nav-sub-item"        data-tab="kfreq"     onclick="sidebarTab('kfreq',this)">☁️ 키워드 분석</button>
-      <button class="nav-sub-item"        data-tab="plan-cmp"  onclick="sidebarTab('plan-cmp',this)">🎯 계획 vs 실적</button>
+      <button class="nav-sub-item active" data-tab="heatmap"   onclick="sidebarTab('heatmap',this)">업무 히트맵</button>
+      <button class="nav-sub-item"        data-tab="trend"     onclick="sidebarTab('trend',this)">완료율 추이</button>
+      <button class="nav-sub-item"        data-tab="export"    onclick="sidebarTab('export',this)">리포트 내보내기</button>
+      <button class="nav-sub-item"        data-tab="feedback"  onclick="sidebarTab('feedback',this)">피드백</button>
+      <button class="nav-sub-item"        data-tab="kfreq"     onclick="sidebarTab('kfreq',this)">키워드 분석</button>
+      <button class="nav-sub-item"        data-tab="plan-cmp"  onclick="sidebarTab('plan-cmp',this)">계획 vs 실적</button>
     </div>
 
+    <div class="nav-group-label">팀</div>
+
     <button class="nav-item" id="nav-lounge" onclick="sidebarNav('lounge',this)">
-      <span>🎉</span> 라운지
+      <span class="nav-icon">◎</span> 라운지
     </button>
   </nav>
   <div class="sidebar-footer">
     <button class="sidebar-name-btn" onclick="openMyNameModal()" title="내 이름 설정">
-      <span id="my-name-avatar" style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;color:#fff;background:#4f46e5;flex-shrink:0"></span>
+      <span id="my-name-avatar" style="width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;color:#fff;background:#0ea5e9;flex-shrink:0"></span>
       <span id="my-name-label" class="sidebar-name-label">내 이름 설정</span>
     </button>
   </div>
