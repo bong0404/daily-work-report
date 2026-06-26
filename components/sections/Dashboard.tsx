@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { MEMBERS, ALL_MEMBERS, lsGet, lsSet, parseItems, todayString, getMonthDays, MonthPlanData } from '@/lib/constants';
+import { MEMBERS, ALL_MEMBERS, lsGet, lsSet, parseItems, todayString, getMonthDays, MonthPlanData, loadMpData, currentMkey, PlanTask } from '@/lib/constants';
 import { fetchReports } from '@/hooks/useReports';
 
 // ── 공지 타입 ────────────────────────────────────────────
@@ -377,6 +377,69 @@ const EMOJI_CATS = [
   ]},
 ];
 
+// ── 내 업무 요약 ─────────────────────────────────────────
+function MyPlanSummary() {
+  const myName = lsGet('my_name') || '';
+  if (!myName) return null;
+
+  const mkey = currentMkey();
+  const month = parseInt(mkey.split('-')[1]);
+  const mx = getMemberPlanMetrics(myName, mkey);
+  const doneRate = mx.total > 0 ? Math.round(mx.done / mx.total * 100) : 0;
+  const rateColor = mx.total === 0 ? '#aaa' : doneRate >= 80 ? '#16a34a' : '#dc2626';
+
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const todayLabel = `${today.getMonth()+1}월 ${today.getDate()}일`;
+  const planData = loadMpData(mkey, myName);
+  const todayTasks: { cat: string; text: string; status: string }[] = [];
+  planData.categories.forEach(cat => {
+    (planData.grid[cat]?.[todayKey] || []).forEach((t: PlanTask) => {
+      if (t.text?.trim()) todayTasks.push({ cat, text: t.text, status: t.status || (t.done ? 'done' : 'todo') });
+    });
+  });
+
+  const cardStyle: React.CSSProperties = { background: '#fff', borderRadius: 12, border: '1px solid #f1f5f9', padding: '16px 20px', boxShadow: '0 1px 4px rgba(15,23,42,0.05)' };
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 20 }}>
+      <div style={cardStyle}>
+        <div className="dash-section-title" style={{ marginBottom: 12 }}>📋 {month}월 업무 진행률</div>
+        <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: 6 }}>전체 완료율</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          <div className="metric-bar-bg" style={{ flex: 1 }}>
+            <div className="metric-bar-fill progress-bar" style={{ width: `${doneRate}%` }} />
+          </div>
+          <span style={{ fontSize: '1rem', fontWeight: 700, color: rateColor, minWidth: 36, textAlign: 'right' }}>{doneRate}%</span>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          {mx.onTime > 0 && <span className="plan-chip ontime">기한내 {mx.onTime}</span>}
+          {mx.doing  > 0 && <span className="plan-chip doing">진행중 {mx.doing}</span>}
+          <span style={{ fontSize: '0.72rem', color: '#aaa' }}>전체 {mx.total}건</span>
+        </div>
+      </div>
+      <div style={cardStyle}>
+        <div className="dash-section-title" style={{ marginBottom: 12 }}>📌 오늘 할 일 ({todayLabel})</div>
+        {todayTasks.length === 0
+          ? <div style={{ color: '#bbb', fontSize: '0.82rem', textAlign: 'center', padding: '12px 0' }}>오늘 예정된 업무가 없습니다</div>
+          : <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 120, overflowY: 'auto' }}>
+              {todayTasks.map((t, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem' }}>
+                  <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: 4, flexShrink: 0,
+                    background: t.status === 'done' ? '#dcfce7' : t.status === 'doing' ? '#fce7f3' : '#f1f5f9',
+                    color: t.status === 'done' ? '#16a34a' : t.status === 'doing' ? '#db2777' : '#64748b' }}>
+                    {t.status === 'done' ? '완료' : t.status === 'doing' ? '진행' : '예정'}
+                  </span>
+                  <span style={{ color: '#374151', textDecoration: t.status === 'done' ? 'line-through' : 'none', opacity: t.status === 'done' ? 0.5 : 1 }}>{t.text}</span>
+                </div>
+              ))}
+            </div>
+        }
+      </div>
+    </div>
+  );
+}
+
 // ── 공지 게시판 ──────────────────────────────────────────
 function NoticeBoard() {
   const [notices, setNotices]     = useState<Notice[]>([]);
@@ -628,6 +691,7 @@ export function Dashboard() {
 
   return (
     <>
+      <MyPlanSummary />
       <div className="view-controls">
         <input type="date" value={date} onChange={e => setDate(e.target.value)} />
         <button className="btn-load" onClick={loadDashboard} disabled={loading}>
