@@ -443,33 +443,71 @@ interface Poll {
   votes: Record<string, number>;
   createdAt: string;
   subOptions?: string[][];
-  phase?: 1 | 2;
+  phase?: 1 | 2 | 3;
   phaseWinner?: number;
   subVotes?: Record<string, number>;
+  subSubOptions?: (string[][] | null)[];
+  subPhaseWinner?: number;
+  subSubVotes?: Record<string, number>;
 }
 
-const LUNCH_CATEGORIES = [
-  { emoji: '🍚', label: '한식', dishes: ['찌개류', '찜·조림', '볶음류', '국밥·탕', '백반·정식', '쌈밥'] },
-  { emoji: '🍜', label: '분식', dishes: ['떡볶이', '김밥', '라면·우동', '순대·튀김', '만두', '쫄면'] },
-  { emoji: '🥢', label: '중식', dishes: ['짜장면', '짬뽕', '탕수육', '볶음밥', '마라탕', '딤섬'] },
-  { emoji: '🍕', label: '서양식', dishes: ['피자', '파스타', '버거', '샌드위치', '스테이크', '샐러드'] },
-  { emoji: '🍱', label: '아시안', dishes: ['스시·초밥', '라멘', '쌀국수', '팟타이', '카레', '덮밥'] },
-  { emoji: '🌮', label: '중남미', dishes: ['타코', '부리또', '케밥', '샤와르마', '파히타', '나초'] },
+const LUNCH_CATEGORIES: Array<{
+  emoji: string; label: string;
+  dishes?: string[];
+  subcategories?: Array<{ name: string; dishes: string[] }>;
+}> = [
+  {
+    emoji: '🍚', label: '한식',
+    subcategories: [
+      { name: '🍲 찌개류',   dishes: ['김치찌개', '된장찌개', '부대찌개', '순두부찌개', '청국장', '동태찌개', '참치찌개'] },
+      { name: '🍜 국·탕류',  dishes: ['설렁탕', '갈비탕', '해장국', '육개장', '삼계탕', '곰탕', '추어탕', '감자탕'] },
+      { name: '🥘 찜·조림',  dishes: ['갈비찜', '닭볶음탕', '아귀찜', '낙지볶음', '제육볶음', '두부조림', '고등어조림'] },
+      { name: '🍖 구이·고기', dishes: ['삼겹살', '불고기', '갈비구이', '닭갈비', '오리구이', '항정살', '목살구이'] },
+      { name: '🍱 밥류',     dishes: ['비빔밥', '덮밥', '볶음밥', '쌈밥', '오므라이스', '솥밥', '돌솥비빔밥', '곤드레밥'] },
+      { name: '🍝 면·국수',  dishes: ['냉면', '칼국수', '잔치국수', '수제비', '막국수', '쫄면', '비빔국수', '우동'] },
+    ],
+  },
+  {
+    emoji: '🍜', label: '분식',
+    dishes: ['떡볶이', '순대국', '김밥', '라면', '우동', '만두', '튀김', '쫄면', '어묵탕', '핫도그', '토스트', '전'],
+  },
+  {
+    emoji: '🥢', label: '중식',
+    dishes: ['짜장면', '짬뽕', '탕수육', '볶음밥', '마라탕', '딤섬', '마라샹궈', '꿔바로우', '양꼬치', '훠궈', '샤브샤브', '깐풍기'],
+  },
+  {
+    emoji: '🍕', label: '서양식',
+    dishes: ['피자', '파스타', '버거', '샌드위치', '스테이크', '샐러드', '리조또', '씨푸드', '브런치', '치킨', '수프', '그라탱'],
+  },
+  {
+    emoji: '🍱', label: '아시안',
+    dishes: ['스시·초밥', '라멘', '쌀국수', '팟타이', '카레', '덮밥', '나시고렝', '톰얌꿍', '월남쌈', '반미', '포케', '타코야키'],
+  },
+  {
+    emoji: '🌮', label: '중남미',
+    dishes: ['타코', '부리또', '케밥', '샤와르마', '파히타', '나초', '퀘사디아', '엔칠라다', '과카몰리'],
+  },
 ];
 
 const POLL_TEMPLATES: Array<{
   label: string; question: string; options: string[];
-  subOptions?: string[][]; startDirect?: boolean;
+  subOptions?: string[][]; subSubOptions?: (string[][] | null)[];
+  startDirect?: boolean;
 }> = [
   {
     label: '🍱 점심 메뉴',
     question: '오늘 점심 어떤 종류로?',
     options: LUNCH_CATEGORIES.map(c => `${c.emoji} ${c.label}`),
-    subOptions: LUNCH_CATEGORIES.map(c => c.dishes),
+    subOptions: LUNCH_CATEGORIES.map(c =>
+      c.subcategories ? c.subcategories.map(s => s.name) : (c.dishes || [])
+    ),
+    subSubOptions: LUNCH_CATEGORIES.map(c =>
+      c.subcategories ? c.subcategories.map(s => s.dishes) : null
+    ),
     startDirect: true,
   },
-  { label: '☕ 카페', question: '카페 메뉴 고르기!', options: ['☕ 아메리카노', '🥛 라떼', '🍵 녹차라떼', '🧋 버블티', '🍹 에이드'] },
-  { label: '🍺 회식', question: '회식 장소 어디로 갈까요?', options: ['🥩 고기집', '🐟 횟집', '🍝 이탈리안', '🥢 중식당', '🍺 호프집'] },
+  { label: '☕ 카페', question: '카페 메뉴 고르기!', options: ['☕ 아메리카노', '🥛 라떼', '🍵 녹차라떼', '🧋 버블티', '🍹 에이드', '🍦 스무디'] },
+  { label: '🍺 회식', question: '회식 장소 어디로 갈까요?', options: ['🥩 고기집', '🐟 횟집', '🍝 이탈리안', '🥢 중식당', '🍺 호프집', '🍷 와인바', '🥘 분식집'] },
 ];
 
 const POLL_COLORS = ['#6366f1', '#22c55e', '#f97316', '#ec4899', '#14b8a6', '#a855f7'];
@@ -501,7 +539,7 @@ function TeamPoll() {
 
   function applyTemplate(t: typeof POLL_TEMPLATES[0]) {
     if (t.startDirect) {
-      savePoll({ id: Date.now(), question: t.question, options: t.options, votes: {}, createdAt: new Date().toISOString(), subOptions: t.subOptions, phase: 1 });
+      savePoll({ id: Date.now(), question: t.question, options: t.options, votes: {}, createdAt: new Date().toISOString(), subOptions: t.subOptions, subSubOptions: t.subSubOptions, phase: 1 });
       return;
     }
     setNewQuestion(t.question);
@@ -512,7 +550,11 @@ function TeamPoll() {
   function vote(optIdx: number) {
     if (!myName) { alert('내 이름을 먼저 설정해주세요'); return; }
     if (!poll) return;
-    if (poll.phase === 2) {
+    if (poll.phase === 3) {
+      const sv = { ...poll.subSubVotes };
+      if (sv[myName] === optIdx) delete sv[myName]; else sv[myName] = optIdx;
+      savePoll({ ...poll, subSubVotes: sv });
+    } else if (poll.phase === 2) {
       const sv = { ...poll.subVotes };
       if (sv[myName] === optIdx) delete sv[myName]; else sv[myName] = optIdx;
       savePoll({ ...poll, subVotes: sv });
@@ -528,9 +570,19 @@ function TeamPoll() {
     savePoll({ ...poll, phase: 2, phaseWinner: winnerIdx, subVotes: {} });
   }
 
+  function advanceSubPhase(subWinnerIdx: number) {
+    if (!poll) return;
+    savePoll({ ...poll, phase: 3, subPhaseWinner: subWinnerIdx, subSubVotes: {} });
+  }
+
   function backToPhase1() {
     if (!poll) return;
     savePoll({ ...poll, phase: 1, phaseWinner: undefined, subVotes: {} });
+  }
+
+  function backToPhase2() {
+    if (!poll) return;
+    savePoll({ ...poll, phase: 2, subPhaseWinner: undefined, subSubVotes: {} });
   }
 
   const totalVoters = poll ? Object.keys(poll.votes).length : 0;
@@ -653,26 +705,30 @@ function TeamPoll() {
               </>
             );
           })() : poll.phase === 2 && poll.phaseWinner !== undefined && poll.subOptions ? (() => {
-            const dishes = poll.subOptions[poll.phaseWinner];
+            const items = poll.subOptions[poll.phaseWinner];
             const subVotes = poll.subVotes || {};
             const totalSub = Object.keys(subVotes).length;
             const mySubVote = myName in subVotes ? subVotes[myName] : -1;
             const winnerCat = poll.options[poll.phaseWinner];
             const catColor = POLL_COLORS[poll.phaseWinner % POLL_COLORS.length];
+            const hasDeeperLevel = poll.subSubOptions?.[poll.phaseWinner] != null;
+            const subVoteCounts = items.map((_, i) => Object.values(subVotes).filter(v => v === i).length);
+            const maxSubVotes = Math.max(...subVoteCounts, 0);
+            const leadingSubIdx = maxSubVotes > 0 ? subVoteCounts.indexOf(maxSubVotes) : -1;
             return (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <button onClick={backToPhase1} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '0.82rem', padding: '4px 8px', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <button onClick={backToPhase1} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '0.82rem', padding: '4px 8px', borderRadius: 8 }}>
                     ← 카테고리
                   </button>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span style={{ fontSize: '1.1rem' }}>{winnerCat.split(' ')[0]}</span>
-                    <span style={{ fontSize: '0.95rem', fontWeight: 700, color: catColor }}>{winnerCat.split(' ').slice(1).join(' ')} 세부 메뉴</span>
+                    <span style={{ fontSize: '0.95rem', fontWeight: 700, color: catColor }}>{winnerCat.split(' ').slice(1).join(' ')} {hasDeeperLevel ? '분류' : '세부 메뉴'}</span>
                   </div>
                   <span style={{ marginLeft: 'auto', fontSize: '0.72rem', color: '#94a3b8', background: '#f8fafc', borderRadius: 20, padding: '2px 10px' }}>2단계</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-                  {dishes.map((dish, i) => {
+                  {items.map((item, i) => {
                     const voters = Object.entries(subVotes).filter(([, v]) => v === i).map(([n]) => n);
                     const pct = totalSub > 0 ? Math.round(voters.length / totalSub * 100) : 0;
                     const isMyVote = mySubVote === i;
@@ -681,8 +737,65 @@ function TeamPoll() {
                         <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: catColor, opacity: 0.08, transition: 'width 0.4s ease' }} />
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative' }}>
                           <span style={{ width: 26, height: 26, borderRadius: '50%', background: isMyVote ? catColor : '#f1f5f9', color: isMyVote ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
-                          <span style={{ flex: 1, fontWeight: isMyVote ? 700 : 500, color: '#1e293b', fontSize: '0.9rem' }}>{dish}</span>
+                          <span style={{ flex: 1, fontWeight: isMyVote ? 700 : 500, color: '#1e293b', fontSize: '0.9rem' }}>{item}</span>
                           {totalSub > 0 && <span style={{ fontSize: '0.82rem', fontWeight: 700, color: catColor }}>{pct}%</span>}
+                          {isMyVote && <span style={{ fontSize: '0.72rem', color: catColor, fontWeight: 700 }}>✓ 내 선택</span>}
+                          {hasDeeperLevel && <span style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>›</span>}
+                        </div>
+                        {voters.length > 0 && (
+                          <div style={{ marginTop: 6, paddingLeft: 36, display: 'flex', gap: 4, flexWrap: 'wrap', position: 'relative' }}>
+                            {voters.map(n => <span key={n} style={{ fontSize: '0.7rem', padding: '1px 7px', borderRadius: 20, background: `${catColor}18`, color: catColor }}>{n}</span>)}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                {hasDeeperLevel && leadingSubIdx >= 0 && (
+                  <div style={{ textAlign: 'center', marginBottom: 12 }}>
+                    <button onClick={() => advanceSubPhase(leadingSubIdx)}
+                      style={{ padding: '9px 22px', background: catColor, color: '#fff', border: 'none', borderRadius: 22, fontSize: '0.86rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
+                      {items[leadingSubIdx]} 세부 메뉴 보기 →
+                    </button>
+                  </div>
+                )}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>총 {totalSub}명 참여</span>
+                  <button onClick={() => { if (confirm('투표를 종료할까요?')) savePoll(null); }} style={{ fontSize: '0.75rem', color: '#cbd5e1', background: 'none', border: 'none', cursor: 'pointer' }}>투표 종료</button>
+                </div>
+              </>
+            );
+          })() : poll.phase === 3 && poll.phaseWinner !== undefined && poll.subPhaseWinner !== undefined && poll.subSubOptions ? (() => {
+            const dishes = poll.subSubOptions[poll.phaseWinner]?.[poll.subPhaseWinner] || [];
+            const subSubVotes = poll.subSubVotes || {};
+            const totalFinal = Object.keys(subSubVotes).length;
+            const myFinalVote = myName in subSubVotes ? subSubVotes[myName] : -1;
+            const winnerCat = poll.options[poll.phaseWinner];
+            const winnerSub = poll.subOptions?.[poll.phaseWinner]?.[poll.subPhaseWinner] || '';
+            const catColor = POLL_COLORS[poll.phaseWinner % POLL_COLORS.length];
+            return (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                  <button onClick={backToPhase2} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '0.82rem', padding: '4px 8px', borderRadius: 8 }}>
+                    ← {winnerCat.split(' ').slice(1).join(' ')} 분류
+                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: '0.95rem', fontWeight: 700, color: catColor }}>{winnerSub} 세부 메뉴</span>
+                  </div>
+                  <span style={{ marginLeft: 'auto', fontSize: '0.72rem', color: '#94a3b8', background: '#f8fafc', borderRadius: 20, padding: '2px 10px' }}>3단계</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+                  {dishes.map((dish, i) => {
+                    const voters = Object.entries(subSubVotes).filter(([, v]) => v === i).map(([n]) => n);
+                    const pct = totalFinal > 0 ? Math.round(voters.length / totalFinal * 100) : 0;
+                    const isMyVote = myFinalVote === i;
+                    return (
+                      <div key={i} onClick={() => vote(i)} style={{ border: `2px solid ${isMyVote ? catColor : '#e2e8f0'}`, borderRadius: 12, padding: '12px 14px', cursor: 'pointer', transition: 'all 0.15s', background: isMyVote ? `${catColor}0d` : '#fff', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: catColor, opacity: 0.08, transition: 'width 0.4s ease' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative' }}>
+                          <span style={{ width: 26, height: 26, borderRadius: '50%', background: isMyVote ? catColor : '#f1f5f9', color: isMyVote ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
+                          <span style={{ flex: 1, fontWeight: isMyVote ? 700 : 500, color: '#1e293b', fontSize: '0.9rem' }}>{dish}</span>
+                          {totalFinal > 0 && <span style={{ fontSize: '0.82rem', fontWeight: 700, color: catColor }}>{pct}%</span>}
                           {isMyVote && <span style={{ fontSize: '0.72rem', color: catColor, fontWeight: 700 }}>✓ 내 선택</span>}
                         </div>
                         {voters.length > 0 && (
@@ -695,7 +808,7 @@ function TeamPoll() {
                   })}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>총 {totalSub}명 참여</span>
+                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>총 {totalFinal}명 참여</span>
                   <button onClick={() => { if (confirm('투표를 종료할까요?')) savePoll(null); }} style={{ fontSize: '0.75rem', color: '#cbd5e1', background: 'none', border: 'none', cursor: 'pointer' }}>투표 종료</button>
                 </div>
               </>
