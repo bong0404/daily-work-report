@@ -2523,25 +2523,182 @@
     .ladder-name-g:hover .lntxt { fill:#4f46e5; }
 
     @media print {
-      header, .section-switcher, .tab-bar, #toast, .export-controls,
+      .sidebar, .topbar, .section-switcher, .tab-bar, #toast, .export-controls,
       .btn-export-action, button { display:none !important; }
       body { background:#fff; }
-      main { max-width:100% !important; margin:0; padding:0; }
+      .app-body { margin-left:0 !important; }
+      main { padding:0; }
       .export-preview { border:none; padding:0; box-shadow:none; }
+    }
+
+    /* ── 사이드바 레이아웃 ── */
+    .app-layout { display:flex; min-height:100vh; }
+
+    .sidebar {
+      width: 220px; flex-shrink:0;
+      background: #0f172a;
+      display:flex; flex-direction:column;
+      position: fixed; top:0; left:0; height:100vh;
+      z-index: 200;
+      overflow-y: auto; scrollbar-width:none;
+    }
+    .sidebar::-webkit-scrollbar { display:none; }
+
+    .sidebar-header {
+      padding: 18px 16px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      flex-shrink: 0;
+    }
+    .sidebar-logo { font-size:0.82rem; font-weight:700; color:#f1f5f9; letter-spacing:-0.02em; line-height:1.5; }
+    .sidebar-logo span { color:#818cf8; }
+    .sidebar-logo-sub { font-size:0.68rem; color:rgba(255,255,255,0.3); margin-top:2px; }
+
+    .sidebar-nav { flex:1; padding:10px 8px; overflow-y:auto; scrollbar-width:none; }
+    .sidebar-nav::-webkit-scrollbar { display:none; }
+
+    .nav-group-label {
+      font-size:0.65rem; font-weight:700; letter-spacing:0.08em;
+      color:rgba(255,255,255,0.25); text-transform:uppercase;
+      padding:12px 12px 5px; margin-top:4px;
+    }
+
+    .nav-item {
+      display:flex; align-items:center; gap:9px;
+      width:100%; padding:8px 12px; border-radius:8px;
+      font-size:0.82rem; font-weight:500;
+      color:rgba(255,255,255,0.5);
+      cursor:pointer; border:none; background:none;
+      text-align:left; font-family:inherit;
+      transition:all 0.15s; margin-bottom:2px;
+    }
+    .nav-item:hover { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.85); }
+    .nav-item.active { background:rgba(99,102,241,0.22); color:#a5b4fc; font-weight:600; }
+    .nav-item .nav-chevron { margin-left:auto; font-size:0.6rem; opacity:0.4; transition:transform 0.2s; }
+    .nav-item.open .nav-chevron { transform:rotate(90deg); opacity:0.7; }
+
+    .nav-sub {
+      display:none;
+      margin:0 0 2px 20px;
+      padding:2px 0 4px 12px;
+      border-left:1px solid rgba(255,255,255,0.07);
+    }
+    .nav-sub.open { display:block; }
+
+    .nav-sub-item {
+      display:flex; align-items:center; gap:6px;
+      width:100%; padding:5px 10px; border-radius:6px;
+      font-size:0.78rem; color:rgba(255,255,255,0.38);
+      cursor:pointer; border:none; background:none;
+      text-align:left; font-family:inherit;
+      transition:all 0.15s; margin-bottom:1px;
+    }
+    .nav-sub-item:hover { background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.72); }
+    .nav-sub-item.active { color:#818cf8; font-weight:600; background:rgba(99,102,241,0.14); }
+
+    .sidebar-footer {
+      padding:12px 10px;
+      border-top:1px solid rgba(255,255,255,0.07);
+      flex-shrink:0;
+    }
+    .sidebar-name-btn {
+      display:flex; align-items:center; gap:8px;
+      width:100%; padding:7px 10px; border-radius:8px;
+      cursor:pointer; border:none; background:none;
+      font-family:inherit; transition:background 0.15s;
+    }
+    .sidebar-name-btn:hover { background:rgba(255,255,255,0.07); }
+    .sidebar-name-label { font-size:0.78rem; color:rgba(255,255,255,0.5); }
+
+    /* ── 앱 바디 ── */
+    .app-body { margin-left:220px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
+
+    .topbar {
+      background:#fff; border-bottom:1px solid #e8eaf0;
+      padding:0 28px; height:50px;
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:50; flex-shrink:0;
+    }
+    .topbar-title { font-size:0.9rem; font-weight:700; color:#0f172a; }
+    .topbar-sub { font-size:0.82rem; color:#94a3b8; margin-left:8px; font-weight:400; }
+
+    /* 기존 섹션 스위처·탭바 숨김 (DOM에 유지해 JS 호환) */
+    .section-switcher, .tab-bar { display:none !important; }
+
+    /* main 레이아웃 재정의 */
+    main { max-width:none; margin:0; padding:28px 32px; flex:1; }
+    main.plan-wide { max-width:none; }
+
+    @media (max-width: 768px) {
+      .sidebar { width:200px; }
+      .app-body { margin-left:200px; }
+      main { padding:16px; }
+      .topbar { padding:0 16px; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">경영지원본부 <span>·</span> 데일리보고</div>
-  <div style="display:flex;align-items:center;gap:12px">
-    <div id="my-name-display" onclick="openMyNameModal()" style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);font-size:0.82rem;color:rgba(255,255,255,0.7);transition:background 0.15s" title="내 이름 설정">
-      <span id="my-name-avatar" style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;color:#fff;background:#ccc"></span>
-      <span id="my-name-label">내 이름 설정</span>
-    </div>
+<div class="app-layout">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">경영지원본부 <span>·</span> 데일리보고</div>
   </div>
-</header>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" id="nav-dashboard" onclick="sidebarNav('dashboard',this)">
+      <span>📊</span> 현황판
+    </button>
+
+    <button class="nav-item" id="nav-report" onclick="sidebarNav('report',this)">
+      <span>📋</span> 업무보고
+      <span class="nav-chevron">▶</span>
+    </button>
+    <div class="nav-sub" id="nav-sub-report">
+      <button class="nav-sub-item active" data-tab="write"       onclick="sidebarTab('write',this)">✏️ 데일리보고 작성</button>
+      <button class="nav-sub-item"        data-tab="my-summary"  onclick="sidebarTab('my-summary',this)">📊 내 업무 요약</button>
+      <button class="nav-sub-item"        data-tab="by-date"     onclick="sidebarTab('by-date',this)">📅 날짜별 보기</button>
+      <button class="nav-sub-item"        data-tab="by-person"   onclick="sidebarTab('by-person',this)">👤 인물별 보기</button>
+      <button class="nav-sub-item"        data-tab="issues"      onclick="sidebarTab('issues',this)">⚠️ 이슈 모아보기</button>
+      <button class="nav-sub-item"        data-tab="issue-track" onclick="sidebarTab('issue-track',this)">🚨 이슈 트래킹</button>
+      <button class="nav-sub-item"        data-tab="search"      onclick="sidebarTab('search',this)">🔍 키워드 검색</button>
+      <button class="nav-sub-item"        data-tab="weekly"      onclick="sidebarTab('weekly',this)">📋 주간 요약</button>
+    </div>
+
+    <button class="nav-item" id="nav-plan" onclick="sidebarNav('plan',this)">
+      <span>📅</span> 업무계획
+      <span class="nav-chevron">▶</span>
+    </button>
+    <div class="nav-sub" id="nav-sub-plan">
+      <button class="nav-sub-item active" data-tab="weekly-plan"   onclick="sidebarTab('weekly-plan',this)">📅 월 계획</button>
+      <button class="nav-sub-item"        data-tab="person-plan"   onclick="sidebarTab('person-plan',this)">🔍 인물별 조회</button>
+      <button class="nav-sub-item"        data-tab="team-overview" onclick="sidebarTab('team-overview',this)">👥 팀원 현황</button>
+    </div>
+
+    <button class="nav-item" id="nav-admin" onclick="sidebarNav('admin',this)">
+      <span>📈</span> 인사이트
+      <span class="nav-chevron">▶</span>
+    </button>
+    <div class="nav-sub" id="nav-sub-admin">
+      <button class="nav-sub-item active" data-tab="heatmap"   onclick="sidebarTab('heatmap',this)">🔥 업무 히트맵</button>
+      <button class="nav-sub-item"        data-tab="trend"     onclick="sidebarTab('trend',this)">📈 완료율 추이</button>
+      <button class="nav-sub-item"        data-tab="export"    onclick="sidebarTab('export',this)">📤 리포트 내보내기</button>
+      <button class="nav-sub-item"        data-tab="feedback"  onclick="sidebarTab('feedback',this)">💬 피드백</button>
+      <button class="nav-sub-item"        data-tab="kfreq"     onclick="sidebarTab('kfreq',this)">☁️ 키워드 분석</button>
+      <button class="nav-sub-item"        data-tab="plan-cmp"  onclick="sidebarTab('plan-cmp',this)">🎯 계획 vs 실적</button>
+    </div>
+
+    <button class="nav-item" id="nav-lounge" onclick="sidebarNav('lounge',this)">
+      <span>🎉</span> 라운지
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sidebar-name-btn" onclick="openMyNameModal()" title="내 이름 설정">
+      <span id="my-name-avatar" style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;color:#fff;background:#4f46e5;flex-shrink:0"></span>
+      <span id="my-name-label" class="sidebar-name-label">내 이름 설정</span>
+    </button>
+  </div>
+</aside>
+
+<div class="app-body">
 
 <!-- 내 이름 설정 모달 -->
 <div id="my-name-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:1000;align-items:center;justify-content:center">
@@ -2579,9 +2736,15 @@
     <div id="friday-banner-bar" style="height:3px;background:rgba(255,255,255,0.35);border-radius:8px;width:100%;transition:width linear"></div>
   </div>
 </div>
-<div id="overdue-banner" style="display:none;background:linear-gradient(90deg,#ef4444,#f97316);color:#fff;padding:9px 32px;font-size:0.84rem;font-weight:600;align-items:center;justify-content:space-between">
+<div id="overdue-banner" style="display:none;background:linear-gradient(90deg,#ef4444,#f97316);color:#fff;padding:9px 28px;font-size:0.84rem;font-weight:600;align-items:center;justify-content:space-between">
   <span id="overdue-banner-text">⚠️ 기한 초과 업무가 있습니다</span>
   <button onclick="this.parentElement.style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.8rem">닫기</button>
+</div>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:6px">
+    <span class="topbar-title" id="topbar-title">현황판</span>
+  </div>
 </div>
 
 <main>
@@ -3288,6 +3451,8 @@
     </div>
   </div>
 </main>
+</div><!-- /.app-body -->
+</div><!-- /.app-layout -->
 
 <div class="toast" id="toast"></div>
 
@@ -3434,9 +3599,6 @@
     const isAdmin     = section === 'admin';
     const isLounge    = section === 'lounge';
 
-    document.getElementById('tab-bar-report').style.display = isReport ? '' : 'none';
-    document.getElementById('tab-bar-plan').style.display   = isPlan   ? '' : 'none';
-    document.getElementById('tab-bar-admin').style.display  = isAdmin  ? '' : 'none';
     document.querySelector('main').classList.toggle('plan-wide', isPlan);
 
     if (isDashboard) {
@@ -3462,6 +3624,37 @@
       document.getElementById('tab-lounge').classList.add('active');
       initLounge();
     }
+  }
+
+  // ── 사이드바 네비게이션 ────────────────────────────────
+  const _SECTION_TITLES = { dashboard:'현황판', report:'업무보고', plan:'업무계획', admin:'인사이트', lounge:'라운지' };
+
+  function sidebarNav(section, navBtn) {
+    // 사이드바 nav-item 활성화
+    document.querySelectorAll('.nav-item').forEach(b => { b.classList.remove('active','open'); });
+    document.querySelectorAll('.nav-sub').forEach(s => s.classList.remove('open'));
+    navBtn.classList.add('active');
+    const sub = document.getElementById('nav-sub-' + section);
+    if (sub) { navBtn.classList.add('open'); sub.classList.add('open'); }
+    // 첫 번째 서브아이템 활성화
+    if (sub) {
+      const firstSub = sub.querySelector('.nav-sub-item');
+      if (firstSub) { document.querySelectorAll('.nav-sub-item').forEach(b=>b.classList.remove('active')); firstSub.classList.add('active'); }
+    }
+    // topbar 제목 업데이트
+    const titleEl = document.getElementById('topbar-title');
+    if (titleEl) titleEl.textContent = _SECTION_TITLES[section] || '';
+    // 기존 switchSection 위임
+    const fakeBtn = document.getElementById('section-btn-' + section);
+    if (fakeBtn) switchSection(section, fakeBtn);
+  }
+
+  function sidebarTab(tabId, subBtn) {
+    // 사이드바 서브아이템 활성화
+    document.querySelectorAll('.nav-sub-item').forEach(b => b.classList.remove('active'));
+    subBtn.classList.add('active');
+    // 기존 switchTab 위임
+    switchTab(tabId, null);
   }
 
   // ── 탭 전환 ───────────────────────────────────────────
@@ -7326,6 +7519,13 @@
   initFridayBanner();
   initOverdueBanner();
   switchSection('dashboard', document.getElementById('section-btn-dashboard'));
+  // 사이드바 초기 활성화
+  (function() {
+    const navDash = document.getElementById('nav-dashboard');
+    if (navDash) navDash.classList.add('active');
+    const titleEl = document.getElementById('topbar-title');
+    if (titleEl) titleEl.textContent = '현황판';
+  })();
 </script>
 
 </body>
