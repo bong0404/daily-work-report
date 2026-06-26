@@ -4073,15 +4073,13 @@
       return;
     }
     el.innerHTML = msgs.map(m => `
-    <div class="lounge-msg-card">
-      <div class="lounge-msg-header">
-        <span class="lounge-msg-from">✍️ ${m.from}<span style="font-size:0.72rem;font-weight:400;color:#94a3b8;margin-left:4px;">님이 보냄</span></span>
-        <span class="lounge-msg-ts">${m.ts}</span>
-      </div>
-      <div class="lounge-msg-body">${m.msg}</div>
-      <button class="lounge-like-btn ${m.likes.includes(myName)?'liked':''}" onclick="likeMsg(${m.id})">
+    <div class="lounge-msg-card" style="display:flex;align-items:center;gap:16px;">
+      <span class="lounge-msg-from" style="flex-shrink:0;">✍️ ${m.from}<span style="font-size:0.72rem;font-weight:400;color:#94a3b8;margin-left:4px;">님이 보냄</span></span>
+      <span class="lounge-msg-body" style="flex:1;margin-bottom:0;">${m.msg}</span>
+      <button class="lounge-like-btn ${m.likes.includes(myName)?'liked':''}" onclick="likeMsg(${m.id})" style="flex-shrink:0;">
         🙌 ${m.likes.length ? `<strong>${m.likes.length}</strong>` : '응원하기'}
       </button>
+      <span class="lounge-msg-ts" style="flex-shrink:0;">${m.ts}</span>
     </div>`).join('');
   }
 
