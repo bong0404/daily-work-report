@@ -93,6 +93,13 @@ function WriteTab() {
   const [msg, setMsg]           = useState('');
   const [draftBanner, setDraftBanner] = useState<string | null>(null);
 
+  // 내 이름 자동 고정
+  useEffect(() => {
+    const myName = lsGet('my_name') || '';
+    const member = MEMBERS.find(m => m.name === myName);
+    if (member) setName(`${member.name}|${member.dept}`);
+  }, []);
+
   // 초안 복원 감지
   useEffect(() => {
     const draft = loadDraft();
@@ -172,7 +179,16 @@ function WriteTab() {
 
   return (
     <div className="form-card">
-      <div className="form-title">일일 업무보고 작성</div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
+        <div className="form-title" style={{ marginBottom: 0 }}>일일 업무보고 작성</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '7px 10px', fontSize: '0.7em', color: '#64748b', lineHeight: 1.5, flexShrink: 0 }}>
+          <span style={{ fontWeight: 700, color: '#475569', marginBottom: '2px' }}>⌨️ 입력 단축키</span>
+          <span><kbd>Enter</kbd>: 다음 항목 추가</span>
+          <span><kbd>Tab</kbd>: 첨언(↳)으로 전환</span>
+          <span><kbd>Shift+Tab</kbd>: 첨언 해제</span>
+          <span><kbd>Backspace</kbd>: 빈 항목 삭제</span>
+        </div>
+      </div>
 
       {/* 임시저장 복원 배너 */}
       {draftBanner && (
@@ -188,23 +204,22 @@ function WriteTab() {
       <div className="form-row">
         <div className="form-group">
           <label>이름</label>
-          <select value={name} onChange={e => setName(e.target.value)}>
-            <option value="">이름을 선택하세요</option>
-            {MEMBERS.map(m => <option key={m.name} value={`${m.name}|${m.dept}`}>{m.name} ({m.dept})</option>)}
-          </select>
+          {name ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: '#f1f5f9', borderRadius: '6px', border: '1px solid #e2e8f0', color: '#334155', fontWeight: 600 }}>
+              <span>{name.split('|')[0]}</span>
+              <span style={{ fontSize: '0.8em', color: '#94a3b8', fontWeight: 400 }}>({name.split('|')[1]})</span>
+              <span style={{ marginLeft: 'auto', fontSize: '0.75em', color: '#94a3b8' }}>🔒 고정</span>
+            </div>
+          ) : (
+            <div style={{ padding: '8px 12px', background: '#fef9c3', borderRadius: '6px', border: '1px solid #fde68a', color: '#92400e', fontSize: '0.875em' }}>
+              ⚠️ 설정에서 내 이름을 먼저 등록해주세요
+            </div>
+          )}
         </div>
         <div className="form-group">
           <label>보고 날짜</label>
           <input type="date" value={date} onChange={e => setDate(e.target.value)} />
         </div>
-      </div>
-      <hr className="divider" />
-      <div className="shortcut-guide">
-        <span className="shortcut-guide-title">⌨️ 입력 단축키</span>
-        <span><kbd>Enter</kbd> 다음 항목 추가</span>
-        <span><kbd>Tab</kbd> 첨언(↳)으로 전환</span>
-        <span><kbd>Shift+Tab</kbd> 첨언 해제</span>
-        <span><kbd>Backspace</kbd> 빈 항목 삭제</span>
       </div>
       <ItemList label="주요 완료"           items={done}     onAdd={add(setDone)}     onChange={change(setDone)}     onRemove={remove(setDone)}     onIndent={indent(setDone)} />
       <ItemList label="주요 회의 및 의사결정" items={meeting}  onAdd={add(setMeeting)}  onChange={change(setMeeting)}  onRemove={remove(setMeeting)}  onIndent={indent(setMeeting)} />
