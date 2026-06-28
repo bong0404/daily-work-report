@@ -2739,7 +2739,7 @@
       display:flex; align-items:center; justify-content:space-between;
       position:sticky; top:0; z-index:50; flex-shrink:0;
     }
-    .topbar-title { font-size:0.9rem; font-weight:700; color:#0f172a; }
+    .topbar-title { font-size:0.9rem; font-weight:700; color:#1e293b; }
     .topbar-sub { font-size:0.82rem; color:#94a3b8; margin-left:8px; font-weight:400; }
 
     /* 기존 섹션 스위처·탭바 숨김 (DOM에 유지해 JS 호환) */

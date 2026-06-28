@@ -3,7 +3,7 @@ import './globals.css';
 import { Providers } from './providers';
 
 export const metadata: Metadata = {
-  title: '일일 업무보고 - 라로지앵팀',
+  title: 'LA ROSÉE',
   manifest: '/manifest.json',
   appleWebApp: { capable: true, statusBarStyle: 'default', title: '업무보고' },
 };
