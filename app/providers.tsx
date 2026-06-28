@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SectionContext, SectionId, SECTION_DEFAULT_TABS } from '@/hooks/useSection';
 import { useWeeklyReminder } from '@/hooks/useWeeklyReminder';
 
@@ -8,6 +8,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const [section, setSection] = useState<SectionId>('dashboard');
   const [tab, setTab] = useState<string>('');
   useWeeklyReminder();
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW 등록 실패:', err));
+    }
+  }, []);
 
   const handleSetSection = (s: SectionId) => {
     setSection(s);

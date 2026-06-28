@@ -1,0 +1,19 @@
+{
+  "name": "LA ROSÉE 업무보고",
+  "short_name": "업무보고",
+  "description": "라로지앵팀 일일 업무보고 시스템",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"]
+}

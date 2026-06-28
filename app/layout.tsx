@@ -4,6 +4,8 @@ import { Providers } from './providers';
 
 export const metadata: Metadata = {
   title: '일일 업무보고 - 라로지앵팀',
+  manifest: '/manifest.json',
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: '업무보고' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -19,6 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap"
         />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icon.svg" />
+        <meta name="theme-color" content="#4f46e5" />
       </head>
       <body>
         <Providers>{children}</Providers>
