@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { MEMBERS, ALL_MEMBERS, lsGet, lsSet, parseItems, todayString, getMonthDays, MonthPlanData, loadMpData, currentMkey, PlanTask } from '@/lib/constants';
 import { fetchReports } from '@/hooks/useReports';
+import { fireReminderNotification } from '@/hooks/useWeeklyReminder';
 
 // ── 공지 타입 ────────────────────────────────────────────
 interface Notice {
@@ -670,6 +671,81 @@ function NoticeBoard() {
   );
 }
 
+// ── 알림 토스트 팝업 ──────────────────────────────────────
+function NotificationToast({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 6000);
+    return () => clearTimeout(t);
+  }, [onClose]);
+
+  return (
+    <div style={{
+      position: 'fixed', bottom: 28, right: 28, zIndex: 9999,
+      width: 320, background: '#fff', borderRadius: 14,
+      boxShadow: '0 8px 32px rgba(15,23,42,0.18)', overflow: 'hidden',
+      animation: 'slideInToast 0.35s cubic-bezier(0.34,1.56,0.64,1)',
+    }}>
+      <style>{`
+        @keyframes slideInToast {
+          from { transform: translateY(20px); opacity: 0; }
+          to   { transform: translateY(0);    opacity: 1; }
+        }
+      `}</style>
+      {/* 상단 컬러바 */}
+      <div style={{ height: 4, background: 'linear-gradient(90deg,#4f46e5,#818cf8)' }} />
+      <div style={{ padding: '14px 16px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+          {/* 아이콘 */}
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: '#eef2ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0 }}>
+            📅
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600, letterSpacing: '0.04em' }}>LA ROSÉE · 업무 알림</span>
+              <button onClick={onClose} style={{ border: 'none', background: 'none', color: '#cbd5e1', cursor: 'pointer', fontSize: '0.9rem', padding: 0, lineHeight: 1 }}>✕</button>
+            </div>
+            <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#1e293b', marginBottom: 4 }}>
+              차주 타임라인 작성 시간!
+            </div>
+            <div style={{ fontSize: '0.82rem', color: '#64748b', lineHeight: 1.5 }}>
+              퇴근 전 다음 주 타임라인을 작성해주세요 ✅
+            </div>
+          </div>
+        </div>
+        {/* 진행 바 */}
+        <div style={{ marginTop: 12, height: 3, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden' }}>
+          <div style={{ height: '100%', background: '#4f46e5', borderRadius: 2, animation: 'shrink 6s linear forwards' }} />
+          <style>{`@keyframes shrink { from { width:100% } to { width:0% } }`}</style>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 알림 테스트 버튼 ─────────────────────────────────────
+function ReminderTestButton() {
+  const [showToast, setShowToast] = useState(false);
+
+  function handleClick() {
+    setShowToast(false);
+    setTimeout(() => setShowToast(true), 50);
+    fireReminderNotification();
+  }
+
+  return (
+    <>
+      <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <button onClick={handleClick}
+          style={{ padding: '8px 18px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.83rem', fontWeight: 600, color: '#4f46e5', cursor: 'pointer' }}>
+          🔔 알림 테스트
+        </button>
+        <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>매주 금요일 오후 5시 자동 발송</span>
+      </div>
+      {showToast && <NotificationToast onClose={() => setShowToast(false)} />}
+    </>
+  );
+}
+
 // ── 메인 Dashboard 컴포넌트 ──────────────────────────────
 export function Dashboard() {
   const [date, setDate]     = useState(todayString());
@@ -709,6 +785,7 @@ export function Dashboard() {
         <DashboardResult result={result} />
       </div>
       <NoticeBoard />
+      <ReminderTestButton />
     </>
   );
 }

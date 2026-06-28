@@ -55,7 +55,6 @@ export const ADMIN_TABS = [
   { id: 'heatmap',   label: '업무 히트맵' },
   { id: 'trend',     label: '완료율 추이' },
   { id: 'export',    label: '리포트 내보내기' },
-  { id: 'feedback',  label: '피드백' },
   { id: 'kfreq',     label: '키워드 분석' },
   { id: 'plan-cmp',  label: '계획 vs 실적' },
 ];

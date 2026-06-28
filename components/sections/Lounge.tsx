@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { MEMBERS, lsGet, lsSet, parseItems, avatarColor } from '@/lib/constants';
@@ -7,10 +7,12 @@ import { fetchReports } from '@/hooks/useReports';
 // ── 메시지 타입 ──────────────────────────────────────────
 interface LoungeMsg {
   id: number;
-  from: string;
+  from: string;       // 받는 사람
   msg: string;
   ts: string;
   likes: string[];
+  sender?: string;    // 보내는 사람 실명 (없으면 익명)
+  anonymous?: boolean;
 }
 
 function getMsgs(): LoungeMsg[] {
@@ -139,73 +141,132 @@ function MvpBadges() {
 // ── 팀원에게 한마디 ─────────────────────────────────────
 function MessageBoard() {
   const [msgs, setMsgs]     = useState<LoungeMsg[]>([]);
-  const [from, setFrom]     = useState('');
+  const [myName, setMyName] = useState('');
+  const [to, setTo]         = useState('');
+  const [sender, setSender] = useState('');
   const [input, setInput]   = useState('');
-  const myName              = lsGet('my_name') || '';
+  const [anon, setAnon]     = useState(true);
 
   const reload = useCallback(() => setMsgs(getMsgs()), []);
 
-  useEffect(() => { reload(); }, [reload]);
+  useEffect(() => {
+    const name = lsGet('my_name') || '';
+    setMyName(name);
+    setSender(name);
+    reload();
+  }, [reload]);
 
   function post() {
-    if (!from)  { alert('받는 팀원을 선택해주세요'); return; }
+    if (!to) { alert('받는 팀원을 선택해주세요'); return; }
     if (!input.trim()) { alert('메시지를 입력해주세요'); return; }
     const ts = new Date().toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
     const list = getMsgs();
-    list.unshift({ id: Date.now(), from, msg: input.trim(), ts, likes: [] });
+    list.unshift({ id: Date.now(), from: to, msg: input.trim(), ts, likes: [], sender: anon ? '' : sender, anonymous: anon });
     saveMsgs(list);
     setInput('');
     reload();
   }
 
   function toggleLike(id: number) {
-    const name = myName;
-    if (!name) { alert('먼저 내 이름을 설정해주세요'); return; }
+    if (!myName) { alert('먼저 내 이름을 설정해주세요'); return; }
     const list = getMsgs();
     const m = list.find(x => x.id === id); if (!m) return;
-    if (m.likes.includes(name)) m.likes = m.likes.filter(n => n !== name);
-    else m.likes.push(name);
+    if (m.likes.includes(myName)) m.likes = m.likes.filter(n => n !== myName);
+    else m.likes.push(myName);
     saveMsgs(list);
     reload();
   }
 
+  function del(id: number) {
+    saveMsgs(getMsgs().filter(m => m.id !== id));
+    reload();
+  }
+
+  const [inbox, setInbox] = useState(false);
+  const displayed = inbox ? msgs.filter(m => m.from === myName) : msgs;
+
   return (
     <div>
-      <div className="lounge-block-title">💌 팀원에게 한마디</div>
-      <div className="lounge-msg-form">
-        <select className="lounge-msg-sel" value={from} onChange={e => setFrom(e.target.value)}>
-          <option value="">팀원 선택</option>
-          {MEMBERS.map(m => <option key={m.name}>{m.name}</option>)}
-        </select>
-        <input
-          className="lounge-msg-input"
-          type="text"
-          placeholder="응원 메시지를 남겨보세요 ✨ (익명)"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter') post(); }}
-        />
-        <button className="lounge-msg-btn" onClick={post}>전송 💌</button>
-      </div>
-      <div id="lounge-msg-list">
-        {msgs.length === 0
-          ? <div className="empty-state">아직 메시지가 없어요. 첫 번째 한마디를 남겨보세요! 💌</div>
-          : msgs.map(m => (
-            <div key={m.id} className="lounge-msg-card" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <span className="lounge-msg-from" style={{ flexShrink: 0 }}>
-                📨 <span style={{ fontSize: '0.72rem', fontWeight: 400, color: '#94a3b8', marginRight: 2 }}>익명 →</span> {m.from}님에게
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <div className="lounge-block-title" style={{ marginBottom: 0 }}>💌 팀원에게 한마디</div>
+        <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: 8, padding: 3, gap: 2 }}>
+          <button onClick={() => setInbox(false)}
+            style={{ padding: '5px 14px', borderRadius: 6, border: 'none', fontSize: '0.8rem', fontWeight: inbox ? 400 : 700, background: inbox ? 'transparent' : '#fff', color: inbox ? '#94a3b8' : '#4f46e5', cursor: 'pointer', boxShadow: inbox ? 'none' : '0 1px 3px rgba(0,0,0,0.08)' }}>
+            전체
+          </button>
+          <button onClick={() => setInbox(true)}
+            style={{ padding: '5px 14px', borderRadius: 6, border: 'none', fontSize: '0.8rem', fontWeight: inbox ? 700 : 400, background: inbox ? '#fff' : 'transparent', color: inbox ? '#4f46e5' : '#94a3b8', cursor: 'pointer', boxShadow: inbox ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', display: 'flex', alignItems: 'center', gap: 5 }}>
+            내게 온 한마디
+            {msgs.filter(m => m.from === myName).length > 0 && (
+              <span style={{ background: '#4f46e5', color: '#fff', borderRadius: 10, fontSize: '0.7rem', padding: '1px 6px', fontWeight: 700 }}>
+                {msgs.filter(m => m.from === myName).length}
               </span>
-              <span className="lounge-msg-body" style={{ flex: 1, marginBottom: 0 }}>{m.msg}</span>
-              <button
-                className={`lounge-like-btn${m.likes.includes(myName) ? ' liked' : ''}`}
-                onClick={() => toggleLike(m.id)}
-                style={{ flexShrink: 0 }}
-              >
-                🙌 {m.likes.length ? <strong>{m.likes.length}</strong> : '응원하기'}
-              </button>
-              <span className="lounge-msg-ts" style={{ flexShrink: 0 }}>{m.ts}</span>
-            </div>
-          ))
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* 작성 폼 */}
+      <div style={{ background: '#fff', borderRadius: 14, padding: 16, marginBottom: 14, boxShadow: '0 2px 10px rgba(15,23,42,0.07)' }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+          <select value={sender} onChange={e => setSender(e.target.value)}
+            style={{ flex: 1, padding: '7px 10px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.84rem', color: anon ? '#94a3b8' : '#1e293b' }}
+            disabled={anon}>
+            <option value="">보내는 사람</option>
+            {MEMBERS.map(m => <option key={m.name}>{m.name}</option>)}
+          </select>
+          <span style={{ alignSelf: 'center', color: '#cbd5e1', fontSize: '1rem' }}>→</span>
+          <select value={to} onChange={e => setTo(e.target.value)}
+            style={{ flex: 1, padding: '7px 10px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.84rem' }}>
+            <option value="">받는 사람 선택</option>
+            {MEMBERS.map(m => <option key={m.name}>{m.name}</option>)}
+          </select>
+        </div>
+        <textarea value={input} onChange={e => setInput(e.target.value)}
+          placeholder="응원이나 피드백을 남겨보세요 ✨"
+          style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.85rem', resize: 'vertical', minHeight: 68, fontFamily: 'inherit', outline: 'none' }}
+        />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+          <label style={{ fontSize: '0.82rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+            <input type="checkbox" checked={anon} onChange={e => setAnon(e.target.checked)} />
+            익명으로 전달
+          </label>
+          <button onClick={post}
+            style={{ padding: '7px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: '0.83rem', fontWeight: 700, cursor: 'pointer' }}>
+            전송 💌
+          </button>
+        </div>
+      </div>
+
+      {/* 메시지 목록 */}
+      <div>
+        {displayed.length === 0
+          ? <div className="empty-state">{inbox ? `${myName || '나'}에게 온 메시지가 없어요 💌` : '아직 메시지가 없어요. 첫 번째 한마디를 남겨보세요! 💌'}</div>
+          : displayed.map(m => {
+            const senderLabel = m.anonymous === false && m.sender ? m.sender : '익명';
+            return (
+              <div key={m.id} className="lounge-msg-card">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                    <strong style={{ color: m.anonymous === false ? '#4f46e5' : '#94a3b8' }}>{senderLabel}</strong>
+                    <span style={{ margin: '0 6px', color: '#cbd5e1' }}>→</span>
+                    <strong style={{ color: '#0f172a' }}>{m.from}</strong>님에게
+                    <span style={{ marginLeft: 8, color: '#94a3b8', fontSize: '0.75rem' }}>{m.ts}</span>
+                  </span>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <button
+                      className={`lounge-like-btn${m.likes.includes(myName) ? ' liked' : ''}`}
+                      onClick={() => toggleLike(m.id)}>
+                      🙌 {m.likes.length ? <strong>{m.likes.length}</strong> : '응원'}
+                    </button>
+                    <button onClick={() => del(m.id)}
+                      style={{ border: 'none', background: 'none', color: '#d1d5db', cursor: 'pointer', fontSize: '0.85rem', padding: '0 2px' }}>✕</button>
+                  </div>
+                </div>
+                <div className="lounge-msg-body" style={{ marginBottom: 0 }}>{m.msg}</div>
+              </div>
+            );
+          })
         }
       </div>
     </div>
@@ -229,6 +290,7 @@ function LadderGame() {
   const [resMap, setResMap]       = useState<Record<number, string>>({});
   const [svgHtml, setSvgHtml]     = useState('');
   const [resultItems, setResultItems] = useState<{name:string;i:number;result:string}[]>([]);
+  const [winnerPopup, setWinnerPopup] = useState<{name:string;result:string}|null>(null);
   const revealedRef               = useRef<Set<number>>(new Set());
   const revealAllActiveRef        = useRef(false);
   const svgRef                    = useRef<HTMLDivElement>(null);
@@ -338,7 +400,7 @@ function LadderGame() {
         const result = resMap[endCol];
         const name = sel[idx];
         setResultItems(prev => [...prev, { name, i: idx, result }]);
-        if (result !== '😊 통과') alert(`🎉 ${name}님 "${result}" 당첨!`);
+        if (result !== '😊 통과') setWinnerPopup({ name, result });
       }
     }, 820);
   }
@@ -351,6 +413,8 @@ function LadderGame() {
       revealAllActiveRef.current = false;
       const allResults = paths.map((p, i) => ({ name: sel[i], i, result: resMap[p.endCol] }));
       setResultItems(allResults);
+      const winner = allResults.find(r => r.result !== '😊 통과');
+      if (winner) setWinnerPopup({ name: winner.name, result: winner.result });
     }, (n - 1) * 180 + 950);
   }
 
@@ -368,7 +432,7 @@ function LadderGame() {
   });
 
   return (
-    <div>
+    <>
       <div className="lounge-block-title">🎲 사다리타기</div>
       <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 2px 10px rgba(15,23,42,0.07)', display: 'flex', gap: 24, alignItems: 'flex-start' }}>
 
@@ -380,7 +444,7 @@ function LadderGame() {
             type="text"
             value={special}
             onChange={e => setSpecial(e.target.value)}
-            style={{ marginBottom: 3, fontSize: '0.8rem', padding: '7px 10px' }}
+            style={{ marginBottom: 3, fontSize: '0.8rem', padding: '7px 10px', fontWeight: 700 }}
           />
           <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginBottom: 12 }}>나머지는 😊 통과 처리돼요</div>
           <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', marginBottom: 6 }}>👥 참가자</div>
@@ -431,443 +495,201 @@ function LadderGame() {
         </div>
 
       </div>
-    </div>
+    {winnerPopup && (
+      <div
+        onClick={() => setWinnerPopup(null)}
+        style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}
+      >
+        <div
+          onClick={e => e.stopPropagation()}
+          style={{ background: '#fff', borderRadius: 24, padding: '40px 48px', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.25)', maxWidth: 340, width: '90%' }}
+        >
+          <div style={{ fontSize: '3.5rem', marginBottom: 12 }}>🎉</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e1b4b', marginBottom: 6 }}>{winnerPopup.name}님 당첨!</div>
+          <div style={{ fontSize: '1.1rem', color: '#4f46e5', fontWeight: 700, background: '#eef2ff', borderRadius: 12, padding: '10px 20px', margin: '12px 0 24px' }}>{winnerPopup.result}</div>
+          <button
+            onClick={() => setWinnerPopup(null)}
+            style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 12, padding: '10px 32px', fontSize: '0.95rem', fontWeight: 700, cursor: 'pointer' }}
+          >확인</button>
+        </div>
+      </div>
+    )}
+  </>
   );
 }
 
-// ── 팀 투표 ─────────────────────────────────────────────
-interface Poll {
+// ── 자유 제안 투표 ─────────────────────────────────────────
+interface FreeSuggestion {
   id: number;
-  question: string;
-  options: string[];
-  votes: Record<string, number>;
-  createdAt: string;
-  subOptions?: string[][];
-  phase?: 1 | 2 | 3;
-  phaseWinner?: number;
-  subVotes?: Record<string, number>;
-  subSubOptions?: (string[][] | null)[];
-  subPhaseWinner?: number;
-  subSubVotes?: Record<string, number>;
+  text: string;
+  author: string;
+  voters: string[];
 }
 
-const LUNCH_CATEGORIES: Array<{
-  emoji: string; label: string;
-  dishes?: string[];
-  subcategories?: Array<{ name: string; dishes: string[] }>;
-}> = [
-  {
-    emoji: '🍚', label: '한식',
-    subcategories: [
-      { name: '🍲 찌개류',   dishes: ['김치찌개', '된장찌개', '부대찌개', '순두부찌개', '청국장', '동태찌개', '참치찌개'] },
-      { name: '🍜 국·탕류',  dishes: ['설렁탕', '갈비탕', '해장국', '육개장', '삼계탕', '곰탕', '추어탕', '감자탕'] },
-      { name: '🥘 찜·조림',  dishes: ['갈비찜', '닭볶음탕', '아귀찜', '낙지볶음', '제육볶음', '두부조림', '고등어조림'] },
-      { name: '🍖 구이·고기', dishes: ['삼겹살', '불고기', '갈비구이', '닭갈비', '오리구이', '항정살', '목살구이'] },
-      { name: '🍱 밥류',     dishes: ['비빔밥', '덮밥', '볶음밥', '쌈밥', '오므라이스', '솥밥', '돌솥비빔밥', '곤드레밥'] },
-      { name: '🍝 면·국수',  dishes: ['냉면', '칼국수', '잔치국수', '수제비', '막국수', '쫄면', '비빔국수', '우동'] },
-    ],
-  },
-  {
-    emoji: '🍜', label: '분식',
-    dishes: ['떡볶이', '순대국', '김밥', '라면', '우동', '만두', '튀김', '쫄면', '어묵탕', '핫도그', '토스트', '전'],
-  },
-  {
-    emoji: '🥢', label: '중식',
-    dishes: ['짜장면', '짬뽕', '탕수육', '볶음밥', '마라탕', '딤섬', '마라샹궈', '꿔바로우', '양꼬치', '훠궈', '샤브샤브', '깐풍기'],
-  },
-  {
-    emoji: '🍕', label: '서양식',
-    dishes: ['피자', '파스타', '버거', '샌드위치', '스테이크', '샐러드', '리조또', '씨푸드', '브런치', '치킨', '수프', '그라탱'],
-  },
-  {
-    emoji: '🍱', label: '아시안',
-    dishes: ['스시·초밥', '라멘', '쌀국수', '팟타이', '카레', '덮밥', '나시고렝', '톰얌꿍', '월남쌈', '반미', '포케', '타코야키'],
-  },
-  {
-    emoji: '🌮', label: '중남미',
-    dishes: ['타코', '부리또', '케밥', '샤와르마', '파히타', '나초', '퀘사디아', '엔칠라다', '과카몰리'],
-  },
+interface FreeSuggestionPollData {
+  id: number;
+  question: string;
+  suggestions: FreeSuggestion[];
+  createdAt: string;
+}
+
+const FREE_POLL_TEMPLATES = [
+  { label: '🍱 점심 메뉴',  question: '오늘 점심 뭐 먹을까요?' },
+  { label: '☕ 카페 메뉴',  question: '카페 메뉴 어떤 걸로 할까요?' },
+  { label: '🍺 회식 장소',  question: '회식 장소 어디로 갈까요?' },
+  { label: '🏃 팀빌딩',    question: '이번 팀빌딩 활동 어떤 게 좋을까요?' },
+  { label: '🎁 선물',      question: '선물로 뭐가 좋을까요?' },
+  { label: '📅 일정',      question: '일정 어떻게 잡으면 좋을까요?' },
 ];
 
-const POLL_TEMPLATES: Array<{
-  label: string; question: string; options: string[];
-  subOptions?: string[][]; subSubOptions?: (string[][] | null)[];
-  startDirect?: boolean;
-}> = [
-  {
-    label: '🍱 점심 메뉴',
-    question: '오늘 점심 어떤 종류로?',
-    options: LUNCH_CATEGORIES.map(c => `${c.emoji} ${c.label}`),
-    subOptions: LUNCH_CATEGORIES.map(c =>
-      c.subcategories ? c.subcategories.map(s => s.name) : (c.dishes || [])
-    ),
-    subSubOptions: LUNCH_CATEGORIES.map(c =>
-      c.subcategories ? c.subcategories.map(s => s.dishes) : null
-    ),
-    startDirect: true,
-  },
-  { label: '☕ 카페', question: '카페 메뉴 고르기!', options: ['☕ 아메리카노', '🥛 라떼', '🍵 녹차라떼', '🧋 버블티', '🍹 에이드', '🍦 스무디'] },
-  { label: '🍺 회식', question: '회식 장소 어디로 갈까요?', options: ['🥩 고기집', '🐟 횟집', '🍝 이탈리안', '🥢 중식당', '🍺 호프집', '🍷 와인바', '🥘 분식집'] },
-];
+function getFreePoll(): FreeSuggestionPollData | null {
+  try { const s = lsGet('free_suggestion_poll'); return s ? JSON.parse(s) : null; } catch { return null; }
+}
 
-const POLL_COLORS = ['#6366f1', '#22c55e', '#f97316', '#ec4899', '#14b8a6', '#a855f7'];
-
-function TeamPoll() {
-  const [poll, setPoll]           = useState<Poll | null>(null);
-  const [showCreate, setShowCreate] = useState(false);
-  const [newQuestion, setNewQuestion] = useState('');
-  const [newOptions, setNewOptions] = useState(['', '']);
-  const [myName, setMyName]       = useState('');
+function FreeSuggestionPoll() {
+  const [poll, setPoll]         = useState<FreeSuggestionPollData | null>(null);
+  const [myName, setMyName]     = useState('');
+  const [newText, setNewText]   = useState('');
+  const [question, setQuestion] = useState('');
 
   useEffect(() => {
     setMyName(lsGet('my_name') || '');
-    try { const s = lsGet('team_poll'); if (s) setPoll(JSON.parse(s)); } catch { /* ignore */ }
+    setPoll(getFreePoll());
   }, []);
 
-  function savePoll(p: Poll | null) {
-    lsSet('team_poll', p ? JSON.stringify(p) : '');
+  function save(p: FreeSuggestionPollData | null) {
+    lsSet('free_suggestion_poll', p ? JSON.stringify(p) : '');
     setPoll(p);
   }
 
-  function createPoll() {
-    const opts = newOptions.map(o => o.trim()).filter(Boolean);
-    if (!newQuestion.trim()) { alert('질문을 입력해주세요'); return; }
-    if (opts.length < 2) { alert('선택지를 2개 이상 입력해주세요'); return; }
-    savePoll({ id: Date.now(), question: newQuestion.trim(), options: opts, votes: {}, createdAt: new Date().toISOString() });
-    setShowCreate(false); setNewQuestion(''); setNewOptions(['', '']);
+  function startPoll(q: string) {
+    if (!q.trim()) return;
+    save({ id: Date.now(), question: q.trim(), suggestions: [], createdAt: new Date().toISOString() });
+    setQuestion('');
   }
 
-  function applyTemplate(t: typeof POLL_TEMPLATES[0]) {
-    if (t.startDirect) {
-      savePoll({ id: Date.now(), question: t.question, options: t.options, votes: {}, createdAt: new Date().toISOString(), subOptions: t.subOptions, subSubOptions: t.subSubOptions, phase: 1 });
-      return;
-    }
-    setNewQuestion(t.question);
-    setNewOptions([...t.options, '']);
-    setShowCreate(true);
+  function addSuggestion() {
+    if (!myName) { alert('내 이름을 먼저 설정해주세요'); return; }
+    if (!newText.trim() || !poll) return;
+    save({ ...poll, suggestions: [...poll.suggestions, { id: Date.now(), text: newText.trim(), author: myName, voters: [] }] });
+    setNewText('');
   }
 
-  function vote(optIdx: number) {
+  function toggleVote(id: number) {
     if (!myName) { alert('내 이름을 먼저 설정해주세요'); return; }
     if (!poll) return;
-    if (poll.phase === 3) {
-      const sv = { ...poll.subSubVotes };
-      if (sv[myName] === optIdx) delete sv[myName]; else sv[myName] = optIdx;
-      savePoll({ ...poll, subSubVotes: sv });
-    } else if (poll.phase === 2) {
-      const sv = { ...poll.subVotes };
-      if (sv[myName] === optIdx) delete sv[myName]; else sv[myName] = optIdx;
-      savePoll({ ...poll, subVotes: sv });
-    } else {
-      const nv = { ...poll.votes };
-      if (nv[myName] === optIdx) delete nv[myName]; else nv[myName] = optIdx;
-      savePoll({ ...poll, votes: nv });
-    }
+    save({
+      ...poll,
+      suggestions: poll.suggestions.map(s =>
+        s.id !== id ? s :
+        s.voters.includes(myName)
+          ? { ...s, voters: s.voters.filter(n => n !== myName) }
+          : { ...s, voters: [...s.voters, myName] }
+      ),
+    });
   }
 
-  function advancePhase(winnerIdx: number) {
+  function deleteSuggestion(id: number) {
     if (!poll) return;
-    savePoll({ ...poll, phase: 2, phaseWinner: winnerIdx, subVotes: {} });
+    save({ ...poll, suggestions: poll.suggestions.filter(s => s.id !== id) });
   }
 
-  function advanceSubPhase(subWinnerIdx: number) {
-    if (!poll) return;
-    savePoll({ ...poll, phase: 3, subPhaseWinner: subWinnerIdx, subSubVotes: {} });
-  }
-
-  function backToPhase1() {
-    if (!poll) return;
-    savePoll({ ...poll, phase: 1, phaseWinner: undefined, subVotes: {} });
-  }
-
-  function backToPhase2() {
-    if (!poll) return;
-    savePoll({ ...poll, phase: 2, subPhaseWinner: undefined, subSubVotes: {} });
-  }
-
-  const totalVoters = poll ? Object.keys(poll.votes).length : 0;
-  const myVote = poll && myName in poll.votes ? poll.votes[myName] : -1;
+  const sorted = poll ? [...poll.suggestions].sort((a, b) => b.voters.length - a.voters.length) : [];
+  const topVotes = sorted[0]?.voters.length ?? 0;
 
   return (
     <div>
-      <div className="lounge-block-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span>🗳️ 팀 투표</span>
-        <button onClick={() => setShowCreate(p => !p)} style={{ fontSize: '0.78rem', padding: '4px 12px', borderRadius: 20, border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', color: '#64748b', fontWeight: 600 }}>
-          {showCreate ? '✕ 닫기' : '+ 새 투표'}
-        </button>
-      </div>
+      <div className="lounge-block-title">🙋 자유 제안 투표</div>
 
-      {/* 투표 생성 폼 */}
-      {showCreate && (
+      {!poll && (
         <div style={{ background: '#fff', borderRadius: 14, padding: 20, marginBottom: 14, boxShadow: '0 2px 10px rgba(15,23,42,0.07)' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', marginBottom: 8 }}>빠른 템플릿</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
-            {POLL_TEMPLATES.map(t => (
-              <button key={t.label} onClick={() => applyTemplate(t)}
-                style={{ padding: '5px 12px', borderRadius: 20, border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer', fontSize: '0.78rem', color: '#475569', fontWeight: 600 }}>
-                {t.label}
-              </button>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', marginBottom: 8 }}>빠른 시작</div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
+            {FREE_POLL_TEMPLATES.map(t => (
+              <button key={t.label} onClick={() => startPoll(t.question)}
+                style={{ padding: '6px 14px', borderRadius: 20, border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer', fontSize: '0.82rem', color: '#475569', fontWeight: 600, transition: 'all 0.12s' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#eef2ff'; e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.color = '#6366f1'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.color = '#475569'; }}
+              >{t.label}</button>
             ))}
           </div>
-          <input type="text" placeholder="질문을 입력하세요 (예: 오늘 점심 뭐 먹을까요?)"
-            value={newQuestion} onChange={e => setNewQuestion(e.target.value)}
-            style={{ width: '100%', padding: '9px 12px', border: '1px solid #e2e8f0', borderRadius: 9, fontSize: '0.88rem', marginBottom: 10, boxSizing: 'border-box' }}
-          />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
-            {newOptions.map((opt, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <span style={{ width: 22, height: 22, borderRadius: '50%', background: POLL_COLORS[i % POLL_COLORS.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.7rem', fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
-                <input type="text" placeholder={`선택지 ${i + 1}`} value={opt}
-                  onChange={e => { const o = [...newOptions]; o[i] = e.target.value; setNewOptions(o); }}
-                  onKeyDown={e => { if (e.key === 'Enter' && i === newOptions.length - 1 && newOptions.length < 6) setNewOptions(p => [...p, '']); }}
-                  style={{ flex: 1, padding: '7px 10px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.84rem' }}
-                />
-                {newOptions.length > 2 && (
-                  <button onClick={() => setNewOptions(p => p.filter((_, j) => j !== i))}
-                    style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', fontSize: '1rem', padding: '0 4px' }}>✕</button>
-                )}
-              </div>
-            ))}
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {newOptions.length < 6 && (
-              <button onClick={() => setNewOptions(p => [...p, ''])}
-                style={{ padding: '7px 14px', border: '1px dashed #cbd5e1', borderRadius: 8, background: '#fff', cursor: 'pointer', fontSize: '0.82rem', color: '#94a3b8' }}>
-                + 선택지 추가
+          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 14 }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', marginBottom: 8 }}>직접 입력</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input type="text" placeholder="주제를 입력하세요 (예: 오늘 저녁 회식)"
+                value={question} onChange={e => setQuestion(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') startPoll(question); }}
+                style={{ flex: 1, padding: '9px 12px', border: '1px solid #e2e8f0', borderRadius: 9, fontSize: '0.85rem' }}
+              />
+              <button onClick={() => startPoll(question)} disabled={!question.trim()}
+                style={{ padding: '9px 16px', background: question.trim() ? '#4f46e5' : '#f1f5f9', color: question.trim() ? '#fff' : '#94a3b8', border: 'none', borderRadius: 9, fontWeight: 700, cursor: question.trim() ? 'pointer' : 'not-allowed', fontSize: '0.85rem', transition: 'all 0.15s', flexShrink: 0 }}>
+                열기
               </button>
-            )}
-            <button onClick={createPoll}
-              style={{ padding: '7px 20px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', marginLeft: 'auto' }}>
-              투표 시작 🗳️
-            </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* 활성 투표 */}
       {poll ? (
         <div style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 2px 10px rgba(15,23,42,0.07)' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b' }}>{poll.question}</div>
+            <button onClick={() => { if (confirm('투표를 종료할까요?')) save(null); }} style={{ fontSize: '0.75rem', color: '#cbd5e1', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, marginLeft: 8 }}>종료</button>
+          </div>
 
-          {/* 2단계 카테고리 투표 (점심 메뉴 등) */}
-          {poll.phase === 1 && poll.subOptions ? (() => {
-            const voteCounts = poll.options.map((_, i) => Object.values(poll.votes).filter(v => v === i).length);
-            const maxVotes = Math.max(...voteCounts, 0);
-            const leadingIdx = maxVotes > 0 ? voteCounts.indexOf(maxVotes) : -1;
-            return (
-              <>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <div style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b' }}>{poll.question}</div>
-                  <span style={{ fontSize: '0.72rem', color: '#94a3b8', background: '#f8fafc', borderRadius: 20, padding: '2px 10px' }}>1단계</span>
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: 14 }}>카테고리를 선택하면 세부 메뉴로 이동해요</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 16 }}>
-                  {poll.options.map((opt, i) => {
-                    const parts = opt.split(' ');
-                    const emoji = parts[0];
-                    const name = parts.slice(1).join(' ');
-                    const voters = Object.entries(poll.votes).filter(([, v]) => v === i).map(([n]) => n);
-                    const pct = totalVoters > 0 ? Math.round(voters.length / totalVoters * 100) : 0;
-                    const isMyVote = myVote === i;
-                    const isLeading = i === leadingIdx;
-                    const color = POLL_COLORS[i % POLL_COLORS.length];
-                    return (
-                      <div key={i} onClick={() => vote(i)} style={{
-                        border: `2px solid ${isMyVote ? color : isLeading && totalVoters > 0 ? `${color}88` : '#e2e8f0'}`,
-                        borderRadius: 14, padding: '14px 8px 10px', cursor: 'pointer',
-                        textAlign: 'center', position: 'relative', overflow: 'hidden',
-                        background: isMyVote ? `${color}0d` : '#fff', transition: 'all 0.15s',
-                      }}>
-                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${pct}%`, background: color, opacity: 0.1, transition: 'height 0.4s ease' }} />
-                        <div style={{ position: 'relative', fontSize: '1.7rem', marginBottom: 4, lineHeight: 1 }}>{emoji}</div>
-                        <div style={{ position: 'relative', fontSize: '0.82rem', fontWeight: isMyVote ? 700 : 500, color: isMyVote ? color : '#1e293b' }}>{name}</div>
-                        {totalVoters > 0 && <div style={{ position: 'relative', fontSize: '0.72rem', color, fontWeight: 700, marginTop: 2 }}>{pct}%</div>}
-                        {voters.length > 0 && (
-                          <div style={{ position: 'relative', display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', marginTop: 4 }}>
-                            {voters.map(n => <span key={n} style={{ fontSize: '0.6rem', padding: '1px 5px', borderRadius: 10, background: `${color}18`, color }}>{n}</span>)}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                {leadingIdx >= 0 && (
-                  <div style={{ textAlign: 'center', marginBottom: 12 }}>
-                    <button onClick={() => advancePhase(leadingIdx)}
-                      style={{ padding: '9px 22px', background: POLL_COLORS[leadingIdx % POLL_COLORS.length], color: '#fff', border: 'none', borderRadius: 22, fontSize: '0.86rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
-                      {poll.options[leadingIdx]} 세부 메뉴 보기 →
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+            {sorted.length === 0 && (
+              <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem', padding: '16px 0' }}>아직 의견이 없어요. 첫 번째로 제안해보세요!</div>
+            )}
+            {sorted.map(s => {
+              const isMyVote = s.voters.includes(myName);
+              const isMine   = s.author === myName;
+              const isTop    = topVotes > 0 && s.voters.length === topVotes;
+              return (
+                <div key={s.id} style={{ border: `2px solid ${isMyVote ? '#6366f1' : isTop ? '#6366f144' : '#e2e8f0'}`, borderRadius: 12, padding: '12px 14px', background: isMyVote ? '#eef2ff' : '#fff', transition: 'all 0.15s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <button onClick={() => toggleVote(s.id)} style={{
+                      width: 40, height: 40, borderRadius: '50%', border: 'none', cursor: 'pointer', flexShrink: 0,
+                      background: isMyVote ? '#6366f1' : '#f1f5f9',
+                      color: isMyVote ? '#fff' : '#94a3b8',
+                      fontWeight: 700, fontSize: '0.82rem',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', lineHeight: 1,
+                    }}>
+                      <span style={{ fontSize: '1rem' }}>👍</span>
+                      {s.voters.length > 0 && <span style={{ fontSize: '0.65rem', marginTop: 1 }}>{s.voters.length}</span>}
                     </button>
-                  </div>
-                )}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>총 {totalVoters}명 참여</span>
-                  <button onClick={() => { if (confirm('투표를 종료할까요?')) savePoll(null); }} style={{ fontSize: '0.75rem', color: '#cbd5e1', background: 'none', border: 'none', cursor: 'pointer' }}>투표 종료</button>
-                </div>
-              </>
-            );
-          })() : poll.phase === 2 && poll.phaseWinner !== undefined && poll.subOptions ? (() => {
-            const items = poll.subOptions[poll.phaseWinner];
-            const subVotes = poll.subVotes || {};
-            const totalSub = Object.keys(subVotes).length;
-            const mySubVote = myName in subVotes ? subVotes[myName] : -1;
-            const winnerCat = poll.options[poll.phaseWinner];
-            const catColor = POLL_COLORS[poll.phaseWinner % POLL_COLORS.length];
-            const hasDeeperLevel = poll.subSubOptions?.[poll.phaseWinner] != null;
-            const subVoteCounts = items.map((_, i) => Object.values(subVotes).filter(v => v === i).length);
-            const maxSubVotes = Math.max(...subVoteCounts, 0);
-            const leadingSubIdx = maxSubVotes > 0 ? subVoteCounts.indexOf(maxSubVotes) : -1;
-            return (
-              <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <button onClick={backToPhase1} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '0.82rem', padding: '4px 8px', borderRadius: 8 }}>
-                    ← 카테고리
-                  </button>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: '1.1rem' }}>{winnerCat.split(' ')[0]}</span>
-                    <span style={{ fontSize: '0.95rem', fontWeight: 700, color: catColor }}>{winnerCat.split(' ').slice(1).join(' ')} {hasDeeperLevel ? '분류' : '세부 메뉴'}</span>
-                  </div>
-                  <span style={{ marginLeft: 'auto', fontSize: '0.72rem', color: '#94a3b8', background: '#f8fafc', borderRadius: 20, padding: '2px 10px' }}>2단계</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-                  {items.map((item, i) => {
-                    const voters = Object.entries(subVotes).filter(([, v]) => v === i).map(([n]) => n);
-                    const pct = totalSub > 0 ? Math.round(voters.length / totalSub * 100) : 0;
-                    const isMyVote = mySubVote === i;
-                    return (
-                      <div key={i} onClick={() => vote(i)} style={{ border: `2px solid ${isMyVote ? catColor : '#e2e8f0'}`, borderRadius: 12, padding: '12px 14px', cursor: 'pointer', transition: 'all 0.15s', background: isMyVote ? `${catColor}0d` : '#fff', position: 'relative', overflow: 'hidden' }}>
-                        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: catColor, opacity: 0.08, transition: 'width 0.4s ease' }} />
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative' }}>
-                          <span style={{ width: 26, height: 26, borderRadius: '50%', background: isMyVote ? catColor : '#f1f5f9', color: isMyVote ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
-                          <span style={{ flex: 1, fontWeight: isMyVote ? 700 : 500, color: '#1e293b', fontSize: '0.9rem' }}>{item}</span>
-                          {totalSub > 0 && <span style={{ fontSize: '0.82rem', fontWeight: 700, color: catColor }}>{pct}%</span>}
-                          {isMyVote && <span style={{ fontSize: '0.72rem', color: catColor, fontWeight: 700 }}>✓ 내 선택</span>}
-                          {hasDeeperLevel && <span style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>›</span>}
-                        </div>
-                        {voters.length > 0 && (
-                          <div style={{ marginTop: 6, paddingLeft: 36, display: 'flex', gap: 4, flexWrap: 'wrap', position: 'relative' }}>
-                            {voters.map(n => <span key={n} style={{ fontSize: '0.7rem', padding: '1px 7px', borderRadius: 20, background: `${catColor}18`, color: catColor }}>{n}</span>)}
-                          </div>
-                        )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {s.text}
+                        {isTop && <span style={{ fontSize: '0.68rem', background: '#fef3c7', color: '#b45309', borderRadius: 20, padding: '1px 7px', fontWeight: 700 }}>🏆 1위</span>}
                       </div>
-                    );
-                  })}
-                </div>
-                {hasDeeperLevel && leadingSubIdx >= 0 && (
-                  <div style={{ textAlign: 'center', marginBottom: 12 }}>
-                    <button onClick={() => advanceSubPhase(leadingSubIdx)}
-                      style={{ padding: '9px 22px', background: catColor, color: '#fff', border: 'none', borderRadius: 22, fontSize: '0.86rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
-                      {items[leadingSubIdx]} 세부 메뉴 보기 →
-                    </button>
-                  </div>
-                )}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>총 {totalSub}명 참여</span>
-                  <button onClick={() => { if (confirm('투표를 종료할까요?')) savePoll(null); }} style={{ fontSize: '0.75rem', color: '#cbd5e1', background: 'none', border: 'none', cursor: 'pointer' }}>투표 종료</button>
-                </div>
-              </>
-            );
-          })() : poll.phase === 3 && poll.phaseWinner !== undefined && poll.subPhaseWinner !== undefined && poll.subSubOptions ? (() => {
-            const dishes = poll.subSubOptions[poll.phaseWinner]?.[poll.subPhaseWinner] || [];
-            const subSubVotes = poll.subSubVotes || {};
-            const totalFinal = Object.keys(subSubVotes).length;
-            const myFinalVote = myName in subSubVotes ? subSubVotes[myName] : -1;
-            const winnerCat = poll.options[poll.phaseWinner];
-            const winnerSub = poll.subOptions?.[poll.phaseWinner]?.[poll.subPhaseWinner] || '';
-            const catColor = POLL_COLORS[poll.phaseWinner % POLL_COLORS.length];
-            return (
-              <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <button onClick={backToPhase2} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: '0.82rem', padding: '4px 8px', borderRadius: 8 }}>
-                    ← {winnerCat.split(' ').slice(1).join(' ')} 분류
-                  </button>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: '0.95rem', fontWeight: 700, color: catColor }}>{winnerSub} 세부 메뉴</span>
-                  </div>
-                  <span style={{ marginLeft: 'auto', fontSize: '0.72rem', color: '#94a3b8', background: '#f8fafc', borderRadius: 20, padding: '2px 10px' }}>3단계</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-                  {dishes.map((dish, i) => {
-                    const voters = Object.entries(subSubVotes).filter(([, v]) => v === i).map(([n]) => n);
-                    const pct = totalFinal > 0 ? Math.round(voters.length / totalFinal * 100) : 0;
-                    const isMyVote = myFinalVote === i;
-                    return (
-                      <div key={i} onClick={() => vote(i)} style={{ border: `2px solid ${isMyVote ? catColor : '#e2e8f0'}`, borderRadius: 12, padding: '12px 14px', cursor: 'pointer', transition: 'all 0.15s', background: isMyVote ? `${catColor}0d` : '#fff', position: 'relative', overflow: 'hidden' }}>
-                        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: catColor, opacity: 0.08, transition: 'width 0.4s ease' }} />
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative' }}>
-                          <span style={{ width: 26, height: 26, borderRadius: '50%', background: isMyVote ? catColor : '#f1f5f9', color: isMyVote ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
-                          <span style={{ flex: 1, fontWeight: isMyVote ? 700 : 500, color: '#1e293b', fontSize: '0.9rem' }}>{dish}</span>
-                          {totalFinal > 0 && <span style={{ fontSize: '0.82rem', fontWeight: 700, color: catColor }}>{pct}%</span>}
-                          {isMyVote && <span style={{ fontSize: '0.72rem', color: catColor, fontWeight: 700 }}>✓ 내 선택</span>}
-                        </div>
-                        {voters.length > 0 && (
-                          <div style={{ marginTop: 6, paddingLeft: 36, display: 'flex', gap: 4, flexWrap: 'wrap', position: 'relative' }}>
-                            {voters.map(n => <span key={n} style={{ fontSize: '0.7rem', padding: '1px 7px', borderRadius: 20, background: `${catColor}18`, color: catColor }}>{n}</span>)}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>총 {totalFinal}명 참여</span>
-                  <button onClick={() => { if (confirm('투표를 종료할까요?')) savePoll(null); }} style={{ fontSize: '0.75rem', color: '#cbd5e1', background: 'none', border: 'none', cursor: 'pointer' }}>투표 종료</button>
-                </div>
-              </>
-            );
-          })() : (
-            /* 일반 투표 */
-            <>
-              <div style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b', marginBottom: 16 }}>{poll.question}</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-                {poll.options.map((opt, i) => {
-                  const voters = Object.entries(poll.votes).filter(([, v]) => v === i).map(([n]) => n);
-                  const pct = totalVoters > 0 ? Math.round(voters.length / totalVoters * 100) : 0;
-                  const isMyVote = myVote === i;
-                  const color = POLL_COLORS[i % POLL_COLORS.length];
-                  return (
-                    <div key={i} onClick={() => vote(i)} style={{ border: `2px solid ${isMyVote ? color : '#e2e8f0'}`, borderRadius: 12, padding: '12px 14px', cursor: 'pointer', transition: 'all 0.15s', background: isMyVote ? `${color}0d` : '#fff', position: 'relative', overflow: 'hidden' }}>
-                      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: color, opacity: 0.08, transition: 'width 0.4s ease' }} />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, position: 'relative' }}>
-                        <span style={{ width: 26, height: 26, borderRadius: '50%', background: isMyVote ? color : '#f1f5f9', color: isMyVote ? '#fff' : '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
-                        <span style={{ flex: 1, fontWeight: isMyVote ? 700 : 500, color: '#1e293b', fontSize: '0.9rem' }}>{opt}</span>
-                        {totalVoters > 0 && <span style={{ fontSize: '0.82rem', fontWeight: 700, color }}>{pct}%</span>}
-                        {isMyVote && <span style={{ fontSize: '0.72rem', color, fontWeight: 700 }}>✓ 내 선택</span>}
-                      </div>
-                      {voters.length > 0 && (
-                        <div style={{ marginTop: 6, paddingLeft: 36, display: 'flex', gap: 4, flexWrap: 'wrap', position: 'relative' }}>
-                          {voters.map(n => <span key={n} style={{ fontSize: '0.7rem', padding: '1px 7px', borderRadius: 20, background: `${color}18`, color }}>{n}</span>)}
-                        </div>
-                      )}
+                      <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: 2 }}>제안: {s.author}</div>
                     </div>
-                  );
-                })}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>총 {totalVoters}명 참여</span>
-                <button onClick={() => { if (confirm('투표를 종료할까요?')) savePoll(null); }} style={{ fontSize: '0.75rem', color: '#cbd5e1', background: 'none', border: 'none', cursor: 'pointer' }}>투표 종료</button>
-              </div>
-            </>
-          )}
+                    {isMine && (
+                      <button onClick={() => deleteSuggestion(s.id)} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', fontSize: '0.9rem', padding: '0 4px', flexShrink: 0 }}>✕</button>
+                    )}
+                  </div>
+                  {s.voters.length > 0 && (
+                    <div style={{ marginTop: 8, paddingLeft: 50, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                      {s.voters.map(n => <span key={n} style={{ fontSize: '0.7rem', padding: '1px 7px', borderRadius: 20, background: '#eef2ff', color: '#6366f1' }}>{n}</span>)}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
-          {!myName && (
-            <div style={{ marginTop: 10, textAlign: 'center', fontSize: '0.78rem', color: '#f97316', background: '#fff7ed', borderRadius: 8, padding: '7px 14px' }}>
-              설정에서 <strong>내 이름을 설정</strong>하면 투표할 수 있어요
-            </div>
-          )}
-        </div>
-      ) : !showCreate ? (
-        <div style={{ background: '#fff', borderRadius: 14, padding: '32px 20px', boxShadow: '0 2px 10px rgba(15,23,42,0.07)', textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: 8 }}>🗳️</div>
-          <div style={{ fontSize: '0.9rem', color: '#94a3b8', marginBottom: 16 }}>진행 중인 투표가 없어요</div>
-          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
-            {POLL_TEMPLATES.map(t => (
-              <button key={t.label} onClick={() => applyTemplate(t)}
-                style={{ padding: '7px 14px', borderRadius: 20, border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer', fontSize: '0.82rem', color: '#475569', fontWeight: 600 }}>
-                {t.label}
-              </button>
-            ))}
-            <button onClick={() => setShowCreate(true)}
-              style={{ padding: '7px 14px', borderRadius: 20, border: '1px dashed #cbd5e1', background: '#fff', cursor: 'pointer', fontSize: '0.82rem', color: '#94a3b8', fontWeight: 600 }}>
-              직접 만들기
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input type="text"
+              placeholder={myName ? '의견을 입력하세요...' : '설정에서 내 이름을 먼저 등록해주세요'}
+              value={newText} onChange={e => setNewText(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') addSuggestion(); }}
+              disabled={!myName}
+              style={{ flex: 1, padding: '9px 12px', border: '1px solid #e2e8f0', borderRadius: 9, fontSize: '0.85rem' }}
+            />
+            <button onClick={addSuggestion} disabled={!myName || !newText.trim()}
+              style={{ padding: '9px 16px', background: !myName || !newText.trim() ? '#f1f5f9' : '#4f46e5', color: !myName || !newText.trim() ? '#94a3b8' : '#fff', border: 'none', borderRadius: 9, fontWeight: 700, cursor: !myName || !newText.trim() ? 'not-allowed' : 'pointer', fontSize: '0.85rem', transition: 'all 0.15s', flexShrink: 0 }}>
+              제안
             </button>
           </div>
         </div>
@@ -886,7 +708,7 @@ export function Lounge() {
         <MvpBadges />
       </div>
       <MessageBoard />
-      <TeamPoll />
+      <FreeSuggestionPoll />
       <LadderGame />
     </div>
   );

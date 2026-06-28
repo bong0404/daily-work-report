@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { MEMBERS, lsGet, lsSet,
   currentMkey, mkeyLabel, getMonthDays, getHoliday,
   loadMpData, saveMpData, PlanTask, MonthPlanData
@@ -22,6 +22,15 @@ interface TaskElProps {
 function TaskEl({ task, onChange, onDelete }: TaskElProps) {
   const status  = task.status || (task.done ? 'done' : 'todo');
   const starred = !!task.starred;
+  const [text, setText] = useState(task.text || '');
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // 외부에서 task가 완전히 교체될 때(월/사람 변경) 텍스트 동기화
+  useEffect(() => {
+    setText(task.text || '');
+  }, [task]);
+
+  useEffect(() => () => clearTimeout(debounceRef.current), []);
 
   function cycleStatus() {
     const next = STATUS_CYCLE[status] || 'doing';
@@ -35,6 +44,13 @@ function TaskEl({ task, onChange, onDelete }: TaskElProps) {
     onChange(update);
   }
 
+  function handleTextChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    const val = e.target.value;
+    setText(val);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => onChange({ text: val }), 600);
+  }
+
   return (
     <div className={`wpt-task${status === 'done' ? ' done' : status === 'doing' ? ' doing' : ''}${starred ? ' starred-task' : ''}${task.color ? ' color-' + task.color : ''}`}>
       <button className={`wpt-status-btn s-${status}`} onClick={cycleStatus} title="클릭하여 상태 변경">
@@ -44,8 +60,8 @@ function TaskEl({ task, onChange, onDelete }: TaskElProps) {
         className="wpt-task-text"
         rows={1}
         placeholder="업무 입력"
-        defaultValue={task.text || ''}
-        onBlur={e => onChange({ text: e.target.value })}
+        value={text}
+        onChange={handleTextChange}
         onInput={e => {
           const el = e.currentTarget;
           el.style.height = 'auto';
@@ -90,7 +106,9 @@ function TimelinePlanTab() {
   const [data, setData]      = useState<MonthPlanData>(() => loadMpData(currentMkey(), ''));
   const [keyWork, setKeyWork] = useState('');
   const [issue, setIssue]    = useState('');
+  const supabaseTimer        = useRef<ReturnType<typeof setTimeout>>();
   useEffect(() => { setPerson(lsGet('my_name') || ''); }, []);
+  useEffect(() => () => clearTimeout(supabaseTimer.current), []);
 
   const reload = useCallback((m: string, p: string) => {
     const d = loadMpData(m, p);
@@ -118,15 +136,20 @@ function TimelinePlanTab() {
     reload(nm, person);
   }
 
+  function pushToCloud(updated: MonthPlanData, m: string, p: string) {
+    clearTimeout(supabaseTimer.current);
+    supabaseTimer.current = setTimeout(() => {
+      supabase.from('monthly_plans')
+        .upsert({ year_month: m, name: p, data: updated, updated_at: new Date().toISOString() }, { onConflict: 'year_month,name' })
+        .then(({ error }) => { if (error) console.warn('저장 실패:', error.message); });
+    }, 1500);
+  }
+
   function save(newData: MonthPlanData) {
     const updated = { ...newData, keyWork, issue };
     setData(updated);
-    saveMpData(mkey, person, updated);
-    if (person) {
-      supabase.from('monthly_plans')
-        .upsert({ year_month: mkey, name: person, data: updated, updated_at: new Date().toISOString() }, { onConflict: 'year_month,name' })
-        .then(({ error }) => { if (error) console.warn('저장 실패:', error.message); });
-    }
+    saveMpData(mkey, person, updated);       // localStorage 즉시
+    if (person) pushToCloud(updated, mkey, person); // Supabase 1.5s 후
   }
 
   function updateTask(cat: string, dayKey: string, ti: number, changes: Partial<PlanTask>) {
@@ -170,10 +193,11 @@ function TimelinePlanTab() {
     save(newData);
   }
 
-  function saveMemos() {
-    const newData = { ...data, keyWork, issue };
+  function saveMemos(kw = keyWork, iss = issue) {
+    const newData = { ...data, keyWork: kw, issue: iss };
     setData(newData);
-    saveMpData(mkey, person, newData);
+    saveMpData(mkey, person, newData);       // localStorage 즉시
+    if (person) pushToCloud(newData, mkey, person); // Supabase 1.5s 후
   }
 
   const days = getMonthDays(mkey);
@@ -197,11 +221,11 @@ function TimelinePlanTab() {
         <div className="wpt-month-memo" style={{ flex: 1, marginBottom: 0 }}>
           <div className="wpt-memo-col">
             <div className="wpt-memo-col-label">📌 월 주요업무</div>
-            <textarea className="wpt-memo-ta" placeholder="이달의 주요 업무를 입력하세요" value={keyWork} onChange={e => setKeyWork(e.target.value)} onBlur={saveMemos} />
+            <textarea className="wpt-memo-ta" placeholder="이달의 주요 업무를 입력하세요" value={keyWork} onChange={e => { setKeyWork(e.target.value); saveMemos(e.target.value, issue); }} />
           </div>
           <div className="wpt-memo-col">
             <div className="wpt-memo-col-label">⚠️ 이슈</div>
-            <textarea className="wpt-memo-ta" placeholder="이달의 이슈 사항을 입력하세요" value={issue} onChange={e => setIssue(e.target.value)} onBlur={saveMemos} />
+            <textarea className="wpt-memo-ta" placeholder="이달의 이슈 사항을 입력하세요" value={issue} onChange={e => { setIssue(e.target.value); saveMemos(keyWork, e.target.value); }} />
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0, alignItems: 'flex-end' }}>
@@ -215,7 +239,7 @@ function TimelinePlanTab() {
           <div style={{ display: 'flex', flexDirection: 'row', gap: 8 }}>
             <button className="wpt-cat-add-btn" onClick={() => alert('템플릿을 불러옵니다')}>📋 템플릿</button>
             <button className="wpt-cat-add-btn" onClick={addCategory}>+ 카테고리 추가</button>
-            <button className="wp-submit-btn" onClick={saveMemos}>저장</button>
+            <button className="wp-submit-btn" onClick={() => saveMemos()}>저장</button>
           </div>
         </div>
       </div>

@@ -259,6 +259,28 @@
     }
 
     .btn-add-item:hover { background: #eef2ff; }
+
+    .shortcut-guide {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;
+      background: #f8f9ff; border: 1px solid #e8eaf0; border-radius: 10px;
+      padding: 10px 14px; margin-bottom: 16px; font-size: 0.78rem; color: #64748b;
+    }
+    .shortcut-guide-title { font-weight: 700; color: #4f46e5; margin-right: 4px; }
+    .shortcut-guide kbd {
+      display: inline-block; background: #fff; border: 1px solid #d1d5db;
+      border-bottom-width: 2px; border-radius: 5px;
+      padding: 1px 6px; font-size: 0.74rem; font-family: inherit;
+      color: #374151; font-weight: 600;
+    }
+
+    .item-row-sub { padding-left: 20px; }
+    .item-sub-arrow { color: #a5b4fc; font-size: 0.85rem; flex-shrink: 0; margin-right: -2px; }
+    .item-row-sub input[type="text"] { background: #f5f5ff; border-color: #e0e0f8; color: #4f46e5; font-size: 0.84rem; }
+    .item-row-sub input[type="text"]:focus { border-color: #818cf8; background: #fff; }
+    .item-row-sub input[type="text"]::placeholder { color: #c4b5fd; }
+
+    .report-subitem { color: #6366f1; font-size: 0.87em; padding-left: 1.4em; list-style: none; }
+    .report-subitem::before { content: '↳ '; opacity: 0.6; }
     .tmpl-item {
       display: flex;
       align-items: center;
@@ -2518,12 +2540,83 @@
     .ladder-name-g:hover .lntxt { fill:#4f46e5; }
 
     @media print {
-      .sidebar, .topbar, .section-switcher, .tab-bar, #toast, .export-controls,
-      .btn-export-action, button { display:none !important; }
-      body { background:#fff; }
-      .app-body { margin-left:0 !important; }
-      main { padding:0; }
-      .export-preview { border:none; padding:0; box-shadow:none; }
+      @page { size: A4 portrait; margin: 18mm 20mm; }
+
+      /* UI 크롬 전부 숨기기 */
+      body.printing-report .sidebar,
+      body.printing-report .topbar,
+      body.printing-report .section-switcher,
+      body.printing-report .tab-bar,
+      body.printing-report button,
+      body.printing-report #toast,
+      body.printing-report .export-controls { display: none !important; }
+
+      body.printing-report { background: #fff !important; }
+      body.printing-report .app-body { margin-left: 0 !important; }
+      body.printing-report main { padding: 0 !important; }
+
+      /* 인쇄 영역만 전체 화면으로 */
+      body.printing-report #export-print-area {
+        position: fixed;
+        inset: 0;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        overflow: visible;
+        background: #fff;
+      }
+
+      /* ── A4 리포트 타이포그래피 ── */
+      body.printing-report #export-print-area .print-report-title {
+        font-size: 18pt;
+        font-weight: 700;
+        color: #1a1a2e;
+        border-bottom: 2.5pt solid #1a1a2e;
+        padding-bottom: 6pt;
+        margin-bottom: 4pt;
+      }
+      body.printing-report #export-print-area .print-report-period {
+        font-size: 9pt;
+        color: #64748b;
+        margin-bottom: 18pt;
+      }
+      body.printing-report .export-member-block {
+        margin-bottom: 18pt;
+        padding-bottom: 14pt;
+        border-bottom: 1pt solid #e2e8f0;
+        page-break-inside: avoid;
+      }
+      body.printing-report .export-member-block:last-child { border-bottom: none; }
+      body.printing-report .export-member-name {
+        font-size: 12pt;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 6pt;
+        display: flex;
+        align-items: center;
+        gap: 6pt;
+      }
+      body.printing-report .export-date-label {
+        font-size: 8pt;
+        font-weight: 700;
+        color: #9999bb;
+        margin: 6pt 0 3pt;
+      }
+      body.printing-report .export-section-title {
+        font-size: 7.5pt;
+        font-weight: 700;
+        color: #4f46e5;
+        margin: 5pt 0 2pt;
+      }
+      body.printing-report .export-item {
+        font-size: 9pt;
+        color: #374151;
+        padding-left: 12pt;
+        position: relative;
+        line-height: 1.65;
+      }
+      body.printing-report .export-item::before { content: '–'; position: absolute; left: 0; color: #bbb; }
     }
 
     /* ── 사이드바 레이아웃 ── */
@@ -2557,12 +2650,13 @@
     .brand-text-block { display:flex; flex-direction:column; gap:1px; }
     .brand-name-main {
       font-family:'Cormorant Garamond', Georgia, serif;
-      font-size:0.95rem; font-weight:700; letter-spacing:0.06em;
+      font-size:0.95rem; font-weight:600; letter-spacing:0.06em;
       color:#111827; line-height:1.1;
     }
     .brand-paris {
+      font-family:'Cormorant Garamond', Georgia, serif;
       font-size:0.56rem; letter-spacing:0.18em; text-transform:uppercase;
-      color:#9ca3af; font-weight:500; line-height:1;
+      color:#9ca3af; font-weight:600; line-height:1;
     }
 
     .sidebar-nav { flex:1; display:flex; flex-direction:column; padding:8px 8px; overflow-y:auto; scrollbar-width:none; }

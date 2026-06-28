@@ -7,59 +7,141 @@ import { fetchReports, ReportRow } from '@/hooks/useReports';
 import { useSectionContext } from '@/hooks/useSection';
 
 // ── 아이템 리스트 (write form용) ─────────────────────────
-interface Item { text: string; id: number; }
+interface Item { text: string; id: number; indent?: boolean; }
 
-function ItemList({ label, dot, items, onAdd, onChange, onRemove }: {
+function ItemList({ label, items, onAdd, onChange, onRemove, onIndent }: {
   label: string; dot?: string;
   items: Item[];
-  onAdd: () => void;
+  onAdd: (afterId?: number, indent?: boolean) => void;
   onChange: (id: number, val: string) => void;
   onRemove: (id: number) => void;
+  onIndent: (id: number, indent: boolean) => void;
 }) {
+  const lastInputRef = useRef<HTMLInputElement>(null);
+  const prevLen = useRef(items.length);
+
+  useEffect(() => {
+    if (items.length > prevLen.current) lastInputRef.current?.focus();
+    prevLen.current = items.length;
+  }, [items.length]);
+
   return (
     <div className="section-group">
       <div className="section-label"><div className="dot"></div>{label}</div>
       <div className="section-items">
-        {items.map(it => (
-          <div key={it.id} className="item-row">
+        {items.map((it, idx) => (
+          <div key={it.id} className={`item-row${it.indent ? ' item-row-sub' : ''}`}>
+            {it.indent && <span className="item-sub-arrow">↳</span>}
             <input
               type="text"
               className="item-input"
               value={it.text}
               onChange={e => onChange(it.id, e.target.value)}
-              placeholder="내용을 입력하세요"
+              placeholder={it.indent ? '첨언을 입력하세요' : '내용을 입력하세요'}
+              ref={idx === items.length - 1 ? lastInputRef : null}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  onAdd(it.id, it.indent);
+                }
+                if (e.key === 'Tab') {
+                  e.preventDefault();
+                  if (e.shiftKey) onIndent(it.id, false);
+                  else if (idx > 0) onIndent(it.id, true);
+                }
+                if (e.key === 'Backspace' && it.text === '' && items.length > 1) {
+                  e.preventDefault(); onRemove(it.id);
+                }
+              }}
             />
             <button className="item-del" onClick={() => onRemove(it.id)}>✕</button>
           </div>
         ))}
       </div>
-      <button className="btn-add-item" onClick={onAdd}>+ 항목 추가</button>
+      <button className="btn-add-item" onClick={() => onAdd(undefined, false)}>+ 항목 추가</button>
     </div>
   );
 }
 
 let nextId = 1;
-function newItem(text = ''): Item { return { text, id: nextId++ }; }
+function newItem(text = '', indent = false): Item { return { text, id: nextId++, indent }; }
 
 // ── 작성 탭 ─────────────────────────────────────────────
+const DRAFT_KEY = 'report_draft';
+
+interface Draft {
+  name: string; date: string;
+  done: Item[]; meeting: Item[]; progress: Item[]; issue: Item[]; tomorrow: Item[];
+  savedAt: string;
+}
+
+function saveDraft(d: Draft) { lsSet(DRAFT_KEY, JSON.stringify(d)); }
+function loadDraft(): Draft | null {
+  try { const s = lsGet(DRAFT_KEY); return s ? JSON.parse(s) : null; } catch { return null; }
+}
+function clearDraft() { lsSet(DRAFT_KEY, ''); }
+
 function WriteTab() {
-  const [name, setName]       = useState('');
-  const [date, setDate]       = useState(todayString());
-  const [done, setDone]       = useState<Item[]>([]);
-  const [meeting, setMeeting] = useState<Item[]>([]);
+  const [name, setName]         = useState('');
+  const [date, setDate]         = useState(todayString());
+  const [done, setDone]         = useState<Item[]>([]);
+  const [meeting, setMeeting]   = useState<Item[]>([]);
   const [progress, setProgress] = useState<Item[]>([]);
-  const [issue, setIssue]     = useState<Item[]>([]);
+  const [issue, setIssue]       = useState<Item[]>([]);
   const [tomorrow, setTomorrow] = useState<Item[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [msg, setMsg]         = useState('');
+  const [msg, setMsg]           = useState('');
+  const [draftBanner, setDraftBanner] = useState<string | null>(null);
 
-  const add    = (set: React.Dispatch<React.SetStateAction<Item[]>>) => () => set(p => [...p, newItem()]);
+  // 초안 복원 감지
+  useEffect(() => {
+    const draft = loadDraft();
+    if (draft && (draft.done.length || draft.meeting.length || draft.progress.length || draft.issue.length || draft.tomorrow.length)) {
+      setDraftBanner(draft.savedAt);
+    }
+  }, []);
+
+  // 변경 시마다 자동저장 (500ms 디바운스)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const hasContent = [done, meeting, progress, issue, tomorrow].some(list => list.some(x => x.text.trim()));
+      if (!hasContent) return;
+      saveDraft({ name, date, done, meeting, progress, issue, tomorrow, savedAt: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) });
+    }, 500);
+    return () => clearTimeout(t);
+  }, [name, date, done, meeting, progress, issue, tomorrow]);
+
+  function restoreDraft() {
+    const draft = loadDraft();
+    if (!draft) return;
+    setName(draft.name); setDate(draft.date);
+    setDone(draft.done); setMeeting(draft.meeting);
+    setProgress(draft.progress); setIssue(draft.issue); setTomorrow(draft.tomorrow);
+    setDraftBanner(null);
+  }
+
+  const add = (set: React.Dispatch<React.SetStateAction<Item[]>>) => (afterId?: number, indent?: boolean) =>
+    set(p => {
+      const it = newItem('', indent || false);
+      if (afterId === undefined) return [...p, it];
+      const i = p.findIndex(x => x.id === afterId);
+      return i === -1 ? [...p, it] : [...p.slice(0, i + 1), it, ...p.slice(i + 1)];
+    });
   const change = (set: React.Dispatch<React.SetStateAction<Item[]>>) => (id: number, val: string) =>
     set(p => p.map(x => x.id === id ? { ...x, text: val } : x));
   const remove = (set: React.Dispatch<React.SetStateAction<Item[]>>) => (id: number) =>
     set(p => p.filter(x => x.id !== id));
+  const indent = (set: React.Dispatch<React.SetStateAction<Item[]>>) => (id: number, v: boolean) =>
+    set(p => p.map(x => x.id === id ? { ...x, indent: v } : x));
 
-  const texts = (items: Item[]) => items.map(x => x.text.trim()).filter(Boolean);
+  const texts = (items: Item[]) => items
+    .filter(x => x.text.trim())
+    .map(x => x.indent ? `  ↳ ${x.text.trim()}` : x.text.trim());
+
+  function reset() {
+    setDone([]); setMeeting([]); setProgress([]); setIssue([]); setTomorrow([]); setMsg('');
+    clearDraft(); setDraftBanner(null);
+  }
 
   async function submit() {
     if (!name) { setMsg('이름을 선택해주세요'); return; }
@@ -79,6 +161,7 @@ function WriteTab() {
       });
       if (error) throw error;
       setMsg('✅ 업무보고가 제출되었습니다');
+      clearDraft();
       setDone([]); setMeeting([]); setProgress([]); setIssue([]); setTomorrow([]);
     } catch (e: unknown) {
       setMsg('❌ 제출 실패: ' + (e as Error).message);
@@ -90,6 +173,18 @@ function WriteTab() {
   return (
     <div className="form-card">
       <div className="form-title">일일 업무보고 작성</div>
+
+      {/* 임시저장 복원 배너 */}
+      {draftBanner && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fefce8', border: '1px solid #fde68a', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: '0.83rem' }}>
+          <span>💾 <strong>{draftBanner}</strong>에 저장된 임시보고가 있습니다</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={restoreDraft} style={{ padding: '4px 12px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem' }}>복원</button>
+            <button onClick={() => { clearDraft(); setDraftBanner(null); }} style={{ padding: '4px 10px', background: 'none', border: '1px solid #fbbf24', borderRadius: 6, color: '#92400e', cursor: 'pointer', fontSize: '0.8rem' }}>무시</button>
+          </div>
+        </div>
+      )}
+
       <div className="form-row">
         <div className="form-group">
           <label>이름</label>
@@ -104,15 +199,22 @@ function WriteTab() {
         </div>
       </div>
       <hr className="divider" />
-      <ItemList label="주요 완료"           items={done}     onAdd={add(setDone)}     onChange={change(setDone)}     onRemove={remove(setDone)} />
-      <ItemList label="주요 회의 및 의사결정" items={meeting}  onAdd={add(setMeeting)}  onChange={change(setMeeting)}  onRemove={remove(setMeeting)} />
-      <ItemList label="진행사항"            items={progress} onAdd={add(setProgress)} onChange={change(setProgress)} onRemove={remove(setProgress)} />
-      <ItemList label="이슈 및 리스크"       items={issue}    onAdd={add(setIssue)}    onChange={change(setIssue)}    onRemove={remove(setIssue)} />
-      <ItemList label="익일 계획"           items={tomorrow} onAdd={add(setTomorrow)} onChange={change(setTomorrow)} onRemove={remove(setTomorrow)} />
+      <div className="shortcut-guide">
+        <span className="shortcut-guide-title">⌨️ 입력 단축키</span>
+        <span><kbd>Enter</kbd> 다음 항목 추가</span>
+        <span><kbd>Tab</kbd> 첨언(↳)으로 전환</span>
+        <span><kbd>Shift+Tab</kbd> 첨언 해제</span>
+        <span><kbd>Backspace</kbd> 빈 항목 삭제</span>
+      </div>
+      <ItemList label="주요 완료"           items={done}     onAdd={add(setDone)}     onChange={change(setDone)}     onRemove={remove(setDone)}     onIndent={indent(setDone)} />
+      <ItemList label="주요 회의 및 의사결정" items={meeting}  onAdd={add(setMeeting)}  onChange={change(setMeeting)}  onRemove={remove(setMeeting)}  onIndent={indent(setMeeting)} />
+      <ItemList label="진행사항"            items={progress} onAdd={add(setProgress)} onChange={change(setProgress)} onRemove={remove(setProgress)} onIndent={indent(setProgress)} />
+      <ItemList label="이슈 및 리스크"       items={issue}    onAdd={add(setIssue)}    onChange={change(setIssue)}    onRemove={remove(setIssue)}    onIndent={indent(setIssue)} />
+      <ItemList label="익일 계획"           items={tomorrow} onAdd={add(setTomorrow)} onChange={change(setTomorrow)} onRemove={remove(setTomorrow)} onIndent={indent(setTomorrow)} />
       <hr className="divider" />
       {msg && <div style={{ color: msg.startsWith('✅') ? '#16a34a' : '#ef4444', fontSize: '0.85rem', marginBottom: 10 }}>{msg}</div>}
       <div className="form-actions">
-        <button className="btn-reset" onClick={() => { setDone([]); setMeeting([]); setProgress([]); setIssue([]); setTomorrow([]); setMsg(''); }}>초기화</button>
+        <button className="btn-reset" onClick={reset}>초기화</button>
         <button className="btn-submit" onClick={submit} disabled={submitting}>{submitting ? '제출 중...' : '보고 제출'}</button>
       </div>
     </div>
@@ -131,7 +233,12 @@ function renderReportHtml(r: ReportRow, comments: {author: string; text: string;
   const sectionsHtml = sections.map(s => {
     const items = parseItems(r[s.key] as string || '');
     if (!items.length) return '';
-    return `<div><div class="report-section-title">${s.label}</div><ul class="report-items">${items.map(i => `<li>${i}</li>`).join('')}</ul></div>`;
+    const raw = (r[s.key] as string || '').split('\n').filter(Boolean);
+    const lis = raw.map(line => line.startsWith('  ↳ ')
+      ? `<li class="report-subitem">${line.slice(4)}</li>`
+      : `<li>${line}</li>`
+    ).join('');
+    return `<div><div class="report-section-title">${s.label}</div><ul class="report-items">${lis}</ul></div>`;
   }).join('');
 
   const ckey = `${r['날짜']}_${r['이름']}`;
