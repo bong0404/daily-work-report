@@ -193,6 +193,17 @@ function TimelinePlanTab() {
     save(newData);
   }
 
+  function renameCategory(catIdx: number) {
+    const cat = data.categories[catIdx];
+    const newName = prompt('카테고리명을 수정하세요', cat);
+    if (!newName?.trim() || newName.trim() === cat) return;
+    const newData = JSON.parse(JSON.stringify(data)) as MonthPlanData;
+    newData.categories[catIdx] = newName.trim();
+    if (newData.grid[cat]) { newData.grid[newName.trim()] = newData.grid[cat]; delete newData.grid[cat]; }
+    if (newData.memo[cat]) { newData.memo[newName.trim()] = newData.memo[cat]; delete newData.memo[cat]; }
+    save(newData);
+  }
+
   function saveMemos(kw = keyWork, iss = issue) {
     const newData = { ...data, keyWork: kw, issue: iss };
     setData(newData);
@@ -287,6 +298,7 @@ function TimelinePlanTab() {
                           <td className="wpt-cat-cell">
                             <span className="wpt-cat-name">{cat}</span>
                             <div className="wpt-cat-actions">
+                              <button className="wpt-cat-rename-btn" onClick={() => renameCategory(catIdx)} title="카테고리 수정">✏️</button>
                               <button className="wpt-cat-del" onClick={() => deleteCategory(catIdx)} title="카테고리 삭제">✕</button>
                             </div>
                           </td>
